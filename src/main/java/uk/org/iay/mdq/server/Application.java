@@ -49,6 +49,8 @@ public class Application {
          * This means you can't use URL-encoded "/" characters (%2f) within
          * identifiers.
          * 
+         * See, for example, https://jira.springsource.org/browse/SPR-11101
+         * 
          * To fix this, poke the bean responsible until it does what we want.
          * Fortunately, the implementation looks at the appropriate properties
          * on every request so we can do this even after the application has started.
