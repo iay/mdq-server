@@ -27,6 +27,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.HandlerMapping;
 
@@ -38,7 +39,7 @@ import org.springframework.web.servlet.HandlerMapping;
  * alternative implementation which does not make that assumption.
  */
 @Controller
-@RequestMapping("/entities")
+@RequestMapping(value = "/entities", method = RequestMethod.GET)
 public class EntitiesController {
 
     /**

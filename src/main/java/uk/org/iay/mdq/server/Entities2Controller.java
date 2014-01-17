@@ -26,6 +26,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.HandlerMapping;
 
@@ -37,7 +38,7 @@ import org.springframework.web.servlet.HandlerMapping;
  * has by default with URL-encoded "/" characters in identifiers.
  */
 @Controller
-@RequestMapping("/entities2")
+@RequestMapping(value = "/entities2", method = RequestMethod.GET)
 public class Entities2Controller {
 
     /**
