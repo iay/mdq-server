@@ -18,13 +18,14 @@ package uk.org.iay.mdq.server;
 
 import java.util.Arrays;
 
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
-import org.springframework.web.servlet.handler.AbstractHandlerMapping;
 
 /**
  * Application bootstrap class.
@@ -36,6 +37,17 @@ import org.springframework.web.servlet.handler.AbstractHandlerMapping;
 @ImportResource("classpath:beans.xml")
 public class Application {
 // Checkstyle: FinalClass|HideUtilityClassConstructor ON
+    
+    /**
+     * Establishes a bean post-processor to adjust the parsing of URLs so that
+     * things like <code>/entities/x%2fy</code> work as desired.
+     * 
+     * @return a bean post-processor bean
+     */
+    @Bean
+    public BeanPostProcessor mvcConfigurationPostProcessor() {
+        return new MVCConfigurationPostProcessor();
+    }
     
     /**
      * Main entry point; invokes the web server using Spring Boot.
@@ -53,24 +65,11 @@ public class Application {
          */
         app.setShowBanner(false);
         
+        /*
+         * Start the application.
+         */
         final ApplicationContext ctx = app.run(args);
 
-        /*
-         * Spring's default behavior is to decode the URL passed to it by the
-         * container, and then parse the path into components on "/" characters.
-         * This means you can't use URL-encoded "/" characters (%2f) within
-         * identifiers.
-         * 
-         * See, for example, https://jira.springsource.org/browse/SPR-11101
-         * 
-         * To fix this, poke the bean responsible until it does what we want.
-         * Fortunately, the implementation looks at the appropriate properties
-         * on every request so we can do this even after the application has started.
-         */
-        final AbstractHandlerMapping ahm = ctx.getBean("requestMappingHandlerMapping",
-                AbstractHandlerMapping.class);
-        ahm.setUrlDecode(false);
-        
         System.out.println("Let's inspect the beans provided by Spring Boot:");
 
         String[] beanNames = ctx.getBeanDefinitionNames();
