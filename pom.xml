@@ -23,7 +23,7 @@
 
     <properties>
         <checkstyle.configLocation>checkstyle.xml</checkstyle.configLocation>
-        <spring.boot.version>1.0.0.RC2</spring.boot.version>
+        <spring.boot.version>1.0.0.RC3</spring.boot.version>
         <start-class>uk.org.iay.mdq.server.Application</start-class>
     </properties>
 
