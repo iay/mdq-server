@@ -58,7 +58,6 @@ public class Application {
         final AbstractHandlerMapping ahm = ctx.getBean("requestMappingHandlerMapping",
                 AbstractHandlerMapping.class);
         ahm.setUrlDecode(false);
-        ahm.setAlwaysUseFullPath(true);
         
         System.out.println("Let's inspect the beans provided by Spring Boot:");
 
