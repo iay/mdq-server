@@ -13,7 +13,7 @@
     <artifactId>mdq-server</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
-    <name>Metadata Query Protocol server implementation using Shibboleth MDA</name>
+    <name>Metadata Query Server</name>
     <description>
         An implementation of the Metadata Query Protocol, implemented using
         Spring Boot and the Shibboleth metadata aggregator framework.
