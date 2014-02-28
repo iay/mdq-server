@@ -52,6 +52,11 @@ public class Application {
          */
         final SpringApplication app = new SpringApplication(Application.class, beans);
         
+        /*
+         * Customize the application.
+         */
+        app.setShowBanner(false);
+        
         final ApplicationContext ctx = app.run(args);
 
         /*
