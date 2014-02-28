@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Common bean definitions.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    default-lazy-init="true"
+    xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+    <!--
+        ***********************************
+        ***                             ***
+        ***   P A R E N T   B E A N S   ***
+        ***                             ***
+        ***********************************
+    -->
+    
+    <!--
+        Java class parent shorthand beans.
+    -->
+    <bean id="String" abstract="true" class="java.lang.String"/>
+    <bean id="QName" abstract="true" class="javax.xml.namespace.QName"/>
+    
+    <!--
+        Namespace URI beans.
+        
+        One String bean for each of the common namespaces, named by its prefix.
+    -->
+    <bean id="alg_namespace"        parent="String" c:_0="urn:oasis:names:tc:SAML:metadata:algsupport"/>
+    <bean id="ds_namespace"         parent="String" c:_0="http://www.w3.org/2000/09/xmldsig#"/>
+    <bean id="dsig11_namespace"     parent="String" c:_0="http://www.w3.org/2009/xmldsig11#"/>
+    <bean id="hoksso_namespace"     parent="String" c:_0="urn:oasis:names:tc:SAML:2.0:profiles:holder-of-key:SSO:browser"/>
+    <bean id="icmd_namespace"       parent="String" c:_0="http://id.incommon.org/metadata"/>
+    <bean id="idpdisc_namespace"    parent="String" c:_0="urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol"/>
+    <bean id="init_namespace"       parent="String" c:_0="urn:oasis:names:tc:SAML:profiles:SSO:request-init"/>
+    <bean id="md_namespace"         parent="String" c:_0="urn:oasis:names:tc:SAML:2.0:metadata"/>
+    <bean id="mdattr_namespace"     parent="String" c:_0="urn:oasis:names:tc:SAML:metadata:attribute"/>
+    <bean id="mdrpi_namespace"      parent="String" c:_0="urn:oasis:names:tc:SAML:metadata:rpi"/>
+    <bean id="mdui_namespace"       parent="String" c:_0="urn:oasis:names:tc:SAML:metadata:ui"/>
+    <bean id="saml_namespace"       parent="String" c:_0="urn:oasis:names:tc:SAML:2.0:assertion"/>
+    <bean id="samlp_namespace"      parent="String" c:_0="urn:oasis:names:tc:SAML:2.0:protocol"/>
+    <bean id="shibmd_namespace"     parent="String" c:_0="urn:mace:shibboleth:metadata:1.0"/>
+    <bean id="ukfedlabel_namespace" parent="String" c:_0="http://ukfederation.org.uk/2006/11/label"/>
+    <bean id="wayf_namespace"       parent="String" c:_0="http://sdss.ac.uk/2006/06/WAYF"/>
+    <bean id="xenc_namespace"       parent="String" c:_0="http://www.w3.org/2001/04/xmlenc#"/>
+    <bean id="xenc11_namespace"     parent="String" c:_0="http://www.w3.org/2009/xmlenc11#"/>
+    <bean id="xs_namespace"         parent="String" c:_0="http://www.w3.org/2001/XMLSchema"/>
+    <bean id="xsi_namespace"        parent="String" c:_0="http://www.w3.org/2001/XMLSchema-instance"/>
+    <bean id="xsl_namespace"        parent="String" c:_0="http://www.w3.org/1999/XSL/Transform"/>
+
+</beans>

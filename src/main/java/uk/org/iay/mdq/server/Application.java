@@ -23,6 +23,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.servlet.handler.AbstractHandlerMapping;
 
 /**
@@ -41,7 +42,17 @@ public class Application {
      * @param args Command line arguments.
      */
     public static void main(String[] args) {
-        ApplicationContext ctx = SpringApplication.run(Application.class, args);
+        /*
+         * Resources for additional bean definitions.
+         */
+        final ClassPathResource beans = new ClassPathResource("beans.xml");
+        
+        /*
+         * Construct the application.
+         */
+        final SpringApplication app = new SpringApplication(Application.class, beans);
+        
+        final ApplicationContext ctx = app.run(args);
 
         /*
          * Spring's default behaviour is to decode the URL passed to it by the
