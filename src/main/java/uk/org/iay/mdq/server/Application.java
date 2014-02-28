@@ -23,7 +23,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.context.annotation.ImportResource;
 import org.springframework.web.servlet.handler.AbstractHandlerMapping;
 
 /**
@@ -33,6 +33,7 @@ import org.springframework.web.servlet.handler.AbstractHandlerMapping;
 @Configuration
 @EnableAutoConfiguration
 @ComponentScan
+@ImportResource("classpath:beans.xml")
 public class Application {
 // Checkstyle: FinalClass|HideUtilityClassConstructor ON
     
@@ -43,14 +44,9 @@ public class Application {
      */
     public static void main(String[] args) {
         /*
-         * Resources for additional bean definitions.
-         */
-        final ClassPathResource beans = new ClassPathResource("beans.xml");
-        
-        /*
          * Construct the application.
          */
-        final SpringApplication app = new SpringApplication(Application.class, beans);
+        final SpringApplication app = new SpringApplication(Application.class);
         
         /*
          * Customize the application.
@@ -60,7 +56,7 @@ public class Application {
         final ApplicationContext ctx = app.run(args);
 
         /*
-         * Spring's default behaviour is to decode the URL passed to it by the
+         * Spring's default behavior is to decode the URL passed to it by the
          * container, and then parse the path into components on "/" characters.
          * This means you can't use URL-encoded "/" characters (%2f) within
          * identifiers.
