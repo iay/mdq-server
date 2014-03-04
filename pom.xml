@@ -12,6 +12,7 @@
     <groupId>uk.org.iay.mdq</groupId>
     <artifactId>mdq-server</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
 
     <name>Metadata Query Server</name>
     <description>
@@ -128,10 +129,21 @@
                 <artifactId>maven-compiler-plugin</artifactId>
             </plugin>
 
+            <!--
+                Ask Spring Boot to enhance the resulting .jar so that it is
+                directly executable.
+            -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring.boot.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
         </plugins>
