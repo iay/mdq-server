@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- Use the standard Spring Boot logging setup as a base -->
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+
+    <!-- More in-depth debugging of our classes. -->
+    <logger name="uk.org.iay.mdq.server" level="DEBUG"/>
+
+</configuration>

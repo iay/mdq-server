@@ -20,6 +20,8 @@ import java.nio.charset.Charset;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -42,6 +44,9 @@ import org.springframework.web.servlet.HandlerMapping;
 @RequestMapping(value = "/entities", method = RequestMethod.GET)
 public class EntitiesController {
 
+    /** Class logger. */
+    private final Logger log = LoggerFactory.getLogger(EntitiesController.class);
+
     /**
      * Returns the aggregate from the "entities" endpoint if no identifier is supplied.
      * 
@@ -50,7 +55,7 @@ public class EntitiesController {
     @RequestMapping("")
     @ResponseBody
     String entitiesAggregate() {
-        System.out.println("entities() called");
+        log.debug("entities() called");
         return "this was /entities.";
     }
 
@@ -66,7 +71,7 @@ public class EntitiesController {
     @ResponseBody
     HttpEntity<String> entitiesQuery(@PathVariable final String id,
             final HttpServletRequest req) {
-        System.out.println("entities/id() called, id=" + id);
+        log.debug("entities/id() called, id=" + id);
 
         // Don't repeat the pattern.
         final String pattern = (String) req.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
