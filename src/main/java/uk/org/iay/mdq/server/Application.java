@@ -16,8 +16,6 @@
 
 package uk.org.iay.mdq.server;
 
-import java.util.Arrays;
-
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -69,14 +67,6 @@ public class Application {
          * Start the application.
          */
         final ApplicationContext ctx = app.run(args);
-
-        System.out.println("Let's inspect the beans provided by Spring Boot:");
-
-        String[] beanNames = ctx.getBeanDefinitionNames();
-        Arrays.sort(beanNames);
-        for (String beanName : beanNames) {
-            System.out.println(beanName);
-        }
     }
 
 }
