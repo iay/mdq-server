@@ -166,16 +166,6 @@
         </repository>
     </repositories>
 
-    <pluginRepositories>
-        <pluginRepository>
-            <id>spring-snapshots</id>
-            <url>http://repo.spring.io/libs-snapshot</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
-
     <scm>
         <connection>scm:git:https://github.com/iay/mdq-server.git</connection>
         <developerConnection>scm:git:ssh:git@github.com:iay/mdq-server.git</developerConnection>
