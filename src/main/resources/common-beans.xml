@@ -1,0 +1,1059 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Common bean definitions.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    default-lazy-init="true"
+    xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+    <!--
+        ***********************************
+        ***                             ***
+        ***   P A R E N T   B E A N S   ***
+        ***                             ***
+        ***********************************
+    -->
+    
+    <!--
+        Java class parent shorthand beans.
+    -->
+    <bean id="String" abstract="true" class="java.lang.String"/>
+    <bean id="QName" abstract="true" class="javax.xml.namespace.QName"/>
+    
+    <!--
+        Spring resource class parent shorthand beans.
+    -->
+    <bean id="ClassPathResource" abstract="true"
+        class="org.springframework.core.io.ClassPathResource"/>
+    <bean id="FileSystemResource" abstract="true"
+        class="org.springframework.core.io.FileSystemResource"/>
+    
+    <!--
+        Shibboleth-defined Resource class parent bean.
+    -->
+    <bean id="HTTPResource" abstract="true"
+        class="net.shibboleth.ext.spring.resource.HTTPResource"/>
+
+    <!--
+        component_parent
+        
+        Parent for anything based on the Shibboleth component system.
+        These all require initialization before use.
+    -->
+    <bean id="component_parent" abstract="true" init-method="initialize"/>
+    
+    <!--
+        SimplePipeline
+        
+        Parent for pipelines.
+    -->
+    <bean id="SimplePipeline" abstract="true" parent="component_parent"
+        class="net.shibboleth.metadata.pipeline.SimplePipeline"/>
+    
+    <!--
+        stage_parent
+        
+        Parent for all stages.
+    -->
+    <bean id="stage_parent" abstract="true" parent="component_parent"/>
+    
+    <!--
+        CompositeStage
+        
+        Parent for composite stages.
+    -->
+    <bean id="CompositeStage" abstract="true" parent="stage_parent"
+        class="net.shibboleth.metadata.pipeline.CompositeStage"/>
+
+    <!--
+        XMLSignatureValidationStage
+        
+        Parent for XML Signature validation stages.
+        
+        Applies global algorithm blacklists. For values, see:
+            http://www.w3.org/TR/xmlsec-algorithms/
+            
+        Establishes a default of *not* permitting empty references
+        in signatures, per the SAML specification. This will be
+        overridden in specific beans where a signature is known to
+        require it.
+    -->
+    <bean id="XMLSignatureValidationStage" abstract="true" parent="stage_parent"
+        class="net.shibboleth.metadata.dom.XMLSignatureValidationStage">
+        <property name="blacklistedDigests">
+            <list>
+                <value>http://www.w3.org/2001/04/xmldsig-more#md5</value>
+            </list>
+        </property>
+        <property name="blacklistedSignatureMethods">
+            <list>
+                <value>http://www.w3.org/2001/04/xmldsig-more#rsa-md5</value>
+            </list>
+        </property>
+        <property name="permittingEmptyReferences" value="false"/>
+    </bean>
+    
+    <!--
+        XMLSignatureValidationStageSHA256
+        
+        Parent for XML signature validation stages where we know
+        the signature will not be made with MD5 or SHA-1.
+    -->
+    <bean id="XMLSignatureValidationStageSHA256" abstract="true"
+        parent="XMLSignatureValidationStage">
+        <property name="blacklistedDigests">
+            <list>
+                <value>http://www.w3.org/2000/09/xmldsig#sha1</value>
+                <value>http://www.w3.org/2001/04/xmldsig-more#md5</value>
+            </list>
+        </property>
+        <property name="blacklistedSignatureMethods">
+            <list>
+                <value>http://www.w3.org/2000/09/xmldsig#rsa-sha1</value>
+                <value>http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha1</value>
+                <value>http://www.w3.org/2001/04/xmldsig-more#rsa-md5</value>
+            </list>
+        </property>
+    </bean>
+
+    <!--
+        XSLTransformationStage
+        
+        Parent for XSLT-based checking stages.
+    -->
+    <bean id="XSLTransformationStage" abstract="true" parent="stage_parent"
+        class="net.shibboleth.metadata.dom.XSLTransformationStage"/>
+    
+    <!--
+        XSLValidationStage
+        
+        Parent for XSLT-based checking stages.
+    -->
+    <bean id="XSLValidationStage" abstract="true" parent="stage_parent"
+        class="net.shibboleth.metadata.dom.XSLValidationStage"/>
+    
+    <!--
+        EmptyContainerStrippingStage
+        
+        Parent for container stripping stages.
+    -->
+    <bean id="EmptyContainerStrippingStage" abstract="true" parent="stage_parent"
+        class="net.shibboleth.metadata.dom.EmptyContainerStrippingStage"/>
+    
+    <!--
+        ElementStrippingStage
+        
+        Parent for element stripping stages.
+    -->
+    <bean id="ElementStrippingStage" abstract="true" parent="stage_parent"
+        class="net.shibboleth.metadata.dom.ElementStrippingStage"/>
+    
+    <!--
+        NamespaceStrippingStage
+        
+        Parent for namespace stripping stages.
+    -->
+    <bean id="NamespaceStrippingStage" abstract="true" parent="stage_parent"
+        class="net.shibboleth.metadata.dom.NamespaceStrippingStage"/>
+
+    <!--
+        DomFilesystemSourceStage
+        
+        Parent for DOM filesystem source stages.
+    -->
+    <bean id="DOMFilesystemSourceStage" abstract="true" parent="stage_parent"
+        class="net.shibboleth.metadata.dom.DOMFilesystemSourceStage">
+        <property name="parserPool" ref="parserPool"/>
+    </bean>
+
+    <!--
+        DOMResourceSourceStage
+        
+        Parent for DOM resource source stages.
+    -->
+    <bean id="DOMResourceSourceStage" abstract="true" parent="stage_parent"
+        class="net.shibboleth.metadata.dom.DOMResourceSourceStage">
+        <property name="parserPool" ref="parserPool"/>
+    </bean>
+
+    <!--
+        SerializationStage
+        
+        Parent for serialization stages.
+    -->
+    <bean id="SerializationStage" abstract="true" parent="stage_parent"
+        class="net.shibboleth.metadata.pipeline.SerializationStage">
+        <property name="serializer" ref="serializer"/>
+    </bean>
+    
+    <!--
+        PipelineDemultiplexerStage
+        
+        Parent for demultiplexer stages.  Defaults to waiting for pipelines
+        to complete.
+    -->
+    <bean id="PipelineDemultiplexerStage" abstract="true" parent="stage_parent"
+        class="net.shibboleth.metadata.pipeline.PipelineDemultiplexerStage"
+        p:waitingForPipelines="true"
+    />
+    
+    <!--
+        EntityRegistrationAuthorityFilterStage
+        
+        Parent for registration authority filtering stages.
+    -->
+    <bean id="EntityRegistrationAuthorityFilterStage" abstract="true" parent="stage_parent"
+        class="net.shibboleth.metadata.dom.saml.EntityRegistrationAuthorityFilterStage"/>
+    
+    <!-- *** Parent beans for Shibboleth MDA components. *** -->
+
+    <bean id="EntityFilterStage" abstract="true" parent="stage_parent"
+        class="net.shibboleth.metadata.dom.saml.EntityFilterStage"/>
+
+    <bean id="PipelineMergeStage" abstract="true" parent="stage_parent"
+        class="net.shibboleth.metadata.pipeline.PipelineMergeStage"/>
+
+    <bean id="PipelineMergeStage.deduplicate" abstract="true" parent="PipelineMergeStage"
+        p:collectionMergeStrategy-ref="deduplicateMergeStrategy"/>
+    
+    <!-- *** Parent beans for ukf-mda. *** -->
+    
+    <bean id="ElementWhitespaceTrimmingStage" abstract="true" parent="stage_parent"
+        class="uk.org.ukfederation.mda.dom.ElementWhitespaceTrimmingStage"/>
+    
+    <bean id="X509ValidationStage" abstract="true" parent="stage_parent"
+        class="uk.org.ukfederation.mda.validate.X509ValidationStage"/>
+    
+    <bean id="validator_parent" abstract="true" parent="component_parent"/>
+
+    <bean id="X509ConsistentNameValidator" abstract="true" parent="validator_parent"
+        class="uk.org.ukfederation.mda.validate.X509ConsistentNameValidator"/>
+    
+    <bean id="X509RSAExponentValidator" abstract="true" parent="validator_parent"
+        class="uk.org.ukfederation.mda.validate.X509RSAExponentValidator"/>
+    
+    <bean id="X509RSAKeyLengthValidator" abstract="true" parent="validator_parent"
+        class="uk.org.ukfederation.mda.validate.X509RSAKeyLengthValidator"/>
+    
+    <bean id="X509RSAOpenSSLBlacklistValidator" abstract="true" parent="validator_parent"
+        class="uk.org.ukfederation.mda.validate.X509RSAOpenSSLBlacklistValidator"/>
+    
+    <!-- *** Default Shibboleth component bean id property from Spring bean id *** -->
+    <bean class="net.shibboleth.ext.spring.config.IdentifiableBeanPostProcessor" lazy-init="false"/>
+    
+    <!--
+        ***********************************************
+        ***                                         ***
+        ***   N A M E S P A C E   H A N D L I N G   ***
+        ***                                         ***
+        ***********************************************
+    -->
+    
+    <!--
+        Namespace URI beans.
+        
+        One String bean for each of the common namespaces, named by its prefix.
+    -->
+    <bean id="alg_namespace"        parent="String" c:_0="urn:oasis:names:tc:SAML:metadata:algsupport"/>
+    <bean id="ds_namespace"         parent="String" c:_0="http://www.w3.org/2000/09/xmldsig#"/>
+    <bean id="dsig11_namespace"     parent="String" c:_0="http://www.w3.org/2009/xmldsig11#"/>
+    <bean id="hoksso_namespace"     parent="String" c:_0="urn:oasis:names:tc:SAML:2.0:profiles:holder-of-key:SSO:browser"/>
+    <bean id="icmd_namespace"       parent="String" c:_0="http://id.incommon.org/metadata"/>
+    <bean id="idpdisc_namespace"    parent="String" c:_0="urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol"/>
+    <bean id="init_namespace"       parent="String" c:_0="urn:oasis:names:tc:SAML:profiles:SSO:request-init"/>
+    <bean id="md_namespace"         parent="String" c:_0="urn:oasis:names:tc:SAML:2.0:metadata"/>
+    <bean id="mdattr_namespace"     parent="String" c:_0="urn:oasis:names:tc:SAML:metadata:attribute"/>
+    <bean id="mdrpi_namespace"      parent="String" c:_0="urn:oasis:names:tc:SAML:metadata:rpi"/>
+    <bean id="mdui_namespace"       parent="String" c:_0="urn:oasis:names:tc:SAML:metadata:ui"/>
+    <bean id="saml_namespace"       parent="String" c:_0="urn:oasis:names:tc:SAML:2.0:assertion"/>
+    <bean id="samlp_namespace"      parent="String" c:_0="urn:oasis:names:tc:SAML:2.0:protocol"/>
+    <bean id="shibmd_namespace"     parent="String" c:_0="urn:mace:shibboleth:metadata:1.0"/>
+    <bean id="ukfedlabel_namespace" parent="String" c:_0="http://ukfederation.org.uk/2006/11/label"/>
+    <bean id="wayf_namespace"       parent="String" c:_0="http://sdss.ac.uk/2006/06/WAYF"/>
+    <bean id="xenc_namespace"       parent="String" c:_0="http://www.w3.org/2001/04/xmlenc#"/>
+    <bean id="xenc11_namespace"     parent="String" c:_0="http://www.w3.org/2009/xmlenc11#"/>
+    <bean id="xs_namespace"         parent="String" c:_0="http://www.w3.org/2001/XMLSchema"/>
+    <bean id="xsi_namespace"        parent="String" c:_0="http://www.w3.org/2001/XMLSchema-instance"/>
+    <bean id="xsl_namespace"        parent="String" c:_0="http://www.w3.org/1999/XSL/Transform"/>
+    
+    <!--
+        commonNamespaces
+        
+        A NamespaceContext that assigns the usual prefix for each of the commonly used XML namespaces.
+        This is used in the evaluation of XPath expressions.
+    -->
+    <bean id="commonNamespaces" class="net.shibboleth.utilities.java.support.xml.SimpleNamespaceContext">
+        <constructor-arg>
+            <util:map map-class="java.util.HashMap">
+                <entry key="alg"        value-ref="alg_namespace"/>
+                <entry key="ds"         value-ref="ds_namespace"/>
+                <entry key="dsig11"     value-ref="dsig11_namespace"/>
+                <entry key="hoksso"     value-ref="hoksso_namespace"/>
+                <entry key="icmd"       value-ref="icmd_namespace"/>
+                <entry key="idpdisc"    value-ref="idpdisc_namespace"/>
+                <entry key="init"       value-ref="init_namespace"/>
+                <entry key="md"         value-ref="md_namespace"/>
+                <entry key="mdattr"     value-ref="mdattr_namespace"/>
+                <entry key="mdrpi"      value-ref="mdrpi_namespace"/>
+                <entry key="mdui"       value-ref="mdui_namespace"/>
+                <entry key="saml"       value-ref="saml_namespace"/>
+                <entry key="samlp"      value-ref="samlp_namespace"/>
+                <entry key="shibmd"     value-ref="shibmd_namespace"/>
+                <entry key="ukfedlabel" value-ref="ukfedlabel_namespace"/>
+                <entry key="wayf"       value-ref="wayf_namespace"/>
+                <entry key="xenc"       value-ref="xenc_namespace"/>
+                <entry key="xenc11"     value-ref="xenc11_namespace"/>
+                <entry key="xs"         value-ref="xs_namespace"/>
+                <entry key="xsi"        value-ref="xsi_namespace"/>
+                <entry key="xsl"        value-ref="xsl_namespace"/>
+            </util:map>
+        </constructor-arg>
+    </bean>
+    
+    <!--
+        stripAlgNamespace
+        
+        Remove the algorithm support namespace.
+    -->
+    <bean id="stripAlgNamespace" parent="NamespaceStrippingStage"
+        p:id="stripAlgNamespace" p:namespace-ref="alg_namespace"/>
+    
+    <!--
+        stripIdpdiscNamespace
+        
+        Remove the IdP discovery namespace.
+    -->
+    <bean id="stripIdpdiscNamespace" parent="NamespaceStrippingStage"
+        p:id="stripIdpdiscNamespace" p:namespace-ref="idpdisc_namespace"/>
+
+    <!--
+        stripInitNamespace
+        
+        Remove the session initiation namespace.
+    -->
+    <bean id="stripInitNamespace" parent="NamespaceStrippingStage"
+        p:id="stripInitNamespace" p:namespace-ref="init_namespace"/>
+    
+    <!--
+        stripMdattrNamespace
+        
+        Remove the namespace used by the entity attributes extension.
+    -->
+    <bean id="stripMdattrNamespace" parent="NamespaceStrippingStage"
+        p:id="stripMdattrNamespace" p:namespace-ref="mdattr_namespace"/>
+    
+    <!--
+        stripMdrpiNamespace
+        
+        Remove the namespace used by the registration and publication metdata extension.
+    -->
+    <bean id="stripMdrpiNamespace" parent="NamespaceStrippingStage"
+        p:id="stripMdrpiNamespace" p:namespace-ref="mdrpi_namespace"/>
+    
+    <!--
+        stripUkfedlabelNamespace
+        
+        Remove the UK federation label namespace.
+    -->
+    <bean id="stripUkfedlabelNamespace" parent="NamespaceStrippingStage"
+        p:id="stripUkfedlabelNamespace" p:namespace-ref="ukfedlabel_namespace"/>
+    
+    <!--
+        stripWayfNamespace
+        
+        Remove the UK federation WAYF namespace.
+    -->
+    <bean id="stripWayfNamespace" parent="NamespaceStrippingStage"
+        p:id="stripWayfNamespace" p:namespace-ref="wayf_namespace"/>
+    
+    <!--
+        normaliseNamespaces
+        
+        A pipeline stage that can be used before serialisation to normalise the namespaces
+        used in an XML document.
+    -->
+    <bean id="normaliseNamespaces" parent="XSLTransformationStage"
+        p:id="normaliseNamespaces">
+        <property name="XSLResource">
+            <bean parent="ClassPathResource">
+                <constructor-arg value="ns_norm.xsl"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <!--
+        ***************************************************
+        ***                                             ***
+        ***   V A L I D A T I O N   F R A M E W O R K   ***
+        ***                                             ***
+        ***************************************************
+    -->
+    
+    <!--
+        Import beans that perform individual validation checks.
+    -->
+    <import resource="classpath:validation-beans.xml"/>
+    
+    <!--
+        Federation registrationAuthority URIs.
+    -->
+    <bean id="hr_eduhr_registrar" parent="String" c:_0="http://www.srce.hr"/>
+    
+    <!--
+        identificationStrategy
+        
+        Standard item identifier strategy.
+    -->
+    <bean id="identificationStrategy" class="uk.org.ukfederation.mda.UKItemIdentificationStrategy">
+        <property name="ignoredAuthorities">
+            <set>
+                <value>http://ukfederation.org.uk</value>
+            </set>
+        </property>
+        <property name="displayNames">
+            <map>
+                <!--
+                    eduGAIN participant registration authority display names as country codes.
+                
+                    The ordering here is as on the eduGAIN status page:
+                    
+                    http://www.edugain.org/technical/status.php
+                -->
+                <entry key="http://eduid.at"                  value="AT"/>
+                <entry key="http://federation.belnet.be/"     value="BE"/>
+                <entry key="http://cafe.rnp.br"               value="BR"/>
+                <entry key="http://www.canarie.ca"            value="CA"/>
+                <entry key="http://cofre.reuna.cl"            value="CL"/>
+                <entry key-ref="hr_eduhr_registrar"           value="HR"/>
+                <entry key="http://www.eduid.cz/"             value="CZ"/>
+                <entry key="https://www.wayf.dk"              value="DK"/>
+                <entry key="http://www.csc.fi/haka"           value="FI"/>
+                <entry key="https://federation.renater.fr/"   value="FR"/>
+                <entry key="https://www.aai.dfn.de"           value="DE"/>
+                <entry key="http://aai.grnet.gr/"             value="GR"/>
+                <entry key="http://eduid.hu"                  value="HU"/>
+                <entry key="http://www.heanet.ie"             value="IE"/>
+                <entry key="http://www.idem.garr.it/"         value="IT"/>
+                <entry key="http://laife.lanet.lv/"           value="LV"/>
+                <entry key="http://feide.no/"                 value="NO"/>
+                <entry key="http://aai.arnes.si"              value="SI"/>
+                <entry key="http://www.rediris.es/"           value="ES"/>
+                <entry key="http://www.swamid.se/"            value="SE"/>
+                <entry key="http://rr.aai.switch.ch/"         value="CH"/>
+                <entry key="http://www.surfconext.nl/"        value="NL"/>
+                <entry key="http://ukfederation.org.uk"       value="UK"/>
+                
+                <!-- Joining eduGAIN -->
+                <entry key="http://aai.pionier.net.pl"        value="PL"/>
+                
+                <!-- not yet eduGAIN members -->
+                <entry key="https://incommon.org"             value="US"/>
+            </map>
+        </property>
+    </bean>
+    
+    <!--
+        errorAnnouncer
+        
+        A pipeline stage that logs any errors and warnings present,
+        but takes no action on them.
+    -->
+    <bean id="errorAnnouncer" parent="stage_parent"
+        class="net.shibboleth.metadata.pipeline.StatusMetadataLoggingStage"
+        p:id="errorAnnouncer">
+        <property name="identifierStrategy" ref="identificationStrategy"/>
+        <property name="selectionRequirements">
+            <list>
+                <value>#{T(net.shibboleth.metadata.ErrorStatus)}</value>
+                <value>#{T(net.shibboleth.metadata.WarningStatus)}</value>
+            </list>
+        </property>
+    </bean>
+    
+    <!--
+        errorRemover
+        
+        This pipeline stage removes any items marked with an error status.
+    -->
+    <bean id="errorRemover" parent="stage_parent"
+        class="net.shibboleth.metadata.pipeline.ItemMetadataFilterStage"
+        p:id="errorRemover">
+        <property name="identifierStrategy" ref="identificationStrategy"/>
+        <property name="selectionRequirements">
+            <list>
+                <value>#{T(net.shibboleth.metadata.ErrorStatus)}</value>
+            </list>
+        </property>
+    </bean>
+    
+    <!--
+        errorTerminator
+        
+        This pipeline stage causes CLI termination if any item is marked with an error status.
+    -->
+    <bean id="errorTerminator" parent="stage_parent"
+        class="net.shibboleth.metadata.pipeline.ItemMetadataTerminationStage"
+        p:id="errorTerminator">
+        <property name="identifierStrategy" ref="identificationStrategy"/>
+        <property name="selectionRequirements">
+            <list>
+                <value>#{T(net.shibboleth.metadata.ErrorStatus)}</value>
+            </list>
+        </property>
+    </bean>
+    
+    <!--
+        errorAnnouncingFilter
+        
+        Announce any errors or warnings encountered, then remove
+        any items that had errors.  Items with warnings are retained.
+    -->
+    <bean id="errorAnnouncingFilter" parent="CompositeStage"
+        p:id="errorAnnouncingFilter">
+        <property name="composedStages">
+            <list>
+                <ref bean="errorAnnouncer"/>
+                <ref bean="errorRemover"/>
+            </list>
+        </property>
+    </bean>
+    
+    <!--
+        errorTerminatingFilter
+        
+        A pipeline stage that checks for any errors, and then announces
+        and filters any encountered.
+    -->
+    <bean id="errorTerminatingFilter" parent="CompositeStage"
+        p:id="errorTerminatingFilter">
+        <property name="composedStages">
+            <list>
+                <ref bean="errorAnnouncer"/>
+                <ref bean="errorTerminator"/>
+            </list>
+        </property>
+    </bean>
+    
+    
+    
+    <!--
+        *************************************
+        ***                               ***
+        ***   S A M L   M E T A D A T A   ***
+        ***                               ***
+        *************************************
+    -->
+    
+    <!--
+        QNames for SAML metadata elements.
+    -->
+    <bean id="md-NameIDFormat"            parent="QName" c:_0-ref="md_namespace" c:_1="NameIDFormat"/>
+    <bean id="md-OrganizationDisplayName" parent="QName" c:_0-ref="md_namespace" c:_1="OrganizationDisplayName"/>
+
+    <!--
+        Basic EntitiesDescriptor disassembler pipeline stage.
+    -->
+    <bean id="disassemble" parent="stage_parent"
+        class="net.shibboleth.metadata.dom.saml.EntitiesDescriptorDisassemblerStage"
+        p:id="disassemble"/>
+    
+    <!--
+        Basic EntitiesDescriptor assembler pipeline stage.
+    -->
+    <bean id="assemble" parent="stage_parent"
+        class="net.shibboleth.metadata.dom.saml.EntitiesDescriptorAssemblerStage"
+        p:id="assemble"/>
+    
+    <!--
+        Populate ItemId values from entities.
+    -->
+    <bean id="populateItemIds" parent="stage_parent"
+        class="net.shibboleth.metadata.dom.saml.EntityDescriptorItemIdPopulationStage"
+        p:id="populateItemIds"/>
+
+    <!--
+        Remove any empty Extensions elements.
+    -->
+    <bean id="removeEmptyExtensions" parent="EmptyContainerStrippingStage"
+        p:id="removeEmptyExtensions"
+        p:elementName="Extensions"
+        p:elementNamespace-ref="md_namespace"/>
+    
+    <!--
+        Beans to strip out selected SAML metadata elements.
+    -->
+    
+    <bean id="stripArtifactResolutionService" parent="ElementStrippingStage"
+        p:id="stripArtifactResolutionService"
+        p:elementName="ArtifactResolutionService"
+        p:elementNamespace-ref="md_namespace"/>
+    
+    <bean id="stripAssertionConsumerService" parent="ElementStrippingStage"
+        p:id="stripAssertionConsumerService"
+        p:elementName="AssertionConsumerService"
+        p:elementNamespace-ref="md_namespace"/>
+    
+    <bean id="stripAttributeAuthorityDescriptor" parent="ElementStrippingStage"
+        p:id="stripAttributeAuthorityDescriptor"
+        p:elementName="AttributeAuthorityDescriptor"
+        p:elementNamespace-ref="md_namespace"/>
+    
+    <bean id="stripAttributeConsumingService" parent="ElementStrippingStage"
+        p:id="stripAttributeConsumingService"
+        p:elementName="AttributeConsumingService"
+        p:elementNamespace-ref="md_namespace"/>
+    
+    <bean id="stripContactPerson" parent="ElementStrippingStage"
+        p:id="stripContactPerson"
+        p:elementName="ContactPerson"
+        p:elementNamespace-ref="md_namespace"/>
+    
+    <bean id="stripKeyDescriptor" parent="ElementStrippingStage"
+        p:id="stripKeyDescriptor"
+        p:elementName="KeyDescriptor"
+        p:elementNamespace-ref="md_namespace"/>
+    
+    <bean id="stripManageNameIDService" parent="ElementStrippingStage"
+        p:id="stripManageNameIDService"
+        p:elementName="ManageNameIDService"
+        p:elementNamespace-ref="md_namespace"/>
+    
+    <bean id="stripNameIDFormat" parent="ElementStrippingStage"
+        p:id="stripNameIDFormat"
+        p:elementName="NameIDFormat"
+        p:elementNamespace-ref="md_namespace"/>
+    
+    <bean id="stripSingleLogoutService" parent="ElementStrippingStage"
+        p:id="stripSingleLogoutService"
+        p:elementName="SingleLogoutService"
+        p:elementNamespace-ref="md_namespace"/>
+    
+    <bean id="stripSingleSignOnService" parent="ElementStrippingStage"
+        p:id="stripSingleSignOnService"
+        p:elementName="SingleSignOnService"
+        p:elementNamespace-ref="md_namespace"/>
+    
+    
+    
+    <!--
+        *************************************************
+        ***                                           ***
+        ***   M D R P I   S P E C I F I C A T I O N   ***
+        ***                                           ***
+        *************************************************
+    -->
+    
+    <!--
+        Populate RegistrationAuthority values from entities.
+    -->
+    <bean id="populateRegistrationAuthorities" parent="stage_parent"
+        class="net.shibboleth.metadata.dom.saml.mdrpi.RegistrationAuthorityPopulationStage"
+        p:id="populateRegistrationAuthorities"/>
+    
+    <!--
+        default_regauth_parent
+        
+        Parent (template) for per-channel beans.
+        
+        Any registrationAuthority already present on an entity in this
+        channel must match the known registration authority value.
+    -->
+    <bean id="default_regauth_parent" abstract="true" parent="XSLTransformationStage">
+        <property name="XSLResource">
+            <bean parent="ClassPathResource">
+                <constructor-arg value="default_regauth.xsl"/>
+            </bean>
+        </property>
+    </bean>
+    
+
+
+    <!--
+        ***********************************************
+        ***                                         ***
+        ***   M D U I   S P E C I F I C A T I O N   ***
+        ***                                         ***
+        ***********************************************
+    -->
+    
+    <bean id="stripMDUIDiscoHints" parent="ElementStrippingStage"
+        p:id="stripMDUIDiscoHints"
+        p:elementName="DiscoHints"
+        p:elementNamespace-ref="mdui_namespace"/>
+    
+    <!--
+        stripAAMDUI
+        
+        Remove all MDUI metadata from attribute authority roles.
+    -->
+    <bean id="stripAAMDUI" parent="XSLTransformationStage"
+        p:id="stripAAMDUI">
+        <property name="XSLResource">
+            <bean parent="ClassPathResource">
+                <constructor-arg value="strip-aa-mdui.xsl"/>
+            </bean>
+        </property>
+    </bean>
+    
+    
+    <!--
+        *****************************************************
+        ***                                               ***
+        ***   S H I B B O L E T H   E X T E N S I O N S   ***
+        ***                                               ***
+        *****************************************************
+    -->
+    
+    <bean id="stripShibScope" parent="ElementStrippingStage"
+        p:id="stripShibScope"
+        p:elementName="Scope"
+        p:elementNamespace-ref="shibmd_namespace"/>
+    
+
+
+    <!--
+        ***************************
+        ***                     ***
+        ***   X M L   D S I G   ***
+        ***                     ***
+        ***************************
+    -->
+    
+    <!--
+        stripKeyNames
+        
+        Remove all ds:KeyName elements.
+    -->
+    <bean id="stripKeyNames" parent="ElementStrippingStage"
+        p:id="stripKeyNames"
+        p:elementName="KeyName"
+        p:elementNamespace-ref="ds_namespace"/>
+    
+    
+    
+    <!--
+        *************************************
+        ***                               ***
+        ***   D O M   U T I L I T I E S   ***
+        ***                               ***
+        *************************************
+    -->
+    
+    <!--
+        httpClientBuilder
+        
+        Factory for the httpClient bean below.
+    -->
+    <bean id="httpClientBuilder"
+        class="net.shibboleth.utilities.java.support.httpclient.HttpClientBuilder"
+        p:connectionDisregardSslCertificate="true"
+    />
+
+    <!--
+        httpClient
+        
+        Common, basic, HTTP client for use with HTTP resources.
+    -->
+    <bean id="httpClient" factory-bean="httpClientBuilder" factory-method="buildClient"/>
+    
+    <!--
+        parserPool
+        
+        A pre-configured parser pool for use by source stages.
+    -->
+    <bean id="parserPool" parent="component_parent"
+        class="net.shibboleth.utilities.java.support.xml.BasicParserPool"
+        p:ignoreComments="false"
+        p:ignoreElementContentWhitespace="false"/>
+    
+    <!--
+        schemaResources
+        
+        A list of all schema documents that we make common use of in SAML metadata.
+        
+        The schemas are organised such that each schema appears before any of the schemas importing it,
+        so that the parser is not required to explicitly resolve any imports.
+    -->
+    <util:list id="schemaResources">
+        <bean parent="FileSystemResource">
+            <!-- no imports -->
+            <constructor-arg value="#{ systemProperties['basedir'] }/xml/incommon-metadata.xsd"/>
+        </bean>
+        <bean parent="FileSystemResource">
+            <!-- no imports -->
+            <constructor-arg value="#{ systemProperties['basedir'] }/xml/xml.xsd"/>
+        </bean>
+        <bean parent="FileSystemResource">
+            <!-- no imports -->
+            <constructor-arg value="#{ systemProperties['basedir'] }/xml/xmldsig-core-schema.xsd"/>
+        </bean>
+        <bean parent="FileSystemResource">
+            <!-- imports xmldsig-core-schema.xsd -->
+            <constructor-arg value="#{ systemProperties['basedir'] }/xml/xenc-schema.xsd"/>
+        </bean>
+        <bean parent="FileSystemResource">
+            <!-- imports xmldsig-core-schema.xsd, xenc-schema.xsd -->
+            <constructor-arg value="#{ systemProperties['basedir'] }/xml/saml-schema-assertion-2.0.xsd"/>
+        </bean>
+        <bean parent="FileSystemResource">
+            <!-- imports xmldsig-core-schema.xsd, xenc-schema.xsd, saml-schema-assertion-2.0.xsd, xml.xsd -->
+            <constructor-arg value="#{ systemProperties['basedir'] }/xml/saml-schema-metadata-2.0.xsd"/>
+        </bean>
+        <bean parent="FileSystemResource">
+            <!-- no imports -->
+            <constructor-arg value="#{ systemProperties['basedir'] }/xml/ws-addr.xsd"/>
+        </bean>
+        <bean parent="FileSystemResource">
+            <!-- imports ws-addr.xsd -->
+            <constructor-arg value="#{ systemProperties['basedir'] }/xml/ws-securitypolicy-1.2.xsd"/>
+        </bean>
+        <bean parent="FileSystemResource">
+            <!-- no imports -->
+            <constructor-arg value="#{ systemProperties['basedir'] }/xml/MetadataExchange.xsd"/>
+        </bean>
+        <bean parent="FileSystemResource">
+            <constructor-arg value="#{ systemProperties['basedir'] }/xml/oasis-200401-wss-wssecurity-utility-1.0.xsd"/>
+        </bean>
+        <bean parent="FileSystemResource">
+            <!-- imports oasis-200401-wss-wssecurity-utility-1.0.xsd, xml.xsd, xmldsig-core-schema.xsd -->
+            <constructor-arg value="#{ systemProperties['basedir'] }/xml/oasis-200401-wss-wssecurity-secext-1.0.xsd"/>
+        </bean>
+        <bean parent="FileSystemResource">
+            <!-- imports saml-schema-metadata-2.0.xsd, xml.xsd -->
+            <constructor-arg value="#{ systemProperties['basedir'] }/xml/saml-metadata-rpi-v1.0.xsd"/>
+        </bean>
+        <bean parent="FileSystemResource">
+            <!-- imports xmldsig-core-schema.xsd -->
+            <constructor-arg value="#{ systemProperties['basedir'] }/xml/shibboleth-metadata-1.0.xsd"/>
+        </bean>
+        <bean parent="FileSystemResource">
+            <!-- imports saml-schema-assertion-2.0.xsd -->
+            <constructor-arg value="#{ systemProperties['basedir'] }/xml/sstc-metadata-attr.xsd"/>
+        </bean>
+        <bean parent="FileSystemResource">
+            <!-- imports saml-schema-metadata-2.0.xsd -->
+            <constructor-arg value="#{ systemProperties['basedir'] }/xml/sstc-request-initiation.xsd"/>
+        </bean>
+        <bean parent="FileSystemResource">
+            <!-- no imports -->
+            <constructor-arg value="#{ systemProperties['basedir'] }/xml/sstc-saml-holder-of-key-browser-sso.xsd"/>
+        </bean>
+        <bean parent="FileSystemResource">
+            <!-- imports saml-schema-metadata-2.0.xsd -->
+            <constructor-arg value="#{ systemProperties['basedir'] }/xml/sstc-saml-idp-discovery.xsd"/>
+        </bean>
+        <bean parent="FileSystemResource">
+            <!-- no imports -->
+            <constructor-arg value="#{ systemProperties['basedir'] }/xml/sstc-saml-metadata-algsupport-v1.0.xsd"/>
+        </bean>
+        <bean parent="FileSystemResource">
+            <!-- imports saml-schema-metadata-2.0.xsd, xml.xsd -->
+            <constructor-arg value="#{ systemProperties['basedir'] }/xml/sstc-saml-metadata-ui-v1.0.xsd"/>
+        </bean>
+        <bean parent="FileSystemResource">
+            <!-- no imports -->
+            <constructor-arg value="#{ systemProperties['basedir'] }/xml/uk-fed-label.xsd"/>
+        </bean>
+        <bean parent="FileSystemResource">
+            <!-- imports xenc-schema.xsd -->
+            <constructor-arg value="#{ systemProperties['basedir'] }/xml/ws-authorization.xsd"/>
+        </bean>
+        <bean parent="FileSystemResource">
+            <!--
+                Imports oasis-200401-wss-wssecurity-secext-1.0.xsd, oasis-200401-wss-wssecurity-utility-1.0.xsd,
+                ws-addr.xsd, MetadataExchange.xsd, saml-schema-metadata-2.0.xsd, ws-securitypolicy-1.2.xsd,
+                ws-authorization.xsd.
+            -->
+            <constructor-arg value="#{ systemProperties['basedir'] }/xml/ws-federation.xsd"/>
+        </bean>
+        <bean parent="FileSystemResource">
+            <!-- imports xmldsig-core-schema.xsd, xenc-schema.xsd -->
+            <constructor-arg value="#{ systemProperties['basedir'] }/xml/xenc-schema-11.xsd"/>
+        </bean>
+        <bean parent="FileSystemResource">
+            <!-- imports xmldsig-core-schema.xsd -->
+            <constructor-arg value="#{ systemProperties['basedir'] }/xml/xmldsig11-schema.xsd"/>
+        </bean>
+    </util:list>
+    
+    <!--
+        checkSchemas
+        
+        A pipeline stage that checks against all the common schemas, as above.
+    -->
+    <bean id="checkSchemas" parent="stage_parent"
+        class="net.shibboleth.metadata.dom.XMLSchemaValidationStage"
+        p:id="checkSchemas">
+        <property name="schemaResources" ref="schemaResources"/>
+    </bean>
+
+    <!--
+        stripComments
+        
+        A pipeline stage that removes all XML comments from items.
+    -->
+    
+    <bean id="stripComments" parent="XSLTransformationStage"
+        p:id="stripComments">
+        <property name="XSLResource">
+            <bean parent="ClassPathResource">
+                <constructor-arg value="strip-comments.xsl"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <!--
+        everythingSelector
+        
+        An item selection strategy that selects all items.
+    -->
+    <bean id="everythingSelector" class="com.google.common.base.Predicates"
+        factory-method="alwaysTrue"/>
+    
+    <!--
+        Standard serializer.
+    -->
+    <bean id="serializer" class="net.shibboleth.metadata.dom.DOMElementSerializer"/>
+    
+    <!--
+        Merge strategy that removes duplicates.
+    -->
+    <bean id="deduplicateMergeStrategy" class="net.shibboleth.metadata.DeduplicatingItemIdMergeStrategy"/>
+    
+
+
+    <!--
+        ***********************
+        ***                 ***
+        ***   I M P O R T   ***
+        ***                 ***
+        ***********************
+    -->
+
+    <!--
+        cleanImport
+        
+        A pipeline stage that can be used in an import pipeline to clean up the metadata
+        presented, for example by removing redundant attributes or elements which only have
+        meaning when added by the UK federation registrar.
+    -->
+    <bean id="cleanImport" parent="XSLTransformationStage"
+        p:id="cleanImport">
+        <property name="XSLResource">
+            <bean parent="ClassPathResource">
+                <constructor-arg value="clean-import.xsl"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <!--
+        trimImportElementWhitespace
+        
+        Trim whitespace from the specified elements in imported
+        entities.  These would often be errors in UK-registered
+        metadata.
+    -->
+    <bean id="trimImportElementWhitespace" parent="ElementWhitespaceTrimmingStage"
+        p:id="trimImportElementWhitespace">
+        <property name="elementNames">
+            <set>
+                <ref bean="md-NameIDFormat"/>
+                <ref bean="md-OrganizationDisplayName"/>
+            </set>
+        </property>
+    </bean>
+    
+    <!--
+        standardImportActions
+        
+        Standard actions performed on any metadata import channel.  Assumes that the
+        collection has been acquired, had its signature validated, and disassembled into
+        individual entities.
+        
+        The result is a collection of entities, some of which may be labelled with
+        errors.  No announcement of removal of those entities is performed here;
+        that is left to the caller.
+    -->
+    <bean id="standardImportActions" parent="CompositeStage"
+        p:id="standardImportActions">
+        <property name="composedStages">
+            <list>
+                <ref bean="populateItemIds"/>
+                <ref bean="populateRegistrationAuthorities"/>
+
+                <!--
+                    The following two namespaces are always stripped because they are
+                    specific to the UK registrar and can't be valid when imported from
+                    some other source.
+                -->
+                <ref bean="stripUkfedlabelNamespace"/>
+                <ref bean="stripWayfNamespace"/>
+                
+                <!-- Strip all entity attributes from this source. -->
+                <ref bean="stripMdattrNamespace"/>
+
+                <ref bean="cleanImport"/>
+                <ref bean="stripAAMDUI"/>
+                <ref bean="trimImportElementWhitespace"/>
+                <ref bean="removeEmptyExtensions"/>
+                <ref bean="checkSchemas"/>
+                <ref bean="CHECK_imported"/>
+
+                <bean parent="X509ValidationStage"
+                    p:id="checkCertificates">
+                    <property name="validators">
+                        <list>
+                            <!-- Error on RSA key length less than 2048 bits. -->
+                            <bean parent="X509RSAKeyLengthValidator"
+                                p:warningBoundary="0" p:errorBoundary="2048"/>
+                            <!-- Error on small RSA public exponents. -->
+                            <bean parent="X509RSAExponentValidator"/>
+                            
+                            <!--
+                                Debian weak key blacklists.
+                                
+                                Don't need to check for keys below our minimum key size.
+                            -->
+                            <ref bean="debian.2048"/>
+                            <ref bean="debian.4096"/>
+                            
+                            <!--
+                                Compromised key blacklists.
+                                
+                                Again, don't need to check for keys below our minimum key size.
+                                This currently means there are no compromised keys to check for.
+                            -->
+                        </list>
+                    </property>
+                </bean>
+                
+            </list>
+        </property>
+    </bean>
+    
+    <!--
+        standardImportTail
+        
+        Standard actions performed at the end of any metadata import flow.  As imports
+        are currently ending up in files, build an EntitiesDescriptor and normalise the
+        namespaces in the document ready for serialisation.
+    -->
+    <bean id="standardImportTail" parent="CompositeStage"
+        p:id="standardImportTail">
+        <property name="composedStages">
+            <list>
+                <!-- announce and remove any entities with errors -->
+                <ref bean="errorAnnouncingFilter"/>
+                <ref bean="assemble"/>
+                <ref bean="normaliseNamespaces"/>
+            </list>
+        </property>
+    </bean>
+    
+</beans>

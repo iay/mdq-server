@@ -1,0 +1,814 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Common validation bean definitions.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    default-lazy-init="true"
+    xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+    <!--
+        ***********************************
+        ***                             ***
+        ***   F U T U R E   T E S T S   ***
+        ***                             ***
+        ***********************************
+        
+        The tests in this section are not applied to the UK federation metadata at the moment,
+        but will be in the future.  Usually, the delay is due to the presence of the specific
+        case in the current metadata, and the test will be moved into production once that
+        has been cleaned up.  In some cases, this can be a lengthy process.
+        
+        The main check_future test is broken down into a number of sub-tests rather than
+        just writing it as one long XSLT ruleset so that overlapping failures can all be
+        seen at the same time.  This isn't so important in production, where any failure
+        is definitive.  It's much more important while cleaning up existing metadata, where
+        it's less productive to clear up one problem only to have another one emerge from
+        hiding.
+    -->
+    
+    <!--
+        check_future_0
+    -->
+    <bean id="check_future_0" parent="XSLValidationStage"
+        p:id="check_future_0">
+        <property name="XSLResource">
+            <bean parent="FileSystemResource">
+                <constructor-arg value="#{ systemProperties['rulesdir'] }/check_future_0.xsl"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <!--
+        check_future_1
+    -->
+    <bean id="check_future_1" parent="XSLValidationStage"
+        p:id="check_future_1">
+        <property name="XSLResource">
+            <bean parent="FileSystemResource">
+                <constructor-arg value="#{ systemProperties['rulesdir'] }/check_future_1.xsl"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <!--
+        check_future_2
+    -->
+    <bean id="check_future_2" parent="XSLValidationStage"
+        p:id="check_future_2">
+        <property name="XSLResource">
+            <bean parent="FileSystemResource">
+                <constructor-arg value="#{ systemProperties['rulesdir'] }/check_future_2.xsl"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <!--
+        check_future_3
+    -->
+    <bean id="check_future_3" parent="XSLValidationStage"
+        p:id="check_future_3">
+        <property name="XSLResource">
+            <bean parent="FileSystemResource">
+                <constructor-arg value="#{ systemProperties['rulesdir'] }/check_future_3.xsl"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <!--
+        check_future_4
+    -->
+    <bean id="check_future_4" parent="XSLValidationStage"
+        p:id="check_future_4">
+        <property name="XSLResource">
+            <bean parent="FileSystemResource">
+                <constructor-arg value="#{ systemProperties['rulesdir'] }/check_future_4.xsl"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <!--
+        check_future_5
+    -->
+    <bean id="check_future_5" parent="XSLValidationStage"
+        p:id="check_future_5">
+        <property name="XSLResource">
+            <bean parent="FileSystemResource">
+                <constructor-arg value="#{ systemProperties['rulesdir'] }/check_future_5.xsl"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <!--
+        check_future_6
+    -->
+    <bean id="check_future_6" parent="XSLValidationStage"
+        p:id="check_future_6">
+        <property name="XSLResource">
+            <bean parent="FileSystemResource">
+                <constructor-arg value="#{ systemProperties['rulesdir'] }/check_future_6.xsl"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <!--
+        check_future_7
+    -->
+    <bean id="check_future_7" parent="XSLValidationStage"
+        p:id="check_future_7">
+        <property name="XSLResource">
+            <bean parent="FileSystemResource">
+                <constructor-arg value="#{ systemProperties['rulesdir'] }/check_future_7.xsl"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <!--
+        check_future_8
+    -->
+    <bean id="check_future_8" parent="XSLValidationStage"
+        p:id="check_future_8">
+        <property name="XSLResource">
+            <bean parent="FileSystemResource">
+                <constructor-arg value="#{ systemProperties['rulesdir'] }/check_future_8.xsl"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <!--
+        check_future_9
+    -->
+    <bean id="check_future_9" parent="XSLValidationStage"
+        p:id="check_future_9">
+        <property name="XSLResource">
+            <bean parent="FileSystemResource">
+                <constructor-arg value="#{ systemProperties['rulesdir'] }/check_future_9.xsl"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <!--
+        check_future
+        
+        Combines all check_future_N stages.
+    -->
+    <bean id="check_future" parent="CompositeStage"
+        p:id="check_future">
+        <property name="composedStages">
+            <list>
+                <ref bean="check_future_0"/>
+                <ref bean="check_future_1"/>
+                <ref bean="check_future_2"/>
+                <ref bean="check_future_3"/>
+                <ref bean="check_future_4"/>
+                <ref bean="check_future_5"/>
+                <ref bean="check_future_6"/>
+                <ref bean="check_future_7"/>
+                <ref bean="check_future_8"/>
+                <ref bean="check_future_9"/>
+            </list>
+        </property>
+    </bean>
+    
+
+    <!--
+        ***********************************************************
+        ***                                                     ***
+        ***   A L G S U P P O R T   S P E C I F I C A T I O N   ***
+        ***                                                     ***
+        ***********************************************************
+    -->
+        
+
+    <!--
+        check_algsupport
+    -->
+    <bean id="check_algsupport" parent="XSLValidationStage"
+        p:id="check_algsupport">
+        <property name="XSLResource">
+            <bean parent="FileSystemResource">
+                <constructor-arg value="#{ systemProperties['rulesdir'] }/check_algsupport.xsl"/>
+            </bean>
+        </property>
+    </bean>
+
+
+    <!--
+        *********************
+        ***               ***
+        ***   ( E N D )   ***
+        ***               ***
+        *********************
+    -->
+    
+
+    <!--
+        check_adfs
+    -->
+    <bean id="check_adfs" parent="XSLValidationStage"
+        p:id="check_adfs">
+        <property name="XSLResource">
+            <bean parent="FileSystemResource">
+                <constructor-arg value="#{ systemProperties['rulesdir'] }/check_adfs.xsl"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <!--
+        check_bindings
+    -->
+    <bean id="check_bindings" parent="XSLValidationStage"
+        p:id="check_bindings">
+        <property name="XSLResource">
+            <bean parent="FileSystemResource">
+                <constructor-arg value="#{ systemProperties['rulesdir'] }/check_bindings.xsl"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <!--
+        check_filtered
+    -->
+    <bean id="check_filtered" parent="XSLValidationStage"
+        p:id="check_filtered">
+        <property name="XSLResource">
+            <bean parent="FileSystemResource">
+                <constructor-arg value="#{ systemProperties['rulesdir'] }/check_filtered.xsl"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <!--
+        check_hoksso
+    -->
+    <bean id="check_hoksso" parent="XSLValidationStage"
+        p:id="check_hoksso">
+        <property name="XSLResource">
+            <bean parent="FileSystemResource">
+                <constructor-arg value="#{ systemProperties['rulesdir'] }/check_hoksso.xsl"/>
+            </bean>
+        </property>
+    </bean>
+        
+    <!--
+        check_idpdisc
+    -->
+    <bean id="check_idpdisc" parent="XSLValidationStage"
+        p:id="check_idpdisc">
+        <property name="XSLResource">
+            <bean parent="FileSystemResource">
+                <constructor-arg value="#{ systemProperties['rulesdir'] }/check_idpdisc.xsl"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <!--
+        check_imported
+    -->
+    <bean id="check_imported" parent="XSLValidationStage"
+        p:id="check_imported">
+        <property name="XSLResource">
+            <bean parent="FileSystemResource">
+                <constructor-arg value="#{ systemProperties['rulesdir'] }/check_imported.xsl"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <!--
+        check_init
+    -->
+    <bean id="check_init" parent="XSLValidationStage"
+        p:id="check_init">
+        <property name="XSLResource">
+            <bean parent="FileSystemResource">
+                <constructor-arg value="#{ systemProperties['rulesdir'] }/check_init.xsl"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <!--
+        check_mdiop
+    -->
+    <bean id="check_mdiop" parent="XSLValidationStage"
+        p:id="check_mdiop">
+        <property name="XSLResource">
+            <bean parent="FileSystemResource">
+                <constructor-arg value="#{ systemProperties['rulesdir'] }/check_mdiop.xsl"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <!--
+        ***************************************************
+        ***                                             ***
+        ***   M D A T T R   S P E C I F I C A T I O N   ***
+        ***                                             ***
+        ***************************************************
+    -->
+
+    <!--
+        check_mdattr
+    -->
+    <bean id="check_mdattr" parent="XSLValidationStage"
+        p:id="check_mdattr">
+        <property name="XSLResource">
+            <bean parent="FileSystemResource">
+                <constructor-arg value="#{ systemProperties['rulesdir'] }/check_mdattr.xsl"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <!--
+        *************************************************
+        ***                                           ***
+        ***   M D R P I   S P E C I F I C A T I O N   ***
+        ***                                           ***
+        *************************************************
+    -->
+    
+    <!--
+        check_mdrpi_xslt
+        
+        Miscellaneous MDRPI tests, in XSLT.
+    -->
+    <bean id="check_mdrpi_xslt" parent="XSLValidationStage"
+        p:id="check_mdrpi_xslt">
+        <property name="XSLResource">
+            <bean parent="FileSystemResource">
+                <constructor-arg value="#{ systemProperties['rulesdir'] }/check_mdrpi.xsl"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <!--
+        check_mdrpi
+        
+        Composite check for the MDRPI specification.
+    -->
+    <bean id="check_mdrpi" parent="CompositeStage"
+        p:id="check_mdrpi">
+        <property name="composedStages">
+            <list>
+                <ref bean="check_mdrpi_xslt"/>
+            </list>
+        </property>
+    </bean>
+    
+    <!--
+        check_regauth_parent
+        
+        Parent (template) for per-channel beans.
+        
+        Any registrationAuthority already present on an entity in this
+        channel must match the known registration authority value.
+    -->
+    <bean id="check_regauth_parent" abstract="true" parent="XSLValidationStage">
+        <property name="XSLResource">
+            <bean parent="FileSystemResource">
+                <constructor-arg value="#{ systemProperties['rulesdir'] }/check_regauth.xsl"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <!--
+        check_hasreginfo
+        
+        Check that each entity has an mdrpi:RegistrationInfo element.
+    -->
+    <bean id="check_hasreginfo" parent="XSLValidationStage"
+        p:id="check_hasreginfo">
+        <property name="XSLResource">
+            <bean parent="FileSystemResource">
+                <constructor-arg value="#{ systemProperties['rulesdir'] }/check_hasreginfo.xsl"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <!--
+        ***********************************************
+        ***                                         ***
+        ***   M D U I   S P E C I F I C A T I O N   ***
+        ***                                         ***
+        ***********************************************
+    -->
+    
+    <!--
+        check_mdui_iphint
+        
+        Checks for the mdui:IPHint element.
+    -->
+    <bean id="check_mdui_iphint" parent="stage_parent"
+        class="uk.org.ukfederation.mda.validate.mdui.IPHintValidationStage"
+        p:id="check_mdui_iphint"
+        p:checkingNetworks="true"/>
+    
+    <!--
+        check_mdui_xslt
+        
+        Miscellaneous MDUI tests, in XSLT.
+    -->
+    <bean id="check_mdui_xslt" parent="XSLValidationStage"
+        p:id="check_mdui_xslt">
+        <property name="XSLResource">
+            <bean parent="FileSystemResource">
+                <constructor-arg value="#{ systemProperties['rulesdir'] }/check_mdui.xsl"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <!--
+        mdui_dn_en_match
+        
+        If an IdP has both an OrganizationDisplayName in English, and an
+        mdui:DisplayName in English, they must be identical.
+        
+        UKFTS 1.4 section 3.3
+    -->
+    <bean id="mdui_dn_en_match" parent="XSLValidationStage"
+        p:id="mdui_dn_en_match">
+        <property name="XSLResource">
+            <bean parent="FileSystemResource">
+                <constructor-arg value="#{ systemProperties['rulesdir'] }/mdui_dn_en_match.xsl"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <!--
+        mdui_dn_en_present
+        
+        If an entity has mdui:UIInfo, then that must include at least an
+        mdui:DisplayName with an English name.
+    -->
+    <bean id="mdui_dn_en_present" parent="XSLValidationStage"
+        p:id="mdui_dn_en_present">
+        <property name="XSLResource">
+            <bean parent="FileSystemResource">
+                <constructor-arg value="#{ systemProperties['rulesdir'] }/mdui_dn_en_present.xsl"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <!--
+        check_mdui
+        
+        Composite check for the MDUI specification.
+        
+        Omitted the following, which are only applied to
+        UK-registered metadata:
+        
+            mdui_dn_en_present
+            mdui_dn_en_match
+    -->
+    <bean id="check_mdui" parent="CompositeStage"
+        p:id="check_mdui">
+        <property name="composedStages">
+            <list>
+                <ref bean="check_mdui_iphint"/>
+                <ref bean="check_mdui_xslt"/>
+            </list>
+        </property>
+    </bean>
+    
+    <!--
+        *********************
+        ***               ***
+        ***   ( E N D )   ***
+        ***               ***
+        *********************
+    -->
+    
+    <!--
+        check_misc
+    -->
+    <bean id="check_misc" parent="XSLValidationStage"
+        p:id="check_misc">
+        <property name="XSLResource">
+            <bean parent="FileSystemResource">
+                <constructor-arg value="#{ systemProperties['rulesdir'] }/check_misc.xsl"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <!--
+        check_namespaces
+    -->
+    <bean id="check_namespaces" parent="XSLValidationStage"
+        p:id="check_namespaces">
+        <property name="XSLResource">
+            <bean parent="FileSystemResource">
+                <constructor-arg value="#{ systemProperties['rulesdir'] }/check_namespaces.xsl"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <!--
+        check_regscope
+        
+        Check for regular expressions in Shibboleth Scope elements.  Applied very selectively.
+    -->
+    <bean id="check_regscope" parent="XSLValidationStage"
+        p:id="check_regscope">
+        <property name="XSLResource">
+            <bean parent="FileSystemResource">
+                <constructor-arg value="#{ systemProperties['rulesdir'] }/check_regscope.xsl"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <!--
+        check_reqattr
+    -->
+    <bean id="check_reqattr" parent="XSLValidationStage"
+        p:id="check_reqattr">
+        <property name="XSLResource">
+            <bean parent="FileSystemResource">
+                <constructor-arg value="#{ systemProperties['rulesdir'] }/check_reqattr.xsl"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <!--
+        check_saml2int
+    -->
+    <bean id="check_saml2int" parent="XSLValidationStage"
+        p:id="check_saml2int">
+        <property name="XSLResource">
+            <bean parent="FileSystemResource">
+                <constructor-arg value="#{ systemProperties['rulesdir'] }/check_saml2int.xsl"/>
+            </bean>
+        </property>
+    </bean>
+
+    <!--
+        check_saml1
+    -->
+    <bean id="check_saml1" parent="XSLValidationStage"
+        p:id="check_saml1">
+        <property name="XSLResource">
+            <bean parent="FileSystemResource">
+                <constructor-arg value="#{ systemProperties['rulesdir'] }/check_saml1.xsl"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <!--
+        check_saml2
+    -->
+    <bean id="check_saml2" parent="XSLValidationStage"
+        p:id="check_saml2">
+        <property name="XSLResource">
+            <bean parent="FileSystemResource">
+                <constructor-arg value="#{ systemProperties['rulesdir'] }/check_saml2.xsl"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <!--
+        check_saml2meta
+    -->
+    <bean id="check_saml2meta" parent="XSLValidationStage"
+        p:id="check_saml2meta">
+        <property name="XSLResource">
+            <bean parent="FileSystemResource">
+                <constructor-arg value="#{ systemProperties['rulesdir'] }/check_saml2meta.xsl"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <!--
+        check_shibboleth
+    -->
+    <bean id="check_shibboleth" parent="XSLValidationStage"
+        p:id="check_shibboleth">
+        <property name="XSLResource">
+            <bean parent="FileSystemResource">
+                <constructor-arg value="#{ systemProperties['rulesdir'] }/check_shibboleth.xsl"/>
+            </bean>
+        </property>
+    </bean>
+
+    <!--
+        check_validUntil
+        
+        Check that an aggregate has a validUntil instant specified, and that it has not
+        yet expired.  Does not put an upper bound on validUntil intervals.
+    -->
+    <bean id="check_validUntil" parent="stage_parent"
+        class="net.shibboleth.metadata.dom.saml.ValidateValidUntilStage"
+        p:id="check_validUntil">
+        <!--
+            The validUntil attribute must be present.
+        -->
+        <property name="requireValidUntil" value="true"/>
+        <!--
+            Do not constrain the validity interval in this general stage.
+            Constrain in necessary on a per-channel basis.
+        -->
+        <property name="maxValidityInterval" value="0"/>
+    </bean>
+    
+    <!--
+        check_vhosts
+    -->
+    <bean id="check_vhosts" parent="XSLValidationStage"
+        p:id="check_vhosts">
+        <property name="XSLResource">
+            <bean parent="FileSystemResource">
+                <constructor-arg value="#{ systemProperties['rulesdir'] }/check_vhosts.xsl"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <!--
+        *******************************************************************
+        ***                                                             ***
+        ***   I N C O M M O N   F E D E R A T I O N   M E T A D A T A   ***
+        ***                                                             ***
+        *******************************************************************
+    -->
+    
+    <!--
+        check_incmd
+    -->
+    <bean id="check_incmd" parent="XSLValidationStage"
+        p:id="check_incmd">
+        <property name="XSLResource">
+            <bean parent="FileSystemResource">
+                <constructor-arg value="#{ systemProperties['rulesdir'] }/check_incmd.xsl"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <!--
+        *******************************************************************
+        ***                                                             ***
+        ***   U K   F E D E R A T I O N   S P E C I F I C A T I O N S   ***
+        ***                                                             ***
+        *******************************************************************
+    -->
+    
+    <!--
+        check_uk_trust
+    -->
+    <bean id="check_uk_trust" parent="XSLValidationStage"
+        p:id="check_uk_trust">
+        <property name="XSLResource">
+            <bean parent="FileSystemResource">
+                <constructor-arg value="#{ systemProperties['rulesdir'] }/check_uk_trust.xsl"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <!--
+        *******************************************************
+        ***                                                 ***
+        ***   C O L L E C T I O N   C O N S I S T E N C Y   ***
+        ***                                                 ***
+        *******************************************************
+    -->
+    
+    <!--
+        These checks are for consistency across a collection of entities
+        rather than on each entity independently.
+    -->
+    
+    <!--
+        check_aggregate
+        
+        Checks for duplicate entityID values across a set of entities.
+        
+        It is assumed that the entities are wrapped in a single EntitiesDescriptor.
+    -->
+    <bean id="check_aggregate" parent="XSLValidationStage"
+        p:id="check_aggregate">
+        <property name="XSLResource">
+            <bean parent="FileSystemResource">
+                <constructor-arg value="#{ systemProperties['rulesdir'] }/check_aggregate.xsl"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <!--
+        check_dup_display
+        
+        Checks for duplicate identity provider display names across a set of entities.
+        
+        It is assumed that the entities are independently represented as EntityDescriptor
+        items in the item collection.
+    -->
+    <bean id="check_dup_display" parent="stage_parent"
+        p:id="check_dup_display"
+        p:identificationStrategy-ref="identificationStrategy"
+        class="uk.org.ukfederation.mda.IdPDisplayNameDuplicateDetectingStage"/>
+    
+    <!--
+        ***********************************************
+        ***                                         ***
+        ***   X . 5 0 9   C E R T I F I C A T E S   ***
+        ***                                         ***
+        ***********************************************
+    -->
+    
+    <!--
+        Debian weak key blacklists.
+    -->
+
+    <bean id="debian.1024" parent="X509RSAOpenSSLBlacklistValidator"
+        p:id="debian.1024" p:keySize="1024">
+        <property name="blacklistResource">
+            <bean parent="ClassPathResource">
+                <constructor-arg value="_openssl_blacklists/blacklist.RSA-1024"/>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="debian.2048" parent="X509RSAOpenSSLBlacklistValidator"
+        p:id="debian.2048" p:keySize="2048">
+        <property name="blacklistResource">
+            <bean parent="ClassPathResource">
+                <constructor-arg value="_openssl_blacklists/blacklist.RSA-2048"/>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="debian.4096" parent="X509RSAOpenSSLBlacklistValidator"
+        p:id="debian.4096" p:keySize="4096">
+        <property name="blacklistResource">
+            <bean parent="ClassPathResource">
+                <constructor-arg value="_openssl_blacklists/blacklist.RSA-4096"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <!--
+        Blacklist of known compromised 1024-bit keys, e.g., "dummy" keys shipped with
+        SAML products that are sometimes deployed by accident.
+    -->
+    <bean id="compromised.1024" parent="X509RSAOpenSSLBlacklistValidator"
+        p:id="compromised.1024" p:keySize="1024">
+        <property name="blacklistResource">
+            <bean parent="ClassPathResource">
+                <constructor-arg value="_openssl_blacklists/compromised-1024.txt"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <!--
+        *********************************************
+        ***                                       ***
+        ***   A G G R E G A T E D   C H E C K S   ***
+        ***                                       ***
+        *********************************************
+    -->
+    
+    <!--
+        CHECK_std
+    -->
+    <bean id="CHECK_std" parent="CompositeStage"
+        p:id="CHECK_std">
+        <property name="composedStages">
+            <list>
+                <ref bean="check_adfs"/>
+                <ref bean="check_algsupport"/>
+                <ref bean="check_bindings"/>
+                <ref bean="check_hoksso"/>
+                <ref bean="check_idpdisc"/>
+                <ref bean="check_incmd"/>
+                <ref bean="check_init"/>
+                <ref bean="check_mdattr"/>
+                <ref bean="check_mdiop"/>
+                <ref bean="check_mdrpi"/>
+                <ref bean="check_mdui"/>
+                <ref bean="check_misc"/>
+                <ref bean="check_reqattr"/>
+                <ref bean="check_saml1"/>
+                <ref bean="check_saml2"/>
+                <ref bean="check_saml2int"/>
+                <ref bean="check_saml2meta"/>
+                <ref bean="check_shibboleth"/>
+                <ref bean="check_uk_trust"/>
+            </list>
+        </property>
+    </bean>
+    
+    <!--
+        CHECK_imported
+    -->
+    <bean id="CHECK_imported" parent="CompositeStage"
+        p:id="CHECK_imported">
+        <property name="composedStages">
+            <list>
+                <ref bean="CHECK_std"/>
+                <ref bean="check_dup_display"/>
+                <ref bean="check_regscope"/>
+                <ref bean="check_namespaces"/>
+            </list>
+        </property>
+    </bean>
+    
+</beans>
