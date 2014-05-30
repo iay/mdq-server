@@ -30,4 +30,10 @@
         </property>
     </bean>
 
+    <!--
+        Metadata lookup service.
+    -->
+    <bean parent="component_parent" class="uk.org.iay.mdq.server.MetadataService"
+        id="metadataService" lazy-init="false"/>
+
 </beans>
