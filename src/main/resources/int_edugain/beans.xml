@@ -103,7 +103,7 @@
                         invalid signature
                 -->
                 <ref bean="check_validUntil"/>
-                <ref bean="int_edugain_checkSignature"/>
+                <!-- <ref bean="int_edugain_checkSignature"/> -->
                 <ref bean="errorTerminatingFilter"/>
                 
                 <ref bean="disassemble"/>
@@ -120,7 +120,7 @@
                     All eduGAIN entities should have mdrpi:RegistrationInfo elements, but
                     we can't check the actual values.
                 -->
-                <ref bean="check_hasreginfo"/>
+                <!-- <ref bean="check_hasreginfo"/> -->
             </list>
         </property>
     </bean>
