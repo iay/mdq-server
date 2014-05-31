@@ -22,10 +22,21 @@
     <!--
         Pipeline bean used to acquire metadata for service.
     -->
-    <bean id="metadataSource.SAML" parent="SimplePipeline">
+    <bean id="source.SAML" parent="SimplePipeline">
         <property name="stages">
             <list>
                 <ref bean="int_edugain_productionEntities"/>
+            </list>
+        </property>
+    </bean>
+
+    <!--
+        Pipeline used to render metadata for publication.
+    -->
+    <bean id="render.SAML" parent="SimplePipeline">
+        <property name="stages">
+            <list>
+                
             </list>
         </property>
     </bean>
@@ -35,6 +46,12 @@
     -->
     <bean id="metadataService.SAML" parent="component_parent"
         class="uk.org.iay.mdq.server.MetadataService"
-        lazy-init="false"/>
+        lazy-init="false">
+        <property name="sourcePipeline" ref="source.SAML"/>
+        <property name="renderPipeline" ref="render.SAML"/>
+        <property name="serializer">
+            <bean class="net.shibboleth.metadata.dom.DOMElementSerializer"/>
+        </property>
+    </bean>
 
 </beans>
