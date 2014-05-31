@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.annotation.Resource;
+import javax.inject.Named;
 
 import net.shibboleth.metadata.Item;
 import net.shibboleth.metadata.pipeline.Pipeline;
@@ -44,6 +45,7 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
      * The pipeline to execute to acquire metadata.
      */
     @Resource
+    @Named("metadataSource.SAML")
     private Pipeline<T> metadataSourcePipeline;
 
     /**

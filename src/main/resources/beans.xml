@@ -22,7 +22,7 @@
     <!--
         Pipeline bean used to acquire metadata for service.
     -->
-    <bean parent="SimplePipeline" id="metadataSourcePipeline" lazy-init="false">
+    <bean id="metadataSource.SAML" parent="SimplePipeline">
         <property name="stages">
             <list>
                 <ref bean="int_edugain_productionEntities"/>
@@ -33,7 +33,8 @@
     <!--
         Metadata lookup service.
     -->
-    <bean parent="component_parent" class="uk.org.iay.mdq.server.MetadataService"
-        id="metadataService" lazy-init="false"/>
+    <bean id="metadataService.SAML" parent="component_parent"
+        class="uk.org.iay.mdq.server.MetadataService"
+        lazy-init="false"/>
 
 </beans>
