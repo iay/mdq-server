@@ -26,6 +26,7 @@
         <property name="stages">
             <list>
                 <ref bean="int_edugain_productionEntities"/>
+                <ref bean="populateItemIds"/>
             </list>
         </property>
     </bean>
