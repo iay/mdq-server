@@ -20,12 +20,16 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.annotation.Nonnull;
 
 import net.shibboleth.metadata.Item;
+import net.shibboleth.metadata.ItemId;
 import net.shibboleth.metadata.ItemSerializer;
 import net.shibboleth.metadata.pipeline.Pipeline;
 import net.shibboleth.metadata.pipeline.PipelineProcessingException;
@@ -72,7 +76,12 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
     private Collection<Item<T>> itemCollection;
     
     /**
-     * Lock covering the {@link itemCollection}.
+     * Metadata indexed by unique identifier.
+     */
+    private Map<String, Item<T>> uniqueIdentifierIndex;
+    
+    /**
+     * Lock covering the {@link #itemCollection} and {@link #uniqueIdentifierIndex}.
      */
     private ReadWriteLock itemCollectionLock;
     
@@ -175,7 +184,14 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
      * @return metadata associated with the particular identifier
      */
     public byte[] get(@Nonnull final String identifier) {
-        return null;
+        final Collection<Item<T>> items = new ArrayList<>();
+        itemCollectionLock.readLock().lock();
+        final Item<T> item = uniqueIdentifierIndex.get(identifier);
+        if (item != null) {
+            items.add(item.copy());
+        }
+        itemCollectionLock.readLock().unlock();
+        return renderCollection(items);
     }
 
     /**
@@ -190,8 +206,23 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
         sourcePipeline.execute(newItemCollection);
         log.debug("source pipeline executed; {} results", newItemCollection.size());
         
+        final Map<String, Item<T>> newUniqueIdentifierIndex = new HashMap<>();
+        for (Item<T> item : newItemCollection) {
+            final List<ItemId> uniqueIds = item.getItemMetadata().get(ItemId.class);
+            for (ItemId uniqueId : uniqueIds) {
+                final String id = uniqueId.getId();
+                if (newUniqueIdentifierIndex.containsKey(id)) {
+                    log.warn("duplicate unique identifier {} ignored", id);
+                } else {
+                    newUniqueIdentifierIndex.put(id, item);
+                }
+            }
+        }
+        log.debug("unique identifiers: {}", newUniqueIdentifierIndex.size());
+        
         itemCollectionLock.writeLock().lock();
         itemCollection = newItemCollection;
+        uniqueIdentifierIndex = newUniqueIdentifierIndex;
         itemCollectionLock.writeLock().unlock();
     }
     
@@ -225,6 +256,7 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
     @Override
     protected void doDestroy() {
         itemCollection = null;
+        uniqueIdentifierIndex = null;
         sourcePipeline = null;
         renderPipeline = null;
         serializer = null;
