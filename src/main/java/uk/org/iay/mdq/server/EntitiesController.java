@@ -23,7 +23,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -53,8 +52,7 @@ public class EntitiesController {
     /**
      * {@link MetadataService} from which we serve up metadata.
      */
-    @Resource
-    @Qualifier("metadataService.SAML")
+    @Resource(name = "metadataService.SAML")
     private MetadataService<Element> metadataService;
     
     /**
