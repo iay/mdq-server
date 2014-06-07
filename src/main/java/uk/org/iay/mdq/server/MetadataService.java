@@ -136,6 +136,23 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
         return null;
     }
 
+    /**
+     * Acquires new metadata by executing the source pipeline, then
+     * replaces any existing item collection with the results.
+     *  
+     * @throws PipelineProcessingException if something goes wrong in the source pipeline
+     */
+    private void refreshMetadata() throws PipelineProcessingException {
+        final Collection<Item<T>> newItemCollection = new ArrayList<>();
+        log.debug("executing source pipeline");
+        sourcePipeline.execute(newItemCollection);
+        log.debug("source pipeline executed; {} results", newItemCollection.size());
+        
+        itemCollectionLock.writeLock().lock();
+        itemCollection = newItemCollection;
+        itemCollectionLock.writeLock().unlock();
+    }
+    
     /** {@inheritDoc} */
     @Override
     protected void doInitialize() throws ComponentInitializationException {
@@ -156,15 +173,7 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
         itemCollectionLock = new ReentrantReadWriteLock();
         
         try {
-            final Collection<Item<T>> newItemCollection = new ArrayList<>();
-            log.debug("executing source pipeline");
-            sourcePipeline.execute(newItemCollection);
-            log.debug("source pipeline executed; {} results", newItemCollection.size());
-            
-            itemCollectionLock.writeLock().lock();
-            itemCollection = newItemCollection;
-            itemCollectionLock.writeLock().unlock();
-            
+            refreshMetadata();
         } catch (PipelineProcessingException e) {
             throw new ComponentInitializationException("error executing source pipeline", e);
         }
