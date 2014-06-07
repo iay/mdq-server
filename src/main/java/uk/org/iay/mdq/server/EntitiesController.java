@@ -18,10 +18,12 @@ package uk.org.iay.mdq.server;
 
 import java.nio.charset.Charset;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -32,6 +34,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.HandlerMapping;
+import org.w3c.dom.Element;
 
 /**
  * Controller for the <code>/entities</code> endpoint.
@@ -48,6 +51,13 @@ public class EntitiesController {
     private final Logger log = LoggerFactory.getLogger(EntitiesController.class);
 
     /**
+     * {@link MetadataService} from which we serve up metadata.
+     */
+    @Resource
+    @Qualifier("metadataService.SAML")
+    private MetadataService<Element> metadataService;
+    
+    /**
      * Returns the aggregate from the "entities" endpoint if no identifier is supplied.
      * 
      * @return an aggregate of all known entities
@@ -56,7 +66,12 @@ public class EntitiesController {
     @ResponseBody
     String entitiesAggregate() {
         log.debug("entities() called");
-        return "this was /entities.";
+        byte[] bytes = metadataService.getAll();
+        if (bytes == null) {
+            return "this was /entities: no result";
+        } else {
+            return "this was /entities: " + bytes.length + " bytes";
+        }
     }
 
     /**
@@ -78,7 +93,7 @@ public class EntitiesController {
 
         final String searchTerm = new AntPathMatcher().extractPathWithinPattern(pattern, req.getServletPath());
 
-        final String resp =
+        String resp =
                 "             identifier: " + id + "\n" +
                 "      req.getPathInfo(): " + req.getPathInfo() + "\n" +
                 "req.getPathTranslated(): " + req.getPathTranslated() + "\n" +
@@ -87,6 +102,15 @@ public class EntitiesController {
                 "                pattern: " + pattern + "\n" +
                 "                   term: " + searchTerm + "\n" +
                 "                servlet: " + req.getServletPath() + "\n";
+
+        byte[] bytes = metadataService.get(id);
+        if (bytes == null) {
+            resp +=
+                "               response: none" + "\n";
+        } else {
+            resp +=
+                "               response: " + bytes.length + " bytes" + "\n";
+        }
 
         final HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("text", "plain", Charset.forName("UTF-8")));
