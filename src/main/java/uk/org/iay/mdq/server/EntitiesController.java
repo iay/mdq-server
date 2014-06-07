@@ -66,14 +66,16 @@ public class EntitiesController {
     @ResponseBody
     HttpEntity<String> entitiesAggregate() {
         log.debug("entities() called");
-        byte[] bytes = metadataService.getAll();
+        final MetadataService<Element>.Result result = metadataService.getAll();
         
         String resp;
         
-        if (bytes == null) {
+        if (result == null) {
             resp = "this was /entities: no result";
         } else {
-            resp = "this was /entities: " + bytes.length + " bytes\n\n" +
+            final byte[] bytes = result.getBytes();
+            resp = "this was /entities: " + bytes.length + " bytes\n" +
+                    "   etag: " + result.getEtag() + "\n\n" +
                     new String(bytes, Charset.forName("UTF-8"));
         }
 
@@ -95,6 +97,7 @@ public class EntitiesController {
     HttpEntity<String> entitiesQuery(@PathVariable final String id,
             final HttpServletRequest req) {
         log.debug("entities/id() called, id=" + id);
+        final MetadataService<Element>.Result result = metadataService.get(id);
 
         // Don't repeat the pattern.
         final String pattern = (String) req.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
@@ -111,13 +114,14 @@ public class EntitiesController {
                 "                   term: " + searchTerm + "\n" +
                 "                servlet: " + req.getServletPath() + "\n";
 
-        byte[] bytes = metadataService.get(id);
-        if (bytes == null) {
+        if (result == null) {
             resp +=
                 "               response: none" + "\n";
         } else {
+            final byte[] bytes = result.getBytes();
             resp +=
-                "               response: " + bytes.length + " bytes\n\n" +
+                "               response: " + bytes.length + " bytes\n" +
+                "                   etag: " + result.getEtag() + "\n\n" +
                         new String(bytes, Charset.forName("UTF-8"));
         }
 

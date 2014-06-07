@@ -38,6 +38,8 @@ import net.shibboleth.utilities.java.support.component.ComponentInitializationEx
 import net.shibboleth.utilities.java.support.component.ComponentSupport;
 import net.shibboleth.utilities.java.support.logic.Constraint;
 
+import org.cryptacular.util.CodecUtil;
+import org.cryptacular.util.HashUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,6 +49,48 @@ import org.slf4j.LoggerFactory;
  * @param <T> item type of the metadata served
  */
 public class MetadataService<T> extends AbstractIdentifiableInitializableComponent {
+    
+    /**
+     * Representation of the result of a query.
+     */
+    public class Result {
+        
+        /** Bytes representing the rendered result. */
+        private final byte[] bytes;
+        
+        /** Etag value for this result. */
+        private final String etag;
+        
+        /**
+         * Constructor.
+         * 
+         * @param resultBytes byte array represending the rendered result
+         * @param resultEtag etag value for this result
+         */
+        protected Result(@Nonnull final byte[] resultBytes, @Nonnull final String resultEtag) {
+            bytes = resultBytes;
+            etag = resultEtag;
+        }
+        
+        /**
+         * Gets the rendered result as a byte array.
+         * 
+         * @return the rendered result as a byte array.
+         */
+        public byte[] getBytes() {
+            return bytes;
+        }
+        
+        /**
+         * Gets the etag for the result.
+         *  
+         * @return the etag for this result
+         */
+        public String getEtag() {
+            return etag;
+        }
+
+    }
     
     /** Class logger. */
     private final Logger log = LoggerFactory.getLogger(MetadataService.class);
@@ -165,15 +209,33 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
     }
     
     /**
+     * Construct a {@link Result} from the given collection of {@link Item}s
+     * by rendering the collection to a byte array.
+     * 
+     * @param items collection of {@link Items} to construct a result from
+     * 
+     * @return a {@link Result} representing the rendered collection
+     */
+    private Result createResult(@Nonnull final Collection<Item<T>> items) {
+        if (items.size() == 0) {
+            return null;
+        } else {
+            final byte[] bytes = renderCollection(items);
+            final String etag = CodecUtil.hex(HashUtil.sha1(bytes));
+            return new Result(bytes, etag);
+        }
+    }
+
+    /**
      * Query for metadata for all known entities.
      * 
      * @return metadata for all known entities
      */
-    public byte[] getAll() {
+    public Result getAll() {
         itemCollectionLock.readLock().lock();
         final Collection<Item<T>> items = cloneItemCollection(itemCollection);
         itemCollectionLock.readLock().unlock();
-        return renderCollection(items);
+        return createResult(items);
     }
     
     /**
@@ -183,7 +245,7 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
      * 
      * @return metadata associated with the particular identifier
      */
-    public byte[] get(@Nonnull final String identifier) {
+    public Result get(@Nonnull final String identifier) {
         final Collection<Item<T>> items = new ArrayList<>();
         itemCollectionLock.readLock().lock();
         final Item<T> item = uniqueIdentifierIndex.get(identifier);
@@ -191,7 +253,7 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
             items.add(item.copy());
         }
         itemCollectionLock.readLock().unlock();
-        return renderCollection(items);
+        return createResult(items);
     }
 
     /**
