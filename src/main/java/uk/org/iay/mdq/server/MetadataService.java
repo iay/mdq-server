@@ -20,6 +20,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.annotation.Nonnull;
 
@@ -69,6 +71,11 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
      */
     private Collection<Item<T>> itemCollection;
     
+    /**
+     * Lock covering the {@link itemCollection}.
+     */
+    private ReadWriteLock itemCollectionLock;
+    
     public void setSourcePipeline(@Nonnull final Pipeline<T> pipeline) {
         ComponentSupport.ifDestroyedThrowDestroyedComponentException(this);
         ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
@@ -98,8 +105,7 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
         return newItems;
     }
     
-    private byte[] renderCollection(@Nonnull final Collection<Item<T>> collection) {
-        final Collection<Item<T>> items = cloneItemCollection(collection);
+    private byte[] renderCollection(@Nonnull final Collection<Item<T>> items) {
         try {
             log.debug("rendering collection of {} elements", items.size());
             renderPipeline.execute(items);
@@ -120,7 +126,10 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
     }
     
     public byte[] getAll() {
-        return renderCollection(itemCollection);
+        itemCollectionLock.readLock().lock();
+        final Collection<Item<T>> items = cloneItemCollection(itemCollection);
+        itemCollectionLock.readLock().unlock();
+        return renderCollection(items);
     }
     
     public byte[] get(@Nonnull final String identifier) {
@@ -144,12 +153,18 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
             throw new ComponentInitializationException("serializer must be supplied");
         }
 
+        itemCollectionLock = new ReentrantReadWriteLock();
+        
         try {
             final Collection<Item<T>> newItemCollection = new ArrayList<>();
             log.debug("executing source pipeline");
             sourcePipeline.execute(newItemCollection);
             log.debug("source pipeline executed; {} results", newItemCollection.size());
+            
+            itemCollectionLock.writeLock().lock();
             itemCollection = newItemCollection;
+            itemCollectionLock.writeLock().unlock();
+            
         } catch (PipelineProcessingException e) {
             throw new ComponentInitializationException("error executing source pipeline", e);
         }
@@ -162,6 +177,7 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
         sourcePipeline = null;
         renderPipeline = null;
         serializer = null;
+        itemCollectionLock = null;
         super.doDestroy();
     }
 
