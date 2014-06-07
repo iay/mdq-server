@@ -76,6 +76,11 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
      */
     private ReadWriteLock itemCollectionLock;
     
+    /**
+     * Sets the {@link Pipeline} used to acquire new metadata.
+     * 
+     * @param pipeline the new source {@link Pipeline}
+     */
     public void setSourcePipeline(@Nonnull final Pipeline<T> pipeline) {
         ComponentSupport.ifDestroyedThrowDestroyedComponentException(this);
         ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
@@ -83,6 +88,11 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
         sourcePipeline = Constraint.isNotNull(pipeline, "source pipeline may not be null");
     }
     
+    /**
+     * Sets the {@link Pipeline} used to render results.
+     * 
+     * @param pipeline the new render {@link Pipeline}
+     */
     public void setRenderPipeline(@Nonnull final Pipeline<T> pipeline) {
         ComponentSupport.ifDestroyedThrowDestroyedComponentException(this);
         ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
@@ -90,6 +100,11 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
         renderPipeline = Constraint.isNotNull(pipeline, "render pipeline may not be null");
     }
     
+    /**
+     * Sets the {@link ItemSerializer} used to serialize rendered results.
+     * 
+     * @param itemSerializer the new {@link ItemSerializer} to use
+     */
     public void setSerializer(@Nonnull final ItemSerializer<T> itemSerializer) {
         ComponentSupport.ifDestroyedThrowDestroyedComponentException(this);
         ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
@@ -97,6 +112,14 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
         serializer = Constraint.isNotNull(itemSerializer, "serializer may not be null");
     }
     
+    /**
+     * Clones an {@link Item} {@link Collection} so that its elements can be mutated
+     * without changing the originals.
+     * 
+     * @param collection {@link Collection} of {@link Item}s to clone
+     * 
+     * @return cloned {@link Collection} of {@link Item}s
+     */
     private Collection<Item<T>> cloneItemCollection(@Nonnull final Collection<Item<T>> collection) {
         final Collection<Item<T>> newItems = new ArrayList<>();
         for (Item<T> item : collection) {
@@ -105,6 +128,13 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
         return newItems;
     }
     
+    /**
+     * Render a {@link Collection} of {@Items} representing the result of a query.
+     * 
+     * @param items query result to render
+     * 
+     * @return rendered query result
+     */
     private byte[] renderCollection(@Nonnull final Collection<Item<T>> items) {
         try {
             log.debug("rendering collection of {} elements", items.size());
@@ -125,6 +155,11 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
         }
     }
     
+    /**
+     * Query for metadata for all known entities.
+     * 
+     * @return metadata for all known entities
+     */
     public byte[] getAll() {
         itemCollectionLock.readLock().lock();
         final Collection<Item<T>> items = cloneItemCollection(itemCollection);
@@ -132,6 +167,13 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
         return renderCollection(items);
     }
     
+    /**
+     * Query for metadata for a particular identifier.
+     * 
+     * @param identifier identifier for which metadata is requested
+     * 
+     * @return metadata associated with the particular identifier
+     */
     public byte[] get(@Nonnull final String identifier) {
         return null;
     }
