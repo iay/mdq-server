@@ -64,14 +64,22 @@ public class EntitiesController {
      */
     @RequestMapping("")
     @ResponseBody
-    String entitiesAggregate() {
+    HttpEntity<String> entitiesAggregate() {
         log.debug("entities() called");
         byte[] bytes = metadataService.getAll();
+        
+        String resp;
+        
         if (bytes == null) {
-            return "this was /entities: no result";
+            resp = "this was /entities: no result";
         } else {
-            return "this was /entities: " + bytes.length + " bytes";
+            resp = "this was /entities: " + bytes.length + " bytes\n\n" +
+                    new String(bytes, Charset.forName("UTF-8"));
         }
+
+        final HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("text", "plain", Charset.forName("UTF-8")));
+        return new HttpEntity<String>(resp, headers);
     }
 
     /**
@@ -109,7 +117,8 @@ public class EntitiesController {
                 "               response: none" + "\n";
         } else {
             resp +=
-                "               response: " + bytes.length + " bytes" + "\n";
+                "               response: " + bytes.length + " bytes\n\n" +
+                        new String(bytes, Charset.forName("UTF-8"));
         }
 
         final HttpHeaders headers = new HttpHeaders();
