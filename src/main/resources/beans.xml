@@ -27,6 +27,13 @@
             <list>
                 <ref bean="int_edugain_productionEntities"/>
                 <ref bean="populateItemIds"/>
+                <bean class="net.shibboleth.metadata.pipeline.ItemIdTransformStage">
+                    <property name="idTransformers">
+                        <list>
+                            <bean class="net.shibboleth.metadata.pipeline.MDQuerySHA1ItemIdTransformer"/>
+                        </list>
+                    </property>
+                </bean>
             </list>
         </property>
     </bean>
