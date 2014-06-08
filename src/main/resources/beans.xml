@@ -20,7 +20,11 @@
     <import resource="classpath:int_edugain/beans.xml"/>
     
     <!--
-        Pipeline bean used to acquire metadata for service.
+        Pipeline used to acquire metadata for service.
+        
+        Input: empty collection.
+        
+        Output: collection of individual entity metadata items.
     -->
     <bean id="source.SAML" parent="SimplePipeline">
         <property name="stages">
@@ -40,6 +44,12 @@
 
     <!--
         Pipeline used to render metadata for publication.
+        
+        Input: collection of individual entity metadata items.
+        
+        Output: collection of items ready for serialization. For SAML, the collction is
+            normally a single item, multiple entities having been combined into an
+            EntitiesDescriptor.
     -->
     <bean id="render.SAML" parent="SimplePipeline">
         <property name="stages">
