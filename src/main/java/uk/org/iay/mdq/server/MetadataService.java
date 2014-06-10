@@ -53,7 +53,7 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
     /**
      * Representation of the result of a query.
      */
-    public class Result {
+    public class ServiceResult implements Result {
         
         /** Bytes representing the rendered result. */
         private final byte[] bytes;
@@ -67,25 +67,17 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
          * @param resultBytes byte array represending the rendered result
          * @param resultEtag etag value for this result
          */
-        protected Result(@Nonnull final byte[] resultBytes, @Nonnull final String resultEtag) {
+        protected ServiceResult(@Nonnull final byte[] resultBytes, @Nonnull final String resultEtag) {
             bytes = resultBytes;
             etag = resultEtag;
         }
         
-        /**
-         * Gets the rendered result as a byte array.
-         * 
-         * @return the rendered result as a byte array.
-         */
+        @Override
         public byte[] getBytes() {
             return bytes;
         }
         
-        /**
-         * Gets the etag for the result.
-         *  
-         * @return the etag for this result
-         */
+        @Override
         public String getEtag() {
             return etag;
         }
@@ -222,7 +214,7 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
         } else {
             final byte[] bytes = renderCollection(items);
             final String etag = CodecUtil.hex(HashUtil.sha1(bytes));
-            return new Result(bytes, etag);
+            return new ServiceResult(bytes, etag);
         }
     }
 

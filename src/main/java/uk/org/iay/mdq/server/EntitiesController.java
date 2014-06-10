@@ -61,7 +61,7 @@ public class EntitiesController {
     @ResponseBody
     HttpEntity<String> entitiesAggregate() {
         log.debug("entities() called");
-        final MetadataService<Element>.Result result = metadataService.getAll();
+        final Result result = metadataService.getAll();
         
         String resp;
         
@@ -90,7 +90,7 @@ public class EntitiesController {
     @ResponseBody
     HttpEntity<String> entitiesQuery(@PathVariable final String id) {
         log.debug("entities/id() called, id=" + id);
-        final MetadataService<Element>.Result result = metadataService.get(id);
+        final Result result = metadataService.get(id);
 
         String resp =
                 "             identifier: " + id + "\n";
