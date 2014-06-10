@@ -29,9 +29,10 @@ public interface Result {
     public abstract String getEtag();
 
     /**
-     * Gets the rendered result as a byte array.
+     * Gets the rendered result as a byte array. If no result is
+     * represented, returns <code>null</code>.
      * 
-     * @return the rendered result as a byte array.
+     * @return the rendered result as a byte array, or <code>null</code>.
      */
     public abstract byte[] getBytes();
 

@@ -208,9 +208,10 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
      * 
      * @return a {@link Result} representing the rendered collection
      */
+    @Nonnull
     private Result createResult(@Nonnull final Collection<Item<T>> items) {
         if (items.size() == 0) {
-            return null;
+            return new ServiceResult(null, null);
         } else {
             final byte[] bytes = renderCollection(items);
             final String etag = CodecUtil.hex(HashUtil.sha1(bytes));
@@ -223,6 +224,7 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
      * 
      * @return metadata for all known entities
      */
+    @Nonnull
     public Result getAll() {
         itemCollectionLock.readLock().lock();
         final Collection<Item<T>> items = cloneItemCollection(itemCollection);
@@ -237,7 +239,7 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
      * 
      * @return metadata associated with the particular identifier
      */
-    public Result get(@Nonnull final String identifier) {
+    @Nonnull public Result get(@Nonnull final String identifier) {
         final Collection<Item<T>> items = new ArrayList<>();
         itemCollectionLock.readLock().lock();
         final Item<T> item = uniqueIdentifierIndex.get(identifier);

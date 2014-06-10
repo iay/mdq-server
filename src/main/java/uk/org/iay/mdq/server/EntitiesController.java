@@ -62,13 +62,13 @@ public class EntitiesController {
     HttpEntity<String> entitiesAggregate() {
         log.debug("entities() called");
         final Result result = metadataService.getAll();
+        final byte[] bytes = result.getBytes();
         
         String resp;
         
-        if (result == null) {
+        if (bytes == null) {
             resp = "this was /entities: no result";
         } else {
-            final byte[] bytes = result.getBytes();
             resp = "this was /entities: " + bytes.length + " bytes\n" +
                     "   etag: " + result.getEtag() + "\n\n" +
                     new String(bytes, Charset.forName("UTF-8"));
@@ -91,14 +91,14 @@ public class EntitiesController {
     HttpEntity<String> entitiesQuery(@PathVariable final String id) {
         log.debug("entities/id() called, id=" + id);
         final Result result = metadataService.get(id);
+        final byte[] bytes = result.getBytes();
 
         String resp =
                 "             identifier: " + id + "\n";
-        if (result == null) {
+        if (bytes == null) {
             resp +=
                 "               response: none" + "\n";
         } else {
-            final byte[] bytes = result.getBytes();
             resp +=
                 "               response: " + bytes.length + " bytes\n" +
                 "                   etag: " + result.getEtag() + "\n\n" +
