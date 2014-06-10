@@ -19,7 +19,6 @@ package uk.org.iay.mdq.server;
 import java.nio.charset.Charset;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,12 +26,10 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.AntPathMatcher;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.HandlerMapping;
 import org.w3c.dom.Element;
 
 /**
@@ -86,32 +83,17 @@ public class EntitiesController {
      * Returns the result of a query for an identifier.
      * 
      * @param id identifier to query for
-     * @param req {@link HttpServletRequest} representing the request in progress
      * 
      * @return the metadata for the identified entity or entities
      */
     @RequestMapping("/{id:.*}")
     @ResponseBody
-    HttpEntity<String> entitiesQuery(@PathVariable final String id,
-            final HttpServletRequest req) {
+    HttpEntity<String> entitiesQuery(@PathVariable final String id) {
         log.debug("entities/id() called, id=" + id);
         final MetadataService<Element>.Result result = metadataService.get(id);
 
-        // Don't repeat the pattern.
-        final String pattern = (String) req.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
-
-        final String searchTerm = new AntPathMatcher().extractPathWithinPattern(pattern, req.getServletPath());
-
         String resp =
-                "             identifier: " + id + "\n" +
-                "      req.getPathInfo(): " + req.getPathInfo() + "\n" +
-                "req.getPathTranslated(): " + req.getPathTranslated() + "\n" +
-                "    req.getRequestURI(): " + req.getRequestURI() + "\n" +
-                "   req.getContextPath(): " + req.getContextPath() + "\n" +
-                "                pattern: " + pattern + "\n" +
-                "                   term: " + searchTerm + "\n" +
-                "                servlet: " + req.getServletPath() + "\n";
-
+                "             identifier: " + id + "\n";
         if (result == null) {
             resp +=
                 "               response: none" + "\n";
