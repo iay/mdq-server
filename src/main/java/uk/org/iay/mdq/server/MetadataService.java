@@ -174,7 +174,7 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
     }
     
     /**
-     * Render a {@link Collection} of {@Items} representing the result of a query.
+     * Render a {@link Collection} of {@link Item}s representing the result of a query.
      * 
      * @param items query result to render
      * 
@@ -204,7 +204,7 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
      * Construct a {@link Result} from the given collection of {@link Item}s
      * by rendering the collection to a byte array.
      * 
-     * @param items collection of {@link Items} to construct a result from
+     * @param items collection of {@link Item}s to construct a result from
      * 
      * @return a {@link Result} representing the rendered collection
      */

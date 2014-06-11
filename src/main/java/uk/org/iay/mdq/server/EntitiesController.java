@@ -32,8 +32,7 @@ import org.w3c.dom.Element;
  * Controller for the <code>/entities</code> endpoint.
  * 
  * This implementation assumes that encoded "/" characters in identifiers
- * are parsed correctly by Spring. See {@link Entities2Controller} for an
- * alternative implementation which does not make that assumption.
+ * are parsed correctly by Spring.
  */
 @Controller
 @RequestMapping(value = "/entities", method = RequestMethod.GET)
@@ -51,7 +50,7 @@ public class EntitiesController {
     /**
      * Returns the aggregate from the "entities" endpoint if no identifier is supplied.
      * 
-     * @param model
+     * @param model {@link Model} containing attributes for the view
      * 
      * @return an aggregate of all known entities
      */
@@ -65,7 +64,7 @@ public class EntitiesController {
     /**
      * Returns the result of a query for an identifier.
      * 
-     * @param model 
+     * @param model {@link Model} containing attributes for the view
      * @param id identifier to query for
      * 
      * @return the metadata for the identified entity or entities
