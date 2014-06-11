@@ -7,10 +7,10 @@ html {
         title('mdq-server query result')
     }
     body {
-        byte[] bytes = result.getBytes()
-        if (bytes == null) {
+        if (result.isNotFound()) {
             p('No results were returned from the query.')
         } else {
+            byte[] bytes = result.getBytes()
             p("The query returned a $bytes.length byte response.")
             p("The ETag value for the response is ${result.getEtag()}.")
             p('Rendered metadata looks like this:')

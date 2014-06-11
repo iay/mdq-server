@@ -52,8 +52,7 @@ public class ResultTextView implements View {
         log.debug("rendering as {}", getContentType());
         final Result result = (Result) model.get("result");
 
-        final byte[] bytes = result.getBytes();
-        if (bytes == null) {
+        if (result.isNotFound()) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
@@ -73,6 +72,7 @@ public class ResultTextView implements View {
         response.setContentType(new MediaType("text", "plain", Charset.forName("UTF-8")).toString());
         final Writer w = new OutputStreamWriter(out, Charset.forName("UTF-8"));
 
+        final byte[] bytes = result.getBytes();
         w.write("Query result is:\n");
         w.write("   " + bytes.length + " bytes\n");
         w.write("   etag is " + result.getEtag() + "\n");

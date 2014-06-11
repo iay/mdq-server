@@ -22,6 +22,15 @@ package uk.org.iay.mdq.server;
 public interface Result {
 
     /**
+     * Returns whether the {@link Result} represents a query for which no data
+     * was found.
+     * 
+     * @return <code>true</code> if the {@link Result} represents a query for
+     * which no data was found
+     */
+    public abstract boolean isNotFound();
+    
+    /**
      * Gets the <code>etag</code> for the result.
      *  
      * @return the <code>etag</code> for this result

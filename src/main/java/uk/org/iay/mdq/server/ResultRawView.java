@@ -59,8 +59,7 @@ public class ResultRawView implements View {
         final Result result = (Result) model.get("result");
         log.debug("rendering as {}", getContentType());
 
-        final byte[] bytes = result.getBytes();
-        if (bytes == null) {
+        if (result.isNotFound()) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
@@ -79,7 +78,7 @@ public class ResultRawView implements View {
         
         response.setContentType(getContentType());
         
-        out.write(bytes);
+        out.write(result.getBytes());
     }
 
 }

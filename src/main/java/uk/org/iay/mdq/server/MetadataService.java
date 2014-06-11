@@ -64,12 +64,22 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
         /**
          * Constructor.
          * 
-         * @param resultBytes byte array represending the rendered result
+         * @param resultBytes byte array representing the rendered result
          * @param resultEtag etag value for this result
          */
         protected ServiceResult(@Nonnull final byte[] resultBytes, @Nonnull final String resultEtag) {
             bytes = resultBytes;
             etag = resultEtag;
+        }
+        
+        /**
+         * Constructor.
+         * 
+         * Represent a query for which no results were found.
+         */
+        protected ServiceResult() {
+            bytes = null;
+            etag = null;
         }
         
         @Override
@@ -80,6 +90,11 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
         @Override
         public String getEtag() {
             return etag;
+        }
+
+        @Override
+        public boolean isNotFound() {
+            return bytes == null;
         }
 
     }
@@ -211,7 +226,7 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
     @Nonnull
     private Result createResult(@Nonnull final Collection<Item<T>> items) {
         if (items.size() == 0) {
-            return new ServiceResult(null, null);
+            return new ServiceResult();
         } else {
             final byte[] bytes = renderCollection(items);
             final String etag = CodecUtil.hex(HashUtil.sha1(bytes));
