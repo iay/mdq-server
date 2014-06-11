@@ -47,14 +47,45 @@
         
         Input: collection of individual entity metadata items.
         
-        Output: collection of items ready for serialization. For SAML, the collction is
+        Output: collection of items ready for serialization. For SAML, the collection is
             normally a single item, multiple entities having been combined into an
             EntitiesDescriptor.
     -->
     <bean id="render.SAML" parent="SimplePipeline">
         <property name="stages">
             <list>
+                <!--
+                    If more than one EntityDescriptor has been found,
+                    wrap them all in an EntitiesDescriptor.
+                -->
+                <bean id="assemble" parent="stage_parent"
+                    class="net.shibboleth.metadata.dom.saml.EntitiesDescriptorAssemblerStage">
+                    <property name="collectionPredicate">
+                        <bean class="net.shibboleth.metadata.pipeline.AtLeastCollectionPredicate"
+                            p:minimum="2"/>
+                    </property>
+                </bean>
                 
+                <!--
+                    Set cacheDuration to 6 hours.
+                -->
+                <bean id="addCacheDuration" parent="stage_parent"
+                    class="net.shibboleth.metadata.dom.saml.SetCacheDurationStage"
+                    p:cacheDuration="#{ 1000L * 60 * 60 * 6 }"/>
+                    
+                <!--
+                    Set validUntil window to 14 days.
+                -->
+                <bean id="addValidUntil" parent="stage_parent"
+                    class="net.shibboleth.metadata.dom.saml.SetValidUntilStage"
+                    p:validityDuration="#{ 1000L * 60 * 60 * 24 * 14 }"/>
+                    
+                <!--
+                    Add a random ID attribute for the signature to use.
+                -->
+                <bean id="addID" parent="stage_parent"
+                    class="net.shibboleth.metadata.dom.saml.GenerateIdStage"/>
+                    
             </list>
         </property>
     </bean>
