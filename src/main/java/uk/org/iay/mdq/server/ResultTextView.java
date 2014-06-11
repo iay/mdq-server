@@ -72,11 +72,12 @@ public class ResultTextView implements View {
 
         response.setContentType(new MediaType("text", "plain", Charset.forName("UTF-8")).toString());
         final Writer w = new OutputStreamWriter(out, Charset.forName("UTF-8"));
-        String resp;
-        resp = "this was /entities: " + bytes.length + " bytes\n" +
-                "   etag: " + result.getEtag() + "\n\n" +
-                new String(bytes, Charset.forName("UTF-8"));
-        w.write(resp);
+
+        w.write("Query result is:\n");
+        w.write("   " + bytes.length + " bytes\n");
+        w.write("   etag is " + result.getEtag() + "\n");
+        w.write("\n");
+        w.write(new String(bytes, Charset.forName("UTF-8")));
     }
 
 }
