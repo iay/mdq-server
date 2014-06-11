@@ -110,6 +110,7 @@
         -->
         <property name="viewResolvers">
             <list>
+                <ref bean="groovyTemplateViewResolver"/>
             </list>
         </property>
         
