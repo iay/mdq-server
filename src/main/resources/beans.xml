@@ -72,4 +72,57 @@
         </property>
     </bean>
 
+    <!--
+        Plain text view for query results.
+    -->
+    <bean id="queryResultText" class="uk.org.iay.mdq.server.ResultTextView"/>
+
+    <!--
+        SAML metadata view for query results.
+    -->
+    <bean id="queryResultRaw" class="uk.org.iay.mdq.server.ResultRawView"
+        c:cType="application/samlmetadata+xml"/>
+
+    <!--
+        View resolver for the application.
+    -->
+    <bean id="viewResolver"
+        class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver" lazy-init="false">
+        
+        <!--
+            Content negotiation strategy.
+            
+            * Ignore file extension and format attribute.
+            * Use Accept header.
+            * Default to SAML metadata.
+        -->
+        <property name="contentNegotiationManager">
+            <bean class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
+                <property name="favorPathExtension" value="false"/>
+                <property name="favorParameter" value="false"/>
+                <property name="ignoreAcceptHeader" value="false"/>
+                <property name="defaultContentType" value="application/samlmetadata+xml"/>
+            </bean>
+        </property>
+    
+        <!--
+            Disable all other view resolvers until we have them configured correctly. 
+        -->
+        <property name="viewResolvers">
+            <list>
+            </list>
+        </property>
+        
+        <!--
+            Rely on default views for SAML metadata and text/plain. Prefer the
+            SAML metadata view.
+        -->
+        <property name="defaultViews">
+            <list>
+                <ref bean="queryResultRaw"/>
+                <ref bean="queryResultText"/>
+            </list>
+        </property>
+    </bean>
+
 </beans>

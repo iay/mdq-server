@@ -16,20 +16,16 @@
 
 package uk.org.iay.mdq.server;
 
-import java.nio.charset.Charset;
-
+import javax.annotation.Nonnull;
 import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.w3c.dom.Element;
 
 /**
@@ -55,59 +51,30 @@ public class EntitiesController {
     /**
      * Returns the aggregate from the "entities" endpoint if no identifier is supplied.
      * 
+     * @param model
+     * 
      * @return an aggregate of all known entities
      */
     @RequestMapping("")
-    @ResponseBody
-    HttpEntity<String> entitiesAggregate() {
-        log.debug("entities() called");
-        final Result result = metadataService.getAll();
-        final byte[] bytes = result.getBytes();
-        
-        String resp;
-        
-        if (bytes == null) {
-            resp = "this was /entities: no result";
-        } else {
-            resp = "this was /entities: " + bytes.length + " bytes\n" +
-                    "   etag: " + result.getEtag() + "\n\n" +
-                    new String(bytes, Charset.forName("UTF-8"));
-        }
-
-        final HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(new MediaType("text", "plain", Charset.forName("UTF-8")));
-        return new HttpEntity<String>(resp, headers);
+    String queryAllEntities(@Nonnull final Model model) {
+        log.debug("queried for all entities");
+        model.addAttribute("result", metadataService.getAll());
+        return "queryResult";
     }
-
+    
     /**
      * Returns the result of a query for an identifier.
      * 
+     * @param model 
      * @param id identifier to query for
      * 
      * @return the metadata for the identified entity or entities
      */
     @RequestMapping("/{id:.*}")
-    @ResponseBody
-    HttpEntity<String> entitiesQuery(@PathVariable final String id) {
-        log.debug("entities/id() called, id=" + id);
-        final Result result = metadataService.get(id);
-        final byte[] bytes = result.getBytes();
-
-        String resp =
-                "             identifier: " + id + "\n";
-        if (bytes == null) {
-            resp +=
-                "               response: none" + "\n";
-        } else {
-            resp +=
-                "               response: " + bytes.length + " bytes\n" +
-                "                   etag: " + result.getEtag() + "\n\n" +
-                        new String(bytes, Charset.forName("UTF-8"));
-        }
-
-        final HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(new MediaType("text", "plain", Charset.forName("UTF-8")));
-        return new HttpEntity<String>(resp, headers);
+    String queryByIdentifier(@Nonnull final Model model, @PathVariable final String id) {
+        log.debug("query by identifier, id=" + id);
+        model.addAttribute("result", metadataService.get(id));
+        return "queryResult";
     }
 
 }
