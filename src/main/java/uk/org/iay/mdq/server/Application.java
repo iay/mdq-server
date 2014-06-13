@@ -16,6 +16,8 @@
 
 package uk.org.iay.mdq.server;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -24,6 +26,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
+import org.springframework.core.env.Environment;
 
 /**
  * Application bootstrap class.
@@ -53,6 +56,12 @@ public class Application {
      * @param args Command line arguments.
      */
     public static void main(String[] args) {
+
+        /*
+         * Class logger.
+         */
+        final Logger log = LoggerFactory.getLogger(EntitiesController.class);
+
         /*
          * Construct the application.
          */
@@ -67,6 +76,14 @@ public class Application {
          * Start the application.
          */
         final ApplicationContext ctx = app.run(args);
+        
+        final Environment env = ctx.getEnvironment();
+        for (String profile : env.getDefaultProfiles()) {
+            log.debug("default profile: {}", profile);
+        }
+        for (String profile : env.getActiveProfiles()) {
+            log.debug("active profile: {}", profile);
+        }
     }
 
 }
