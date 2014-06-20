@@ -31,11 +31,11 @@ public interface Result {
     public abstract boolean isNotFound();
     
     /**
-     * Gets the <code>etag</code> for the result.
+     * Gets the <code>ETag</code> for the result.
      *  
-     * @return the <code>etag</code> for this result
+     * @return the <code>ETag</code> for this result
      */
-    public abstract String getEtag();
+    public abstract String getETag();
 
     /**
      * Gets the rendered result as a byte array. If no result is

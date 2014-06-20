@@ -58,18 +58,18 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
         /** Bytes representing the rendered result. */
         private final byte[] bytes;
         
-        /** Etag value for this result. */
+        /** ETag value for this result. */
         private final String etag;
         
         /**
          * Constructor.
          * 
          * @param resultBytes byte array representing the rendered result
-         * @param resultEtag etag value for this result
+         * @param resultETag ETag value for this result
          */
-        protected ServiceResult(@Nonnull final byte[] resultBytes, @Nonnull final String resultEtag) {
+        protected ServiceResult(@Nonnull final byte[] resultBytes, @Nonnull final String resultETag) {
             bytes = resultBytes;
-            etag = resultEtag;
+            etag = resultETag;
         }
         
         /**
@@ -88,7 +88,7 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
         }
         
         @Override
-        public String getEtag() {
+        public String getETag() {
             return etag;
         }
 

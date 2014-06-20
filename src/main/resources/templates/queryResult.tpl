@@ -12,7 +12,7 @@ html {
         } else {
             byte[] bytes = result.getBytes()
             p("The query returned a $bytes.length byte response.")
-            p("The ETag value for the response is ${result.getEtag()}.")
+            p("The ETag value for the response is ${result.getETag()}.")
             p('Rendered metadata looks like this:')
             pre {
                 yield new String(result.getBytes(), Charset.forName("UTF-8"))

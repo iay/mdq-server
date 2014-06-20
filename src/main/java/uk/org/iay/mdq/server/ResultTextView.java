@@ -75,7 +75,7 @@ public class ResultTextView implements View {
         final byte[] bytes = result.getBytes();
         w.write("Query result is:\n");
         w.write("   " + bytes.length + " bytes\n");
-        w.write("   etag is " + result.getEtag() + "\n");
+        w.write("   ETag is " + result.getETag() + "\n");
         w.write("\n");
         w.write(new String(bytes, Charset.forName("UTF-8")));
     }
