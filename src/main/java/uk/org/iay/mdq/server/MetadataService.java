@@ -230,7 +230,7 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
         } else {
             final byte[] bytes = renderCollection(items);
             final String etag = CodecUtil.hex(HashUtil.sha1(bytes));
-            return new ServiceResult(bytes, etag);
+            return new ServiceResult(bytes, "\"" + etag + "\"");
         }
     }
 
