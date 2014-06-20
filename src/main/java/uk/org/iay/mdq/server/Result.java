@@ -28,14 +28,14 @@ public interface Result {
      * @return <code>true</code> if the {@link Result} represents a query for
      * which no data was found
      */
-    public abstract boolean isNotFound();
+    public boolean isNotFound();
     
     /**
      * Gets the <code>ETag</code> for the result.
      *  
      * @return the <code>ETag</code> for this result
      */
-    public abstract String getETag();
+    public String getETag();
 
     /**
      * Gets the rendered result as a byte array. If no result is
@@ -43,6 +43,6 @@ public interface Result {
      * 
      * @return the rendered result as a byte array, or <code>null</code>.
      */
-    public abstract byte[] getBytes();
+    public byte[] getBytes();
 
 }
