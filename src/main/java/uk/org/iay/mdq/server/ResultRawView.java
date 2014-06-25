@@ -87,6 +87,7 @@ public class ResultRawView implements View {
         }
         response.setContentType(getContentType());
         response.setContentLength(rep.getBytes().length);
+        response.setHeader("ETag", rep.getETag());
         
         log.debug("selected ({}) representation is {} bytes",
                 contentEncoding, rep.getBytes().length);
