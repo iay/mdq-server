@@ -86,6 +86,7 @@ public class ResultRawView implements View {
             contentEncoding = "normal";
         }
         response.setContentType(getContentType());
+        response.setContentLength(rep.getBytes().length);
         
         log.debug("selected ({}) representation is {} bytes",
                 contentEncoding, rep.getBytes().length);
