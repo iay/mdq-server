@@ -31,6 +31,9 @@ import org.slf4j.LoggerFactory;
  */
 public class DeflateRepresentation extends BaseRepresentation {
 
+    /** Content encoding for this type of representation. */
+    public static final String ENCODING = "compress";
+
     /** Class logger. */
     private static Logger log = LoggerFactory.getLogger(DeflateRepresentation.class);
 
@@ -61,7 +64,7 @@ public class DeflateRepresentation extends BaseRepresentation {
     
     @Override
     public String getContentEncoding() {
-        return "compress";
+        return ENCODING;
     }
     
 }

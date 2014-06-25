@@ -31,6 +31,9 @@ import org.slf4j.LoggerFactory;
  */
 public class GZIPRepresentation extends BaseRepresentation {
 
+    /** Content encoding for this type of representation. */
+    public static final String ENCODING = "gzip";
+
     /** Class logger. */
     private static Logger log = LoggerFactory.getLogger(GZIPRepresentation.class);
 
@@ -61,7 +64,7 @@ public class GZIPRepresentation extends BaseRepresentation {
     
     @Override
     public String getContentEncoding() {
-        return "gzip";
+        return ENCODING;
     }
     
 }

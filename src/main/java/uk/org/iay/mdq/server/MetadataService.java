@@ -92,19 +92,21 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
         @Override
         @Nonnull
         public synchronized Representation getGZIPRepresentation() {
-            if (!representations.containsKey("gzip")) {
-                representations.put("gzip", new GZIPRepresentation(representation.getBytes()));
+            final String encoding = GZIPRepresentation.ENCODING;
+            if (!representations.containsKey(encoding)) {
+                representations.put(encoding, new GZIPRepresentation(representation.getBytes()));
             }
-            return representations.get("gzip");
+            return representations.get(encoding);
         }
 
         @Override
         @Nonnull
         public synchronized Representation getDeflateRepresentation() {
-            if (!representations.containsKey("compress")) {
-                representations.put("compress", new DeflateRepresentation(representation.getBytes()));
+            final String encoding = DeflateRepresentation.ENCODING;
+            if (!representations.containsKey(encoding)) {
+                representations.put(encoding, new DeflateRepresentation(representation.getBytes()));
             }
-            return representations.get("compress");
+            return representations.get(encoding);
         }
 
     }
