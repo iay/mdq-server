@@ -38,8 +38,6 @@ import net.shibboleth.utilities.java.support.component.ComponentInitializationEx
 import net.shibboleth.utilities.java.support.component.ComponentSupport;
 import net.shibboleth.utilities.java.support.logic.Constraint;
 
-import org.cryptacular.util.CodecUtil;
-import org.cryptacular.util.HashUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,22 +52,21 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
      * Representation of the result of a query.
      */
     public class ServiceResult implements Result {
-        
-        /** Bytes representing the rendered result. */
-        private final byte[] bytes;
-        
-        /** ETag value for this result. */
-        private final String etag;
+
+        /** The default, uncompressed {@link Representation} for the {@link Result}. */
+        @Nonnull
+        private final Representation representation;
+
+        /** Other compressed {@link Representation}s, generated on demand. */
+        private final Map<String, Representation> representations = new HashMap<>();
         
         /**
          * Constructor.
          * 
          * @param resultBytes byte array representing the rendered result
-         * @param resultETag ETag value for this result
          */
-        protected ServiceResult(@Nonnull final byte[] resultBytes, @Nonnull final String resultETag) {
-            bytes = resultBytes;
-            etag = resultETag;
+        protected ServiceResult(@Nonnull final byte[] resultBytes) {
+            representation = new SimpleRepresentation(resultBytes);
         }
         
         /**
@@ -78,23 +75,36 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
          * Represent a query for which no results were found.
          */
         protected ServiceResult() {
-            bytes = null;
-            etag = null;
+            representation = null;
         }
         
         @Override
-        public byte[] getBytes() {
-            return bytes;
-        }
-        
-        @Override
-        public String getETag() {
-            return etag;
+        public boolean isNotFound() {
+            return representation == null;
         }
 
         @Override
-        public boolean isNotFound() {
-            return bytes == null;
+        @Nonnull
+        public Representation getRepresentation() {
+            return representation;
+        }
+
+        @Override
+        @Nonnull
+        public synchronized Representation getGZIPRepresentation() {
+            if (!representations.containsKey("gzip")) {
+                representations.put("gzip", new GZIPRepresentation(representation.getBytes()));
+            }
+            return representations.get("gzip");
+        }
+
+        @Override
+        @Nonnull
+        public synchronized Representation getDeflateRepresentation() {
+            if (!representations.containsKey("compress")) {
+                representations.put("compress", new DeflateRepresentation(representation.getBytes()));
+            }
+            return representations.get("compress");
         }
 
     }
@@ -229,8 +239,7 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
             return new ServiceResult();
         } else {
             final byte[] bytes = renderCollection(items);
-            final String etag = CodecUtil.hex(HashUtil.sha1(bytes));
-            return new ServiceResult(bytes, "\"" + etag + "\"");
+            return new ServiceResult(bytes);
         }
     }
 

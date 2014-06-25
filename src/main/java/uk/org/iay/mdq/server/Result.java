@@ -16,6 +16,9 @@
 
 package uk.org.iay.mdq.server;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 /**
  * Result of a query.
  */
@@ -31,18 +34,28 @@ public interface Result {
     public boolean isNotFound();
     
     /**
-     * Gets the <code>ETag</code> for the result.
-     *  
-     * @return the <code>ETag</code> for this result
+     * Returns the normal {@link Representation} for the result.
+     * 
+     * @return the normal {@link Representation} for the result
      */
-    public String getETag();
+    @Nonnull
+    public Representation getRepresentation();
 
     /**
-     * Gets the rendered result as a byte array. If no result is
-     * represented, returns <code>null</code>.
+     * Returns a GZIPped {@link Representation} for the {@link Result}
+     * if one is available.
      * 
-     * @return the rendered result as a byte array, or <code>null</code>.
+     * @return the GZIPped {@link Representation}, or <code>null</code>
      */
-    public byte[] getBytes();
-
+    @Nullable
+    public Representation getGZIPRepresentation();
+    
+    /**
+     * Returns a Deflated {@link Representation} for the {@link Result}
+     * if one is available.
+     * 
+     * @return the Deflated {@link Representation}, or <code>null</code>
+     */
+    @Nullable
+    public Representation getDeflateRepresentation();
 }

@@ -1,5 +1,7 @@
 import java.nio.charset.Charset
 
+import uk.org.iay.mdq.server.Representation
+
 yieldUnescaped '<!DOCTYPE html>'
 
 html {
@@ -7,15 +9,34 @@ html {
         title('mdq-server query result')
     }
     body {
+        h1('mda-server query result')
         if (result.isNotFound()) {
             p('No results were returned from the query.')
         } else {
-            byte[] bytes = result.getBytes()
-            p("The query returned a $bytes.length byte response.")
-            p("The ETag value for the response is ${result.getETag()}.")
-            p('Rendered metadata looks like this:')
+            h2('Available Representations')
+
+            h3('Normal Representation')
+            Representation norm = result.getRepresentation();
+            p("The default representation has a length of ${norm.getBytes().length}.")
+            p("Its ETag value is ${norm.getETag()}.")
+            
+            Representation gzip = result.getGZIPRepresentation();
+            if (gzip != null) {
+                h3('GZIP Representation')
+                p("The GZIPped representation has a length of ${gzip.getBytes().length}.")
+                p("Its ETag value is ${gzip.getETag()}.")
+            }
+            
+            Representation deflate = result.getDeflateRepresentation();
+            if (deflate != null) {
+                h3('Deflated Representation')
+                p("The deflated representation has a length of ${deflate.getBytes().length}.")
+                p("Its ETag value is ${deflate.getETag()}.")
+            }
+
+            h2('Rendered Metadata')
             pre {
-                yield new String(result.getBytes(), Charset.forName("UTF-8"))
+                yield new String(norm.getBytes(), Charset.forName("UTF-8"))
             }
         }
     }

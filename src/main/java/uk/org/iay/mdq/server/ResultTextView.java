@@ -21,8 +21,6 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.util.Map;
-import java.util.zip.DeflaterOutputStream;
-import java.util.zip.GZIPOutputStream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -58,24 +56,15 @@ public class ResultTextView implements View {
         }
 
         OutputStream out = response.getOutputStream();
-        final String acceptEncoding = request.getHeader("Accept-Encoding");
-        if (acceptEncoding != null) {
-            if (acceptEncoding.contains("gzip")) {
-                response.setHeader("Content-Encoding", "gzip");
-                out = new GZIPOutputStream(out);
-            } else if (acceptEncoding.contains("compress")) {
-                response.setHeader("Content-Encoding", "compress");
-                out = new DeflaterOutputStream(out);
-            }
-        }
 
         response.setContentType(new MediaType("text", "plain", Charset.forName("UTF-8")).toString());
         final Writer w = new OutputStreamWriter(out, Charset.forName("UTF-8"));
 
-        final byte[] bytes = result.getBytes();
+        final Representation norm = result.getRepresentation();
+        final byte[] bytes = norm.getBytes();
         w.write("Query result is:\n");
         w.write("   " + bytes.length + " bytes\n");
-        w.write("   ETag is " + result.getETag() + "\n");
+        w.write("   ETag is " + norm.getETag() + "\n");
         w.write("\n");
         w.write(new String(bytes, Charset.forName("UTF-8")));
     }

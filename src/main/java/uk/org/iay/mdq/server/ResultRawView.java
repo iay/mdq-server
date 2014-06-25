@@ -16,10 +16,7 @@
 
 package uk.org.iay.mdq.server;
 
-import java.io.OutputStream;
 import java.util.Map;
-import java.util.zip.DeflaterOutputStream;
-import java.util.zip.GZIPOutputStream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -64,21 +61,36 @@ public class ResultRawView implements View {
             return;
         }
 
-        OutputStream out = response.getOutputStream();
+        // select the representation to provide
+        Representation rep = null;
         final String acceptEncoding = request.getHeader("Accept-Encoding");
         if (acceptEncoding != null) {
             if (acceptEncoding.contains("gzip")) {
-                response.setHeader("Content-Encoding", "gzip");
-                out = new GZIPOutputStream(out);
+                rep = result.getGZIPRepresentation();
             } else if (acceptEncoding.contains("compress")) {
-                response.setHeader("Content-Encoding", "compress");
-                out = new DeflaterOutputStream(out);
+                rep = result.getDeflateRepresentation();
             }
         }
         
+        // default to the normal representation
+        if (rep == null) {
+            rep = result.getRepresentation();
+        }
+        
+        // Set response headers
+        String contentEncoding = rep.getContentEncoding();
+        if (contentEncoding != null) {
+            response.setHeader("Content-Encoding", contentEncoding);
+        } else {
+            // for logging only
+            contentEncoding = "normal";
+        }
         response.setContentType(getContentType());
         
-        out.write(result.getBytes());
+        log.debug("selected ({}) representation is {} bytes",
+                contentEncoding, rep.getBytes().length);
+        
+        response.getOutputStream().write(rep.getBytes());
     }
 
 }
