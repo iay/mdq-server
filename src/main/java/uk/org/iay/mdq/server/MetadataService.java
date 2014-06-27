@@ -20,6 +20,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import net.shibboleth.metadata.Item;
 import net.shibboleth.metadata.ItemId;
@@ -48,6 +50,9 @@ import org.slf4j.LoggerFactory;
  */
 public class MetadataService<T> extends AbstractIdentifiableInitializableComponent {
     
+    /** The identifier used to represent "all entities". */
+    private final static String ID_ALL = null;
+    
     /**
      * Representation of the result of a query.
      */
@@ -61,12 +66,26 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
         private final Map<String, Representation> representations = new HashMap<>();
         
         /**
+         * The identifiers which can be used to retrieve this {@list Result}.
+         * <code>null</code> will be used for the "not found" and "all entities" results.
+         */
+        private final Collection<String> identifiers;
+        
+        /**
          * Constructor.
          * 
          * @param resultBytes byte array representing the rendered result
+         * @param ids identifiers which can be used to retrieve this result
          */
-        protected ServiceResult(@Nonnull final byte[] resultBytes) {
+        protected ServiceResult(@Nonnull final byte[] resultBytes,
+                @Nullable final Collection<String> ids) {
             representation = new SimpleRepresentation(resultBytes);
+            if (ids != null) {
+                identifiers = new ArrayList<>();
+                identifiers.addAll(ids);
+            } else {
+                identifiers = null;
+            }
         }
         
         /**
@@ -76,6 +95,7 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
          */
         protected ServiceResult() {
             representation = null;
+            identifiers = null;
         }
         
         @Override
@@ -109,6 +129,12 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
             return representations.get(encoding);
         }
 
+        @Override
+        @Nullable
+        public Collection<String> getIdentifiers() {
+            return identifiers;
+        }
+
     }
     
     /** Class logger. */
@@ -138,13 +164,58 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
      */
     private Collection<Item<T>> itemCollection;
     
+    private static class IdentifiedItemCollection<T> {
+        
+        @Nonnull
+        private final Collection<Item<T>> items;
+        
+        @Nonnull
+        private final Collection<String> identifiers;
+        
+        /**
+         * Returns the items.
+         * 
+         * @return {@link Collection} of {@link Item}s.
+         */
+        @Nonnull
+        public Collection<Item<T>> getItems() {
+            return items;
+        }
+
+        /**
+         * Returns the identifiers.
+         * 
+         * @return {@link Collection} of identifiers.
+         */
+        @Nonnull
+        public Collection<String> getIdentifiers() {
+            return identifiers;
+        }
+
+        protected IdentifiedItemCollection(@Nonnull final Item<T> item,
+                @Nonnull final Collection<String> keys) {
+            this(Collections.singletonList(item), keys);
+        }
+        
+        protected IdentifiedItemCollection(@Nonnull final Collection<Item<T>> collection,
+                @Nullable final String key) {
+            this(collection, Collections.singletonList(key));
+        }
+
+        protected IdentifiedItemCollection(@Nonnull final Collection<Item<T>> collection,
+                @Nonnull final Collection<String> keys) {
+            items = collection;
+            identifiers = new ArrayList<>(keys);
+        }
+    }
+    
     /**
      * Metadata indexed by unique identifier.
      */
-    private Map<String, Item<T>> uniqueIdentifierIndex;
+    private Map<String, IdentifiedItemCollection<T>> identifiedItemCollections;
     
     /**
-     * Lock covering the {@link #itemCollection} and {@link #uniqueIdentifierIndex}.
+     * Lock covering the {@link #itemCollection} and {@link #identifiedItemCollections}.
      */
     private ReadWriteLock itemCollectionLock;
     
@@ -236,12 +307,13 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
      * @return a {@link Result} representing the rendered collection
      */
     @Nonnull
-    private Result createResult(@Nonnull final Collection<Item<T>> items) {
+    private Result createResult(@Nonnull final Collection<Item<T>> items,
+            @Nonnull final Collection<String> ids) {
         if (items.size() == 0) {
             return new ServiceResult();
         } else {
             final byte[] bytes = renderCollection(items);
-            return new ServiceResult(bytes);
+            return new ServiceResult(bytes, ids);
         }
     }
 
@@ -252,10 +324,7 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
      */
     @Nonnull
     public Result getAll() {
-        itemCollectionLock.readLock().lock();
-        final Collection<Item<T>> items = cloneItemCollection(itemCollection);
-        itemCollectionLock.readLock().unlock();
-        return createResult(items);
+        return get(ID_ALL);
     }
     
     /**
@@ -267,13 +336,15 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
      */
     @Nonnull public Result get(@Nonnull final String identifier) {
         final Collection<Item<T>> items = new ArrayList<>();
+        final Collection<String> identifiers = new ArrayList<>();
         itemCollectionLock.readLock().lock();
-        final Item<T> item = uniqueIdentifierIndex.get(identifier);
-        if (item != null) {
-            items.add(item.copy());
+        final IdentifiedItemCollection<T> identifiedItemCollection = identifiedItemCollections.get(identifier);
+        if (identifiedItemCollection != null) {
+            items.addAll(cloneItemCollection(identifiedItemCollection.getItems()));
+            identifiers.addAll(identifiedItemCollection.getIdentifiers());
         }
         itemCollectionLock.readLock().unlock();
-        return createResult(items);
+        return createResult(items, identifiers);
     }
 
     /**
@@ -288,23 +359,28 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
         sourcePipeline.execute(newItemCollection);
         log.debug("source pipeline executed; {} results", newItemCollection.size());
         
-        final Map<String, Item<T>> newUniqueIdentifierIndex = new HashMap<>();
+        final Map<String, IdentifiedItemCollection<T>> newIdentifiedItemCollections = new HashMap<>();
         for (Item<T> item : newItemCollection) {
             final List<ItemId> uniqueIds = item.getItemMetadata().get(ItemId.class);
+            final List<String> ids = new ArrayList<String>();
             for (ItemId uniqueId : uniqueIds) {
-                final String id = uniqueId.getId();
-                if (newUniqueIdentifierIndex.containsKey(id)) {
+                ids.add(uniqueId.getId());
+            }
+            final IdentifiedItemCollection<T> newCollection = new IdentifiedItemCollection<>(item, ids);
+            for (String id : ids) {
+                if (newIdentifiedItemCollections.containsKey(id)) {
                     log.warn("duplicate unique identifier {} ignored", id);
                 } else {
-                    newUniqueIdentifierIndex.put(id, item);
+                    newIdentifiedItemCollections.put(id, newCollection);
                 }
             }
         }
-        log.debug("unique identifiers: {}", newUniqueIdentifierIndex.size());
+        log.debug("unique identifiers: {}", newIdentifiedItemCollections.size());
+        newIdentifiedItemCollections.put(ID_ALL, new IdentifiedItemCollection(newItemCollection, ID_ALL));
         
         itemCollectionLock.writeLock().lock();
         itemCollection = newItemCollection;
-        uniqueIdentifierIndex = newUniqueIdentifierIndex;
+        identifiedItemCollections = newIdentifiedItemCollections;
         itemCollectionLock.writeLock().unlock();
     }
     
@@ -338,7 +414,7 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
     @Override
     protected void doDestroy() {
         itemCollection = null;
-        uniqueIdentifierIndex = null;
+        identifiedItemCollections = null;
         sourcePipeline = null;
         renderPipeline = null;
         serializer = null;

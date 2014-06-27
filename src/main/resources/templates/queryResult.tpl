@@ -13,7 +13,20 @@ html {
         if (result.isNotFound()) {
             p('No results were returned from the query.')
         } else {
-            h2('Available Representations')
+            h2('Result Returned')
+            Collection<String> ids = result.getIdentifiers();
+            p("Identifiers: ${ids.size}");
+            if (ids.size != 0) {
+                ul {
+                   for (id in ids) {
+                       if (id == null) {
+                           li('null (ID_ALL)')
+                       } else {
+                           li(id)
+                       }
+                   }
+                }
+            }
 
             h3('Normal Representation')
             Representation norm = result.getRepresentation();

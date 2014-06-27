@@ -16,6 +16,8 @@
 
 package uk.org.iay.mdq.server;
 
+import java.util.Collection;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -58,4 +60,15 @@ public interface Result {
      */
     @Nullable
     public Representation getDeflateRepresentation();
+    
+    /**
+     * Returns the {@link Collection} of identifiers associated with this {@list Result}.
+     * 
+     * A <code>null</code> result is returned for the "not found" and "all entities" results.
+     *  
+     * @return the {@link Collection} of identifiers associated with this {@list Result}, or <code>null</code>.
+     */
+    @Nullable
+    public Collection<String> getIdentifiers();
+    
 }
