@@ -51,7 +51,7 @@ import org.slf4j.LoggerFactory;
 public class MetadataService<T> extends AbstractIdentifiableInitializableComponent {
     
     /** The identifier used to represent "all entities". */
-    private final static String ID_ALL = null;
+    private static final String ID_ALL = null;
     
     /**
      * Representation of the result of a query.
@@ -158,20 +158,61 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
      * we need a new stage to do that.
      */
     private ItemSerializer<T> serializer;
-
-    /**
-     * The metadata we have acquired from the source pipeline.
-     */
-    private Collection<Item<T>> itemCollection;
     
+    /**
+     * Class representing a {@link Collection} of {@link Item}s
+     * associated with a {@link Collection} of identifiers.
+     *
+     * @param <T> type of {@link Item} in the collection
+     */
     private static class IdentifiedItemCollection<T> {
         
+        /** The {@link Collection} of {@Item}s. */
         @Nonnull
         private final Collection<Item<T>> items;
         
+        /** The identifiers associated with the item collection. */
         @Nonnull
         private final Collection<String> identifiers;
         
+        /**
+         * Constructor.
+         * 
+         * Shorthand version with a single {@link Item}.
+         *
+         * @param item single item to be made into a collection
+         * @param keys identifiers to be associated with the collection
+         */
+        protected IdentifiedItemCollection(@Nonnull final Item<T> item,
+                @Nonnull final Collection<String> keys) {
+            this(Collections.singletonList(item), keys);
+        }
+        
+        /**
+         * Constructor.
+         * 
+         * Shorthand version with a single identifier.
+         *
+         * @param collection items to be associated with the identifier
+         * @param key identifier for the item collection.
+         */
+        protected IdentifiedItemCollection(@Nonnull final Collection<Item<T>> collection,
+                @Nullable final String key) {
+            this(collection, Collections.singletonList(key));
+        }
+
+        /**
+         * Constructor.
+         *
+         * @param collection {@link Collection} of {@link Item}s to be associated with the identifiers
+         * @param keys identifiers to be associated with the item collection
+         */
+        protected IdentifiedItemCollection(@Nonnull final Collection<Item<T>> collection,
+                @Nonnull final Collection<String> keys) {
+            items = collection;
+            identifiers = new ArrayList<>(keys);
+        }
+
         /**
          * Returns the items.
          * 
@@ -192,21 +233,6 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
             return identifiers;
         }
 
-        protected IdentifiedItemCollection(@Nonnull final Item<T> item,
-                @Nonnull final Collection<String> keys) {
-            this(Collections.singletonList(item), keys);
-        }
-        
-        protected IdentifiedItemCollection(@Nonnull final Collection<Item<T>> collection,
-                @Nullable final String key) {
-            this(collection, Collections.singletonList(key));
-        }
-
-        protected IdentifiedItemCollection(@Nonnull final Collection<Item<T>> collection,
-                @Nonnull final Collection<String> keys) {
-            items = collection;
-            identifiers = new ArrayList<>(keys);
-        }
     }
     
     /**
@@ -215,7 +241,7 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
     private Map<String, IdentifiedItemCollection<T>> identifiedItemCollections;
     
     /**
-     * Lock covering the {@link #itemCollection} and {@link #identifiedItemCollections}.
+     * Lock covering the {@link #identifiedItemCollections}.
      */
     private ReadWriteLock itemCollectionLock;
     
@@ -303,6 +329,7 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
      * by rendering the collection to a byte array.
      * 
      * @param items collection of {@link Item}s to construct a result from
+     * @param ids identifiers associated with the result
      * 
      * @return a {@link Result} representing the rendered collection
      */
@@ -379,7 +406,6 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
         newIdentifiedItemCollections.put(ID_ALL, new IdentifiedItemCollection(newItemCollection, ID_ALL));
         
         itemCollectionLock.writeLock().lock();
-        itemCollection = newItemCollection;
         identifiedItemCollections = newIdentifiedItemCollections;
         itemCollectionLock.writeLock().unlock();
     }
@@ -413,7 +439,6 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
     /** {@inheritDoc} */
     @Override
     protected void doDestroy() {
-        itemCollection = null;
         identifiedItemCollections = null;
         sourcePipeline = null;
         renderPipeline = null;
