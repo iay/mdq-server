@@ -242,9 +242,23 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
     
     /**
      * Lock covering the {@link #identifiedItemCollections}.
+     * 
+     * Lock ordering: this lock should be taken, if required, *before* the
+     * result cache lock.
      */
     private ReadWriteLock itemCollectionLock;
+
+    /** Cache of {@link Result}s, indexed by identifier. */
+    private Map<String, Result> resultCache;
     
+    /**
+     * Lock covering the result cache.
+     * 
+     * Lock ordering: this lock should be taken, if required, *after* the
+     * item collection lock.
+     */
+    private ReadWriteLock cacheLock;
+
     /**
      * Sets the {@link Pipeline} used to acquire new metadata.
      * 
@@ -325,26 +339,6 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
     }
     
     /**
-     * Construct a {@link Result} from the given collection of {@link Item}s
-     * by rendering the collection to a byte array.
-     * 
-     * @param items collection of {@link Item}s to construct a result from
-     * @param ids identifiers associated with the result
-     * 
-     * @return a {@link Result} representing the rendered collection
-     */
-    @Nonnull
-    private Result createResult(@Nonnull final Collection<Item<T>> items,
-            @Nonnull final Collection<String> ids) {
-        if (items.size() == 0) {
-            return new ServiceResult();
-        } else {
-            final byte[] bytes = renderCollection(items);
-            return new ServiceResult(bytes, ids);
-        }
-    }
-
-    /**
      * Query for metadata for all known entities.
      * 
      * @return metadata for all known entities
@@ -362,16 +356,58 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
      * @return metadata associated with the particular identifier
      */
     @Nonnull public Result get(@Nonnull final String identifier) {
-        final Collection<Item<T>> items = new ArrayList<>();
-        final Collection<String> identifiers = new ArrayList<>();
-        itemCollectionLock.readLock().lock();
-        final IdentifiedItemCollection<T> identifiedItemCollection = identifiedItemCollections.get(identifier);
-        if (identifiedItemCollection != null) {
-            items.addAll(cloneItemCollection(identifiedItemCollection.getItems()));
-            identifiers.addAll(identifiedItemCollection.getIdentifiers());
+        /*
+         * Try and resolve using the cache; a read lock will suffice.
+         */
+        cacheLock.readLock().lock();
+        try {
+            final Result cachedResult = resultCache.get(identifier);
+            if (cachedResult != null) {
+                log.debug("cache hit for {}", identifier);
+                return cachedResult;
+            }
+        } finally {
+            cacheLock.readLock().unlock();
         }
-        itemCollectionLock.readLock().unlock();
-        return createResult(items, identifiers);
+        
+        /*
+         * If the result we want isn't in the cache, see whether we have a
+         * collection of items we can render.
+         */
+        itemCollectionLock.readLock().lock();
+        try {
+            final IdentifiedItemCollection<T> identifiedItemCollection = identifiedItemCollections.get(identifier);
+            
+            /*
+             * Return a "not found" result if the identifier has no definition.
+             */
+            if (identifiedItemCollection == null) {
+                return new ServiceResult();
+            }
+            
+            /*
+             * Render the item collection.
+             */
+            final Collection<String> identifiers = identifiedItemCollection.getIdentifiers();
+            final byte[] bytes = renderCollection(cloneItemCollection(identifiedItemCollection.getItems()));
+            final Result result = new ServiceResult(bytes, identifiers);
+            
+            /*
+             * Write the result into the cache for each of its
+             * potential identifiers.
+             */
+            cacheLock.writeLock().lock();
+            try {
+                for (String id : identifiers) {
+                    resultCache.put(id, result);
+                }
+                return result;
+            } finally {
+                cacheLock.writeLock().unlock();
+            }
+        } finally {
+            itemCollectionLock.readLock().unlock();
+        }
     }
 
     /**
@@ -406,8 +442,14 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
         newIdentifiedItemCollections.put(ID_ALL, new IdentifiedItemCollection(newItemCollection, ID_ALL));
         
         itemCollectionLock.writeLock().lock();
-        identifiedItemCollections = newIdentifiedItemCollections;
-        itemCollectionLock.writeLock().unlock();
+        cacheLock.writeLock().lock();
+        try {
+            identifiedItemCollections = newIdentifiedItemCollections;
+            resultCache = new HashMap<>();
+        } finally {
+            cacheLock.writeLock().unlock();
+            itemCollectionLock.writeLock().unlock();
+        }
     }
     
     /** {@inheritDoc} */
@@ -428,6 +470,7 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
         }
 
         itemCollectionLock = new ReentrantReadWriteLock();
+        cacheLock = new ReentrantReadWriteLock();
         
         try {
             refreshMetadata();
@@ -444,6 +487,8 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
         renderPipeline = null;
         serializer = null;
         itemCollectionLock = null;
+        resultCache = null;
+        cacheLock = null;
         super.doDestroy();
     }
 
