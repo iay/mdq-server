@@ -9,7 +9,7 @@ html {
         title('mdq-server query result')
     }
     body {
-        h1('mda-server query result')
+        h1('mdq-server query result')
         if (result.isNotFound()) {
             p('No results were returned from the query.')
         } else {
