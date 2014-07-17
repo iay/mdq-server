@@ -1,1 +1,3 @@
 target/
+signing.key
+signing.crt

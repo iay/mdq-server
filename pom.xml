@@ -230,7 +230,7 @@
         <profile>
             <id>incommon</id>
             <properties>
-                <spring.profiles.active>incommon</spring.profiles.active>
+                <spring.profiles.active>incommon,sign</spring.profiles.active>
             </properties>
             <build>
             <plugins>
@@ -239,7 +239,7 @@
                     <artifactId>spring-boot-maven-plugin</artifactId>
                     <configuration>
                         <arguments>
-                            <argument>--spring.profiles.active=incommon</argument>
+                            <argument>--spring.profiles.active=incommon,sign</argument>
                         </arguments>
                     </configuration>
                 </plugin>

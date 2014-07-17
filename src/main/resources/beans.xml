@@ -91,6 +91,8 @@
                 <bean id="addID" parent="stage_parent"
                     class="net.shibboleth.metadata.dom.saml.GenerateIdStage"/>
                     
+                <!-- perform signature or not, depending on profile -->
+                <ref bean="perform.signature"/>
             </list>
         </property>
     </bean>
@@ -216,4 +218,43 @@
     <beans profile="prod">
         <alias alias="source.entities" name="int_edugain_productionEntities"/>
     </beans>
+    
+    <!--
+        "sign" profile
+    -->
+    <beans profile="sign">
+    
+        <bean id="perform.signature" parent="XMLSignatureSigningStage">
+            <property name="certificates">
+                <bean parent="X509CertificateFactoryBean">
+                    <property name="resource">
+                        <bean parent="FileSystemResource">
+                            <constructor-arg value="${sign.certificate}"/>
+                        </bean>
+                    </property>
+                </bean>
+            </property>
+            <property name="privateKey">
+                <bean parent="PrivateKeyFactoryBean">
+                    <property name="resource">
+                        <bean parent="FileSystemResource">
+                            <constructor-arg value="${sign.key}"/>
+                        </bean>
+                    </property>
+                </bean>
+            </property>
+        </bean>
+
+    </beans>
+
+    <!--
+        "not signing" profile
+    -->
+    <beans profile="!sign">
+    
+        <!-- do nothing -->
+        <bean id="perform.signature" parent="CompositeStage"/>
+
+    </beans>
+
 </beans>
