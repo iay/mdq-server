@@ -52,9 +52,9 @@
         Metadata signing certificate.
     -->
     <bean id="hu_eduid_signingCertificate" class="net.shibboleth.ext.spring.factory.X509CertificateFactoryBean">
-        <property name="certificateFile">
-            <bean class="java.io.File">
-                <constructor-arg value="${basedir}/mdx/hu_eduid/href-metadata-signer-2011.crt"/>
+        <property name="resource">
+            <bean class="ClassPathResource">
+                <constructor-arg value="hu_eduid/href-metadata-signer-2011.crt"/>
             </bean>
         </property>
     </bean>

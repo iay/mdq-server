@@ -62,9 +62,9 @@
         Metadata signing certificate.
     -->
     <bean id="cz_eduid_signingCertificate" class="net.shibboleth.ext.spring.factory.X509CertificateFactoryBean">
-        <property name="certificateFile">
-            <bean class="java.io.File">
-                <constructor-arg value="${basedir}/mdx/cz_eduid/metadata.eduid.cz.crt.pem"/>
+        <property name="resource">
+            <bean class="ClassPathResource">
+                <constructor-arg value="cz_eduid/metadata.eduid.cz.crt.pem"/>
             </bean>
         </property>
     </bean>
