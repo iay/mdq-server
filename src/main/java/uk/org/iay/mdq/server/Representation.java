@@ -20,7 +20,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * A particular representation of a {@link Response}.
+ * A particular representation of a {@link Result}.
  */
 public interface Representation {
     

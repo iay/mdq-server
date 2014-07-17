@@ -62,11 +62,11 @@ public interface Result {
     public Representation getDeflateRepresentation();
     
     /**
-     * Returns the {@link Collection} of identifiers associated with this {@list Result}.
+     * Returns the {@link Collection} of identifiers associated with this {@link Result}.
      * 
      * A <code>null</code> result is returned for the "not found" and "all entities" results.
      *  
-     * @return the {@link Collection} of identifiers associated with this {@list Result}, or <code>null</code>.
+     * @return the {@link Collection} of identifiers associated with this {@link Result}, or <code>null</code>.
      */
     @Nullable
     public Collection<String> getIdentifiers();

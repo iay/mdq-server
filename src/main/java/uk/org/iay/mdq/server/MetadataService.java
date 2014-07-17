@@ -66,7 +66,7 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
         private final Map<String, Representation> representations = new HashMap<>();
         
         /**
-         * The identifiers which can be used to retrieve this {@list Result}.
+         * The identifiers which can be used to retrieve this {@link Result}.
          * <code>null</code> will be used for the "not found" and "all entities" results.
          */
         private final Collection<String> identifiers;
@@ -167,7 +167,7 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
      */
     private static class IdentifiedItemCollection<T> {
         
-        /** The {@link Collection} of {@Item}s. */
+        /** The {@link Collection} of {@link Item}s. */
         @Nonnull
         private final Collection<Item<T>> items;
         
