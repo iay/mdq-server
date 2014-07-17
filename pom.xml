@@ -226,6 +226,26 @@
             </plugins>
             </build>
         </profile>
+
+        <profile>
+            <id>incommon</id>
+            <properties>
+                <spring.profiles.active>incommon</spring.profiles.active>
+            </properties>
+            <build>
+            <plugins>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <configuration>
+                        <arguments>
+                            <argument>--spring.profiles.active=incommon</argument>
+                        </arguments>
+                    </configuration>
+                </plugin>
+            </plugins>
+            </build>
+        </profile>
     </profiles>
 
     <repositories>

@@ -20,6 +20,11 @@
     <import resource="classpath:int_edugain/beans.xml"/>
     
     <!--
+        Import InCommon beans.
+    -->
+    <import resource="classpath:us_incommon/beans.xml"/>
+    
+    <!--
         Pipeline used to acquire metadata for service.
         
         Input: empty collection.
@@ -175,6 +180,28 @@
                         </property>
                     </bean>
                     <ref bean="disassemble"/>
+                </list>
+            </property>
+        </bean>
+
+    </beans>
+
+    <!--
+        "incommon" profile
+        
+        Metadata is sourced from the InCommon production aggregate.
+    -->
+    <beans profile="incommon">
+    
+        <bean name="source.entities" parent="CompositeStage">
+            <property name="composedStages">
+                <list>
+                    <!-- Start with the InCommon production aggregate. -->
+                    <ref bean="us_incommon_productionEntities"/>
+                    
+                    <!-- Retain only IdP entities. -->
+                    <bean parent="XPathFilteringStage"
+                        p:XPathExpression="not(md:IDPSSODescriptor)"/>
                 </list>
             </property>
         </bean>
