@@ -24,6 +24,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -40,6 +42,7 @@ import net.shibboleth.utilities.java.support.component.ComponentInitializationEx
 import net.shibboleth.utilities.java.support.component.ComponentSupport;
 import net.shibboleth.utilities.java.support.logic.Constraint;
 
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -158,6 +161,13 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
      * we need a new stage to do that.
      */
     private ItemSerializer<T> serializer;
+
+    /**
+     * Refresh interval for the metadata source, in milliseconds.
+     * 
+     * Set to 0 to disable refresh after the initial fetch.
+     */
+    private long refreshInterval;
     
     /**
      * Class representing a {@link Collection} of {@link Item}s
@@ -260,6 +270,11 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
     private ReadWriteLock cacheLock;
 
     /**
+     * Executor on which to schedule metadata source refreshes.
+     */
+    private ScheduledThreadPoolExecutor executor;
+    
+    /**
      * Sets the {@link Pipeline} used to acquire new metadata.
      * 
      * @param pipeline the new source {@link Pipeline}
@@ -294,6 +309,27 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
 
         serializer = Constraint.isNotNull(itemSerializer, "serializer may not be null");
     }
+
+    /**
+     * Gets the metadata source refresh interval, in milliseconds.
+     * 
+     * @return the metadata source refresh interval.
+     */
+    public long getRefreshInterval() {
+        return refreshInterval;
+    }
+    
+    /**
+     * Sets the metadata source refresh interval, in milliseconds.
+     * 
+     * @param refresh the metadata source refresh interval
+     */
+    public void setRefreshInterval(final long refresh) {
+        ComponentSupport.ifDestroyedThrowDestroyedComponentException(this);
+        ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
+
+        refreshInterval = refresh;
+    }    
     
     /**
      * Clones an {@link Item} {@link Collection} so that its elements can be mutated
@@ -472,16 +508,47 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
         itemCollectionLock = new ReentrantReadWriteLock();
         cacheLock = new ReentrantReadWriteLock();
         
+        // perform initial metadata refresh
         try {
             refreshMetadata();
         } catch (PipelineProcessingException e) {
             throw new ComponentInitializationException("error executing source pipeline", e);
+        }
+        
+        // Schedule regular metadata refresh if enabled.
+        if (refreshInterval != 0) {
+            executor = new ScheduledThreadPoolExecutor(1);
+            executor.scheduleWithFixedDelay(
+                    new Runnable() {
+
+                        public void run() {
+                            try {
+                                refreshMetadata();
+                            } catch (PipelineProcessingException e) {
+                                log.debug("metadata source refresh failed: {}", e);
+                            }
+                            log.debug("next refresh estimated at {}", new DateTime().plus(refreshInterval));
+                        }
+                        
+                    },
+                    refreshInterval, refreshInterval, TimeUnit.MILLISECONDS);
+            log.debug("initial refresh estimated at {}", new DateTime().plus(refreshInterval));
         }
     }
 
     /** {@inheritDoc} */
     @Override
     protected void doDestroy() {
+        if (executor != null) {
+            executor.shutdownNow();
+            try {
+                executor.awaitTermination(30, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                log.debug("ignored InterruptedException while winding down executor");
+            } finally {
+                executor = null;
+            }
+        }
         identifiedItemCollections = null;
         sourcePipeline = null;
         renderPipeline = null;

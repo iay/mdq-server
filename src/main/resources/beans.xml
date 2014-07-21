@@ -105,6 +105,7 @@
         lazy-init="false">
         <property name="sourcePipeline" ref="source.SAML"/>
         <property name="renderPipeline" ref="render.SAML"/>
+        <property name="refreshInterval" value="${metadataService.SAML.refreshInterval}"/>
         <property name="serializer">
             <bean class="net.shibboleth.metadata.dom.DOMElementSerializer"/>
         </property>
