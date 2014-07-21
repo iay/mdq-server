@@ -72,18 +72,18 @@
                 </bean>
                 
                 <!--
-                    Set cacheDuration to 6 hours.
+                    Set cacheDuration.
                 -->
                 <bean id="addCacheDuration" parent="stage_parent"
                     class="net.shibboleth.metadata.dom.saml.SetCacheDurationStage"
-                    p:cacheDuration="#{ 1000L * 60 * 60 * 6 }"/>
+                    p:cacheDuration="${render.SAML.cacheDuration}"/>
                     
                 <!--
-                    Set validUntil window to 14 days.
+                    Set validUntil window.
                 -->
                 <bean id="addValidUntil" parent="stage_parent"
                     class="net.shibboleth.metadata.dom.saml.SetValidUntilStage"
-                    p:validityDuration="#{ 1000L * 60 * 60 * 24 * 14 }"/>
+                    p:validityDuration="${render.SAML.validUntil}"/>
                     
                 <!--
                     Add a random ID attribute for the signature to use.
