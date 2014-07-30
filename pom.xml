@@ -6,7 +6,7 @@
     <parent>
         <groupId>net.shibboleth</groupId>
         <artifactId>parent-v3</artifactId>
-        <version>3</version>
+        <version>4</version>
     </parent>
 
     <groupId>uk.org.iay.mdq</groupId>
@@ -40,7 +40,7 @@
         <dependency>
             <groupId>net.shibboleth.utilities</groupId>
             <artifactId>java-support</artifactId>
-            <version>3.0.0</version>
+            <version>4.0.0</version>
         </dependency>
 
         <dependency>
@@ -138,7 +138,7 @@
         <dependency>
             <groupId>net.shibboleth.ext</groupId>
             <artifactId>spring-extensions</artifactId>
-            <version>1.2.0</version>
+            <version>2.0.0</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
