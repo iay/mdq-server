@@ -25,6 +25,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.View;
 
+import com.google.common.net.HttpHeaders;
+
 /**
  * Render a query result from the raw result with a given content type.
  */
@@ -63,7 +65,7 @@ public class ResultRawView implements View {
 
         // select the representation to provide
         Representation rep = null;
-        final String acceptEncoding = request.getHeader("Accept-Encoding");
+        final String acceptEncoding = request.getHeader(HttpHeaders.ACCEPT_ENCODING);
         if (acceptEncoding != null) {
             if (acceptEncoding.contains("gzip")) {
                 rep = result.getGZIPRepresentation();
@@ -80,14 +82,14 @@ public class ResultRawView implements View {
         // Set response headers
         String contentEncoding = rep.getContentEncoding();
         if (contentEncoding != null) {
-            response.setHeader("Content-Encoding", contentEncoding);
+            response.setHeader(HttpHeaders.CONTENT_ENCODING, contentEncoding);
         } else {
             // for logging only
             contentEncoding = "normal";
         }
         response.setContentType(getContentType());
         response.setContentLength(rep.getBytes().length);
-        response.setHeader("ETag", rep.getETag());
+        response.setHeader(HttpHeaders.ETAG, rep.getETag());
         
         log.debug("selected ({}) representation is {} bytes",
                 contentEncoding, rep.getBytes().length);
