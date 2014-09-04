@@ -51,7 +51,7 @@ public class EntitiesControllerTest extends AbstractTestNGSpringContextTests {
         
         mockMvc.perform(get("/entities"))
             .andExpect(status().isOk())
-            .andExpect(view().name("queryResult"));
+            .andExpect(view().name("queryAllResult"));
     }
 
 }

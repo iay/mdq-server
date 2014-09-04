@@ -58,7 +58,7 @@ public class EntitiesController {
     String queryAllEntities(@Nonnull final Model model) {
         log.debug("queried for all entities");
         model.addAttribute("result", metadataService.getAll());
-        return "queryResult";
+        return "queryAllResult";
     }
     
     /**
