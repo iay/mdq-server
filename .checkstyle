@@ -4,7 +4,7 @@
   <local-check-config name="Ian's Checkstyle" location="/Users/iay/code/mdq-server/checkstyle.xml" type="external" description="Ian's Checkstyle (like the Shibboleth one).">
     <additional-data name="protect-config-file" value="false"/>
   </local-check-config>
-  <fileset name="Java" enabled="true" check-config-name="Ian's Checkstyle" local="true">
-    <file-match-pattern match-pattern="\.java" include-pattern="true"/>
+  <fileset name="main source" enabled="true" check-config-name="Ian's Checkstyle" local="true">
+    <file-match-pattern match-pattern="src/main/java/.*\.java$" include-pattern="true"/>
   </fileset>
 </fileset-config>
