@@ -215,15 +215,7 @@
         <profile>
             <id>prod</id>
             <properties>
-                <spring.profiles.active>prod</spring.profiles.active>
-            </properties>
-        </profile>
-
-
-        <profile>
-            <id>incommon</id>
-            <properties>
-                <spring.profiles.active>incommon,sign</spring.profiles.active>
+                <spring.profiles.active>prod,sign</spring.profiles.active>
             </properties>
         </profile>
     </profiles>

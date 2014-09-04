@@ -15,16 +15,6 @@
     <import resource="classpath:common-beans.xml"/>
     
     <!--
-        Import eduGAIN beans.
-    -->
-    <import resource="classpath:int_edugain/beans.xml"/>
-    
-    <!--
-        Import InCommon beans.
-    -->
-    <import resource="classpath:us_incommon/beans.xml"/>
-    
-    <!--
         Pipeline used to acquire metadata for service.
         
         Input: empty collection.
@@ -166,65 +156,28 @@
     </bean>
 
     <!--
-        "dev" profile
+        Externalise part of the configuration.
         
-        Metadata is sourced from a local XML resource.
+        By default, include a local classpath config.xml; this can be overridden by
+        setting the config.xml property to, for example, a file: resource.
+        
+        An external config.xml is expected to replace the definitions of
+        all beans in the default config.xml, and may also redefine any
+        of the beans defined here up to this point.
     -->
-    <beans profile="dev">
-    
-        <bean name="source.entities" parent="CompositeStage">
-            <property name="composedStages">
-                <list>
-                    <bean parent="DOMResourceSourceStage">
-                        <property name="DOMResource">
-                            <bean parent="ClassPathResource">
-                                <constructor-arg value="dev/entities.xml"/>
-                            </bean>
-                        </property>
-                    </bean>
-                    <ref bean="disassemble"/>
-                </list>
-            </property>
-        </bean>
-
-    </beans>
+    <import resource="${config.xml:classpath:config.xml}"/>
 
     <!--
-        "incommon" profile
+        perform.signature
         
-        Metadata is sourced from the InCommon production aggregate.
-    -->
-    <beans profile="incommon">
-    
-        <bean name="source.entities" parent="CompositeStage">
-            <property name="composedStages">
-                <list>
-                    <!-- Start with the InCommon production aggregate. -->
-                    <ref bean="us_incommon_productionEntities"/>
-                    
-                    <!-- Retain only IdP entities. -->
-                    <bean parent="XPathFilteringStage"
-                        p:XPathExpression="not(md:IDPSSODescriptor)"/>
-                </list>
-            </property>
-        </bean>
-
-    </beans>
-
-    <!--
-        "prod" profile
+        By default, don't perform signing operation.
         
-        Metadata is sourced from the eduGAIN production aggregate.
+        In the "sign" profile, sign using external signature and key resources.
     -->
-    <beans profile="prod">
-        <alias alias="source.entities" name="int_edugain_productionEntities"/>
+    <beans profile="!sign">
+        <bean id="perform.signature" parent="CompositeStage"/>
     </beans>
-    
-    <!--
-        "sign" profile
-    -->
     <beans profile="sign">
-    
         <bean id="perform.signature" parent="XMLSignatureSigningStage">
             <property name="certificates">
                 <bean parent="X509CertificateFactoryBean">
@@ -245,17 +198,6 @@
                 </bean>
             </property>
         </bean>
-
-    </beans>
-
-    <!--
-        "not signing" profile
-    -->
-    <beans profile="!sign">
-    
-        <!-- do nothing -->
-        <bean id="perform.signature" parent="CompositeStage"/>
-
     </beans>
 
 </beans>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    default-lazy-init="true"
+    xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <!--
+        Beans defined in this file are expected to be replaced in *all* deployments.
+    -->
+
+    <!--
+        source.entities
+        
+        Stage returning the collection of entities.
+        
+        By default, in the development profile, metadata is sourced from a local XML resource.
+        
+        In the production profile, metadata is sourced from the eduGAIN production aggregate.
+    -->
+    <beans profile="!prod">
+        <bean name="source.entities" parent="CompositeStage">
+            <property name="composedStages">
+                <list>
+                    <bean parent="DOMResourceSourceStage">
+                        <property name="DOMResource">
+                            <bean parent="ClassPathResource">
+                                <constructor-arg value="dev/entities.xml"/>
+                            </bean>
+                        </property>
+                    </bean>
+                    <ref bean="disassemble"/>
+                </list>
+            </property>
+        </bean>
+    </beans>
+    <beans profile="prod">
+        <!--
+            Import eduGAIN beans.
+        -->
+        <import resource="classpath:int_edugain/beans.xml"/>
+    
+        <alias alias="source.entities" name="int_edugain_productionEntities"/>
+    </beans>
+    
+</beans>
