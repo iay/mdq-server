@@ -20,9 +20,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -33,7 +31,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import net.shibboleth.metadata.Item;
-import net.shibboleth.metadata.ItemId;
 import net.shibboleth.metadata.ItemSerializer;
 import net.shibboleth.metadata.pipeline.Pipeline;
 import net.shibboleth.metadata.pipeline.PipelineProcessingException;
@@ -47,14 +44,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Sources metadata and allows lookup on the results.
+ * Sources metadata from an {@link ItemCollectionLibrary} and allows lookup on the results.
  *
  * @param <T> item type of the metadata served
  */
 public class MetadataService<T> extends AbstractIdentifiableInitializableComponent {
-    
-    /** The identifier used to represent "all entities". */
-    private static final String ID_ALL = null;
     
     /**
      * Representation of the result of a query.
@@ -144,9 +138,9 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
     private final Logger log = LoggerFactory.getLogger(MetadataService.class);
 
     /**
-     * The pipeline to execute to acquire metadata.
+     * The {@link ItemCollectionLibrary} from which we acquire metadata.
      */
-    private Pipeline<T> sourcePipeline;
+    private ItemCollectionLibrary<T> itemCollectionLibrary;
     
     /**
      * The pipeline to execute to render metadata for publication.
@@ -169,97 +163,8 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
      */
     private long refreshInterval;
     
-    /**
-     * Class representing a {@link Collection} of {@link Item}s
-     * associated with a {@link Collection} of identifiers.
-     *
-     * @param <T> type of {@link Item} in the collection
-     */
-    private static class IdentifiedItemCollection<T> {
-        
-        /** The {@link Collection} of {@link Item}s. */
-        @Nonnull
-        private final Collection<Item<T>> items;
-        
-        /** The identifiers associated with the item collection. */
-        @Nonnull
-        private final Collection<String> identifiers;
-        
-        /**
-         * Constructor.
-         * 
-         * Shorthand version with a single {@link Item}.
-         *
-         * @param item single item to be made into a collection
-         * @param keys identifiers to be associated with the collection
-         */
-        protected IdentifiedItemCollection(@Nonnull final Item<T> item,
-                @Nonnull final Collection<String> keys) {
-            this(Collections.singletonList(item), keys);
-        }
-        
-        /**
-         * Constructor.
-         * 
-         * Shorthand version with a single identifier.
-         *
-         * @param collection items to be associated with the identifier
-         * @param key identifier for the item collection.
-         */
-        protected IdentifiedItemCollection(@Nonnull final Collection<Item<T>> collection,
-                @Nullable final String key) {
-            this(collection, Collections.singletonList(key));
-        }
-
-        /**
-         * Constructor.
-         *
-         * @param collection {@link Collection} of {@link Item}s to be associated with the identifiers
-         * @param keys identifiers to be associated with the item collection
-         */
-        protected IdentifiedItemCollection(@Nonnull final Collection<Item<T>> collection,
-                @Nonnull final Collection<String> keys) {
-            items = collection;
-            identifiers = new ArrayList<>(keys);
-        }
-
-        /**
-         * Returns the items.
-         * 
-         * @return {@link Collection} of {@link Item}s.
-         */
-        @Nonnull
-        public Collection<Item<T>> getItems() {
-            return items;
-        }
-
-        /**
-         * Returns the identifiers.
-         * 
-         * @return {@link Collection} of identifiers.
-         */
-        @Nonnull
-        public Collection<String> getIdentifiers() {
-            return identifiers;
-        }
-
-    }
-    
-    /**
-     * Metadata indexed by unique identifier.
-     */
-    private Map<String, IdentifiedItemCollection<T>> identifiedItemCollections;
-    
-    /**
-     * Lock covering the {@link #identifiedItemCollections}.
-     * 
-     * Lock ordering: this lock should be taken, if required, *before* the
-     * result cache lock.
-     */
-    private ReadWriteLock itemCollectionLock;
-
     /** Cache of {@link Result}s, indexed by identifier. */
-    private Map<String, Result> resultCache;
+    private Map<String, Result> resultCache = new HashMap<>();
     
     /**
      * Lock covering the result cache.
@@ -275,15 +180,15 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
     private ScheduledThreadPoolExecutor executor;
     
     /**
-     * Sets the {@link Pipeline} used to acquire new metadata.
+     * Sets the {@link ItemCollectionLibrary} used to acquire new metadata.
      * 
-     * @param pipeline the new source {@link Pipeline}
+     * @param library the new source {@link ItemCollectionLibrary}
      */
-    public void setSourcePipeline(@Nonnull final Pipeline<T> pipeline) {
+    public void setItemCollectionLibrary(@Nonnull final ItemCollectionLibrary<T> library) {
         ComponentSupport.ifDestroyedThrowDestroyedComponentException(this);
         ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
 
-        sourcePipeline = Constraint.isNotNull(pipeline, "source pipeline may not be null");
+        itemCollectionLibrary = Constraint.isNotNull(library, "source library may not be null");
     }
     
     /**
@@ -381,7 +286,7 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
      */
     @Nonnull
     public Result getAll() {
-        return get(ID_ALL);
+        return get(ItemCollectionLibrary.ID_ALL);
     }
     
     /**
@@ -407,84 +312,50 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
         }
         
         /*
-         * If the result we want isn't in the cache, see whether we have a
-         * collection of items we can render.
+         * If the result we want isn't in the cache, acquire a collection of items
+         * we can render.
          */
-        itemCollectionLock.readLock().lock();
+        final IdentifiedItemCollection<T> identifiedItemCollection = itemCollectionLibrary.get(identifier);
+        
+        /*
+         * Return a "not found" result if the identifier has no definition.
+         */
+        if (identifiedItemCollection == null) {
+            return new ServiceResult();
+        }
+        
+        /*
+         * Render the item collection.
+         */
+        final Collection<String> identifiers = identifiedItemCollection.getIdentifiers();
+        final byte[] bytes = renderCollection(cloneItemCollection(identifiedItemCollection.getItems()));
+        final Result result = new ServiceResult(bytes, identifiers);
+        
+        /*
+         * Write the result into the cache for each of its
+         * potential identifiers.
+         */
+        cacheLock.writeLock().lock();
         try {
-            final IdentifiedItemCollection<T> identifiedItemCollection = identifiedItemCollections.get(identifier);
-            
-            /*
-             * Return a "not found" result if the identifier has no definition.
-             */
-            if (identifiedItemCollection == null) {
-                return new ServiceResult();
+            for (String id : identifiers) {
+                resultCache.put(id, result);
             }
-            
-            /*
-             * Render the item collection.
-             */
-            final Collection<String> identifiers = identifiedItemCollection.getIdentifiers();
-            final byte[] bytes = renderCollection(cloneItemCollection(identifiedItemCollection.getItems()));
-            final Result result = new ServiceResult(bytes, identifiers);
-            
-            /*
-             * Write the result into the cache for each of its
-             * potential identifiers.
-             */
-            cacheLock.writeLock().lock();
-            try {
-                for (String id : identifiers) {
-                    resultCache.put(id, result);
-                }
-                return result;
-            } finally {
-                cacheLock.writeLock().unlock();
-            }
+            return result;
         } finally {
-            itemCollectionLock.readLock().unlock();
+            cacheLock.writeLock().unlock();
         }
     }
 
     /**
-     * Acquires new metadata by executing the source pipeline, then
-     * replaces any existing item collection with the results.
-     *  
-     * @throws PipelineProcessingException if something goes wrong in the source pipeline
+     * Refresh the underlying {@link ItemCollectionLibrary} and invalidate our result cache.
      */
-    private void refreshMetadata() throws PipelineProcessingException {
-        final Collection<Item<T>> newItemCollection = new ArrayList<>();
-        log.debug("executing source pipeline");
-        sourcePipeline.execute(newItemCollection);
-        log.debug("source pipeline executed; {} results", newItemCollection.size());
-        
-        final Map<String, IdentifiedItemCollection<T>> newIdentifiedItemCollections = new HashMap<>();
-        for (Item<T> item : newItemCollection) {
-            final List<ItemId> uniqueIds = item.getItemMetadata().get(ItemId.class);
-            final List<String> ids = new ArrayList<String>();
-            for (ItemId uniqueId : uniqueIds) {
-                ids.add(uniqueId.getId());
-            }
-            final IdentifiedItemCollection<T> newCollection = new IdentifiedItemCollection<>(item, ids);
-            for (String id : ids) {
-                if (newIdentifiedItemCollections.containsKey(id)) {
-                    log.warn("duplicate unique identifier {} ignored", id);
-                } else {
-                    newIdentifiedItemCollections.put(id, newCollection);
-                }
-            }
-        }
-        log.debug("unique identifiers: {}", newIdentifiedItemCollections.size());
-        newIdentifiedItemCollections.put(ID_ALL, new IdentifiedItemCollection(newItemCollection, ID_ALL));
-        
-        itemCollectionLock.writeLock().lock();
+    private void refreshMetadata() {
         cacheLock.writeLock().lock();
         try {
-            identifiedItemCollections = newIdentifiedItemCollections;
+            itemCollectionLibrary.refresh();
             resultCache = new HashMap<>();
         } finally {
             cacheLock.writeLock().unlock();
-            itemCollectionLock.writeLock().unlock();
         }
     }
     
@@ -493,8 +364,8 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
     protected void doInitialize() throws ComponentInitializationException {
         super.doInitialize();
 
-        if (sourcePipeline == null) {
-            throw new ComponentInitializationException("source pipeline must be supplied");
+        if (itemCollectionLibrary == null) {
+            throw new ComponentInitializationException("source library must be supplied");
         }
         
         if (renderPipeline == null) {
@@ -505,15 +376,7 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
             throw new ComponentInitializationException("serializer must be supplied");
         }
 
-        itemCollectionLock = new ReentrantReadWriteLock();
         cacheLock = new ReentrantReadWriteLock();
-        
-        // perform initial metadata refresh
-        try {
-            refreshMetadata();
-        } catch (PipelineProcessingException e) {
-            throw new ComponentInitializationException("error executing source pipeline", e);
-        }
         
         // Schedule regular metadata refresh if enabled.
         if (refreshInterval != 0) {
@@ -522,11 +385,7 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
                     new Runnable() {
 
                         public void run() {
-                            try {
-                                refreshMetadata();
-                            } catch (PipelineProcessingException e) {
-                                log.debug("metadata source refresh failed: {}", e);
-                            }
+                            refreshMetadata();
                             log.debug("next refresh estimated at {}", new DateTime().plus(refreshInterval));
                         }
                         
@@ -549,11 +408,8 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
                 executor = null;
             }
         }
-        identifiedItemCollections = null;
-        sourcePipeline = null;
         renderPipeline = null;
         serializer = null;
-        itemCollectionLock = null;
         resultCache = null;
         cacheLock = null;
         super.doDestroy();

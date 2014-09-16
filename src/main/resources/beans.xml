@@ -65,12 +65,21 @@
     </bean>
 
     <!--
+        Item collection library.
+    -->
+    <bean id="itemCollection.SAML" parent="component_parent"
+        class="uk.org.iay.mdq.server.ItemCollectionLibrary"
+        lazy-init="false">
+        <property name="sourcePipeline" ref="source.SAML"/>
+    </bean>
+
+    <!--
         Metadata lookup service.
     -->
     <bean id="metadataService.SAML" parent="component_parent"
         class="uk.org.iay.mdq.server.MetadataService"
         lazy-init="false">
-        <property name="sourcePipeline" ref="source.SAML"/>
+        <property name="itemCollectionLibrary" ref="itemCollection.SAML"/>
         <property name="renderPipeline" ref="render.SAML"/>
         <property name="refreshInterval" value="${metadataService.SAML.refreshInterval}"/>
         <property name="serializer">
