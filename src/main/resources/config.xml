@@ -14,6 +14,29 @@
     -->
 
     <!--
+        Pipeline used to acquire metadata for service.
+        
+        Input: empty collection.
+        
+        Output: collection of individual entity metadata items.
+    -->
+    <bean id="source.SAML" parent="SimplePipeline">
+        <property name="stages">
+            <list>
+                <ref bean="source.entities"/>
+                <ref bean="populateItemIds"/>
+                <bean class="net.shibboleth.metadata.pipeline.ItemIdTransformStage">
+                    <property name="idTransformers">
+                        <list>
+                            <bean class="net.shibboleth.metadata.pipeline.MDQuerySHA1ItemIdTransformer"/>
+                        </list>
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <!--
         source.entities
         
         Stage returning the collection of entities.
