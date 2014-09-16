@@ -253,6 +253,21 @@
     
     <!-- *** Parent beans for ukf-mda. *** -->
     
+    <bean id="EntityAttributeFilteringStage" abstract="true" parent="stage_parent"
+        class="uk.org.ukfederation.mda.dom.saml.mdattr.EntityAttributeFilteringStage"/>
+
+    <bean id="EntityCategoryMatcher" abstract="true"
+        class="uk.org.ukfederation.mda.dom.saml.mdattr.EntityCategoryMatcher"/>
+
+    <bean id="EntityCategorySupportMatcher" abstract="true"
+        class="uk.org.ukfederation.mda.dom.saml.mdattr.EntityCategorySupportMatcher"/>
+
+    <bean id="MultiPredicateMatcher" abstract="true"
+        class="uk.org.ukfederation.mda.dom.saml.mdattr.MultiPredicateMatcher"/>
+
+    <bean id="RegistrationAuthorityMatcher" abstract="true"
+        class="uk.org.ukfederation.mda.dom.saml.mdattr.RegistrationAuthorityMatcher"/>
+    
     <bean id="ElementWhitespaceTrimmingStage" abstract="true" parent="stage_parent"
         class="uk.org.ukfederation.mda.dom.ElementWhitespaceTrimmingStage"/>
     
@@ -1032,8 +1047,10 @@
                 <ref bean="trimImportElementWhitespace"/>
                 <ref bean="removeEmptyExtensions"/>
                 <ref bean="checkSchemas"/>
+                <!--
                 <ref bean="CHECK_imported"/>
-
+                -->
+                
                 <bean parent="X509ValidationStage"
                     p:id="checkCertificates">
                     <property name="validators">
