@@ -24,6 +24,7 @@
 
     <properties>
         <checkstyle.configLocation>checkstyle.xml</checkstyle.configLocation>
+        <mda.version>0.9-SNAPSHOT</mda.version>
         <spring.boot.version>1.1.6.RELEASE</spring.boot.version>
         <start-class>uk.org.iay.mdq.server.Application</start-class>
     </properties>
@@ -35,7 +36,7 @@
         <dependency>
             <groupId>net.shibboleth.metadata</groupId>
             <artifactId>aggregator-pipeline</artifactId>
-            <version>0.9-SNAPSHOT</version>
+            <version>${mda.version}</version>
         </dependency>
         <dependency>
             <groupId>net.shibboleth.utilities</groupId>
@@ -154,6 +155,13 @@
 
         <!-- Test dependencies -->
 
+        <dependency>
+            <groupId>net.shibboleth.metadata</groupId>
+            <artifactId>aggregator-pipeline</artifactId>
+            <version>${mda.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>

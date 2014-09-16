@@ -28,6 +28,7 @@ import javax.annotation.Nonnull;
 
 import net.shibboleth.metadata.Item;
 import net.shibboleth.metadata.ItemId;
+import net.shibboleth.metadata.ItemTag;
 import net.shibboleth.metadata.pipeline.Pipeline;
 import net.shibboleth.metadata.pipeline.PipelineProcessingException;
 import net.shibboleth.utilities.java.support.component.AbstractIdentifiableInitializableComponent;
@@ -130,11 +131,17 @@ public class ItemCollectionLibrary<T> extends AbstractIdentifiableInitializableC
         }
         log.debug("source pipeline executed; {} results", newItemCollection.size());
         
+        // all identified collections by name
         final Map<String, IdentifiedItemCollection<T>> newIdentifiedItemCollections = new HashMap<>();
-        for (Item<T> item : newItemCollection) {
+        
+        // temporary map of tagged collections being built
+        final Map<String, List<Item<T>>> taggedCollections = new HashMap<>();
+        
+        for (final Item<T> item : newItemCollection) {
+            // process the item's unique identifiers
             final List<ItemId> uniqueIds = item.getItemMetadata().get(ItemId.class);
             final List<String> ids = new ArrayList<String>();
-            for (ItemId uniqueId : uniqueIds) {
+            for (final ItemId uniqueId : uniqueIds) {
                 ids.add(uniqueId.getId());
             }
             final IdentifiedItemCollection<T> newCollection = new IdentifiedItemCollection<>(item, ids);
@@ -145,9 +152,36 @@ public class ItemCollectionLibrary<T> extends AbstractIdentifiableInitializableC
                     newIdentifiedItemCollections.put(id, newCollection);
                 }
             }
+            
+            // process the item's item tags (non-unique identifiers)
+            final List<ItemTag> tags = item.getItemMetadata().get(ItemTag.class);
+            for (final ItemTag tag : tags) {
+                final String tagName = tag.getTag();
+                
+                // establish the tag if it doesn't already exist
+                if (!taggedCollections.containsKey(tagName)) {
+                    taggedCollections.put(tagName, new ArrayList<Item<T>>());
+                }
+                
+                // add this item to the tag's collection
+                taggedCollections.get(tagName).add(item);
+            }
         }
         log.debug("unique identifiers: {}", newIdentifiedItemCollections.size());
+        
+        // add in the tagged collections
+        if (!taggedCollections.isEmpty()) {
+            log.debug("tagged collection identifiers: {}", taggedCollections.size());
+            for (final Map.Entry<String, List<Item<T>>> entry : taggedCollections.entrySet()) {
+                final IdentifiedItemCollection<T> newColl =
+                        new IdentifiedItemCollection<>(entry.getValue(), entry.getKey());
+                newIdentifiedItemCollections.put(entry.getKey(), newColl);
+            }
+        }
+        
+        // add in the "all entities" collection
         newIdentifiedItemCollections.put(ID_ALL, new IdentifiedItemCollection(newItemCollection, ID_ALL));
+        log.debug("total identifiers: {}", newIdentifiedItemCollections.size());
         
         itemCollectionLock.writeLock().lock();
         try {
