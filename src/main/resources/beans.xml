@@ -164,14 +164,15 @@
         <bean id="perform.signature" parent="CompositeStage"/>
     </beans>
     <beans profile="sign">
+
+        <bean id="certificateResource" parent="FileSystemResource">
+            <constructor-arg value="${sign.certificate}"/>
+        </bean>
+
         <bean id="perform.signature" parent="XMLSignatureSigningStage">
             <property name="certificates">
                 <bean parent="X509CertificateFactoryBean">
-                    <property name="resource">
-                        <bean parent="FileSystemResource">
-                            <constructor-arg value="${sign.certificate}"/>
-                        </bean>
-                    </property>
+                    <property name="resource" ref="certificateResource"/>
                 </bean>
             </property>
             <property name="privateKey">
