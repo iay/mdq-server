@@ -6,7 +6,7 @@
     <parent>
         <groupId>net.shibboleth</groupId>
         <artifactId>parent-v3</artifactId>
-        <version>4</version>
+        <version>TRUNK-SNAPSHOT</version>
     </parent>
 
     <groupId>uk.org.iay.mdq</groupId>
@@ -23,9 +23,13 @@
     <inceptionYear>2014</inceptionYear>
 
     <properties>
-        <checkstyle.configLocation>checkstyle.xml</checkstyle.configLocation>
         <mda.version>0.9-SNAPSHOT</mda.version>
+        <ukf-mda.version>0.9-SNAPSHOT</ukf-mda.version>
+        <java-support.version>5.0-SNAPSHOT</java-support.version>
+        <spring-extensions.version>2.0-SNAPSHOT</spring-extensions.version>
         <spring.boot.version>1.1.6.RELEASE</spring.boot.version>
+
+        <checkstyle.configLocation>checkstyle.xml</checkstyle.configLocation>
         <start-class>uk.org.iay.mdq.server.Application</start-class>
     </properties>
 
@@ -41,7 +45,7 @@
         <dependency>
             <groupId>net.shibboleth.utilities</groupId>
             <artifactId>java-support</artifactId>
-            <version>4.0.0</version>
+            <version>${java-support.version}</version>
         </dependency>
 
         <dependency>
@@ -49,9 +53,17 @@
             <artifactId>jsr305</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+        <dependency>
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
             <version>1</version>
+        </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
         </dependency>
         <dependency>
             <groupId>org.cryptacular</groupId>
@@ -139,7 +151,7 @@
         <dependency>
             <groupId>net.shibboleth.ext</groupId>
             <artifactId>spring-extensions</artifactId>
-            <version>2.0.0</version>
+            <version>${spring-extensions.version}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -150,7 +162,8 @@
         <dependency>
             <groupId>uk.org.ukfederation</groupId>
             <artifactId>ukf-mda</artifactId>
-            <version>0.9-SNAPSHOT</version>
+            <version>${ukf-mda.version}</version>
+            <scope>runtime</scope>
         </dependency>
 
         <!-- Test dependencies -->
