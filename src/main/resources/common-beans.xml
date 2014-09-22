@@ -228,6 +228,10 @@
     
     <!-- *** Parent beans for Shibboleth spring-extensions factory beans. *** -->
 
+    <!-- anticipates name change in spring-extensions bundled with MDA 0.9 -->
+    <bean id="DOMDocumentFactoryBean" abstract="true"
+        class="net.shibboleth.ext.spring.factory.DomDocumentFactoryBean"/>
+    
     <bean id="PrivateKeyFactoryBean" abstract="true"
         class="net.shibboleth.ext.spring.factory.PrivateKeyFactoryBean"/>
     
@@ -250,9 +254,21 @@
 
     <bean id="PipelineMergeStage.deduplicate" abstract="true" parent="PipelineMergeStage"
         p:collectionMergeStrategy-ref="deduplicateMergeStrategy"/>
+
+    <bean id="SplitMergeStage" abstract="true" parent="stage_parent"
+        class="net.shibboleth.metadata.pipeline.SplitMergeStage"/>
+
+    <bean id="XPathItemSelectionStrategy" abstract="true"
+        class="net.shibboleth.metadata.dom.XPathItemSelectionStrategy"/>
     
     <!-- *** Parent beans for ukf-mda. *** -->
     
+    <bean id="ElementWhitespaceTrimmingStage" abstract="true" parent="stage_parent"
+        class="uk.org.ukfederation.mda.dom.ElementWhitespaceTrimmingStage"/>
+    
+    <bean id="X509ValidationStage" abstract="true" parent="stage_parent"
+        class="uk.org.ukfederation.mda.validate.X509ValidationStage"/>
+
     <bean id="EntityAttributeFilteringStage" abstract="true" parent="stage_parent"
         class="uk.org.ukfederation.mda.dom.saml.mdattr.EntityAttributeFilteringStage"/>
 
@@ -267,12 +283,6 @@
 
     <bean id="RegistrationAuthorityMatcher" abstract="true"
         class="uk.org.ukfederation.mda.dom.saml.mdattr.RegistrationAuthorityMatcher"/>
-    
-    <bean id="ElementWhitespaceTrimmingStage" abstract="true" parent="stage_parent"
-        class="uk.org.ukfederation.mda.dom.ElementWhitespaceTrimmingStage"/>
-    
-    <bean id="X509ValidationStage" abstract="true" parent="stage_parent"
-        class="uk.org.ukfederation.mda.validate.X509ValidationStage"/>
     
     <bean id="validator_parent" abstract="true" parent="component_parent"/>
 
@@ -448,6 +458,8 @@
         Federation registrationAuthority URIs.
     -->
     <bean id="hr_eduhr_registrar" parent="String" c:_0="http://www.srce.hr"/>
+    <bean id="il_iif_registrar"   parent="String" c:_0="http://iif.iucc.ac.il"/>
+    <bean id="jp_gakunin_registrar" parent="String" c:_0="https://www.gakunin.jp"/>
     
     <!--
         identificationStrategy
@@ -484,8 +496,10 @@
                 <entry key="http://eduid.hu"                  value="HU"/>
                 <entry key="http://www.heanet.ie"             value="IE"/>
                 <entry key="http://www.idem.garr.it/"         value="IT"/>
+                <entry key-ref="jp_gakunin_registrar"         value="JP"/>
                 <entry key="http://laife.lanet.lv/"           value="LV"/>
                 <entry key="http://feide.no/"                 value="NO"/>
+                <entry key="http://aai.pionier.net.pl"        value="PL"/>
                 <entry key="http://aai.arnes.si"              value="SI"/>
                 <entry key="http://www.rediris.es/"           value="ES"/>
                 <entry key="http://www.swamid.se/"            value="SE"/>
@@ -494,10 +508,10 @@
                 <entry key="http://ukfederation.org.uk"       value="UK"/>
                 
                 <!-- Joining eduGAIN -->
-                <entry key="http://aai.pionier.net.pl"        value="PL"/>
-                
-                <!-- not yet eduGAIN members -->
                 <entry key="https://incommon.org"             value="US"/>
+                
+                <!-- eduGAIN candidates -->
+                <entry key-ref="il_iif_registrar"             value="IL"/>
             </map>
         </property>
     </bean>
@@ -597,8 +611,10 @@
     <!--
         QNames for SAML metadata elements.
     -->
+    <bean id="md-EmailAddress"            parent="QName" c:_0-ref="md_namespace" c:_1="EmailAddress"/>
     <bean id="md-NameIDFormat"            parent="QName" c:_0-ref="md_namespace" c:_1="NameIDFormat"/>
     <bean id="md-OrganizationDisplayName" parent="QName" c:_0-ref="md_namespace" c:_1="OrganizationDisplayName"/>
+    <bean id="md-OrganizationURL"         parent="QName" c:_0-ref="md_namespace" c:_1="OrganizationURL"/>
 
     <!--
         Basic EntitiesDescriptor disassembler pipeline stage.
@@ -726,6 +742,9 @@
         ***********************************************
     -->
     
+    <bean id="mdui-InformationURL" parent="QName" c:_0-ref="mdui_namespace" c:_1="InformationURL"/>
+    <bean id="mdui-Logo"           parent="QName" c:_0-ref="mdui_namespace" c:_1="Logo"/>
+
     <bean id="stripMDUIDiscoHints" parent="ElementStrippingStage"
         p:id="stripMDUIDiscoHints"
         p:elementName="DiscoHints"
@@ -1000,15 +1019,20 @@
         trimImportElementWhitespace
         
         Trim whitespace from the specified elements in imported
-        entities.  These would often be errors in UK-registered
-        metadata.
+        entities.  These would be errors in UK-registered metadata,
+        but repairing the metadata on the fly is often easier than
+        asking for it to be corrected at source.
     -->
     <bean id="trimImportElementWhitespace" parent="ElementWhitespaceTrimmingStage"
         p:id="trimImportElementWhitespace">
         <property name="elementNames">
             <set>
+                <ref bean="md-EmailAddress"/>
                 <ref bean="md-NameIDFormat"/>
                 <ref bean="md-OrganizationDisplayName"/>
+                <ref bean="md-OrganizationURL"/>
+                <ref bean="mdui-InformationURL"/>
+                <ref bean="mdui-Logo"/>
             </set>
         </property>
     </bean>
@@ -1021,7 +1045,7 @@
         individual entities.
         
         The result is a collection of entities, some of which may be labelled with
-        errors.  No announcement of removal of those entities is performed here;
+        errors.  No announcement or removal of those entities is performed here;
         that is left to the caller.
     -->
     <bean id="standardImportActions" parent="CompositeStage"
@@ -1039,9 +1063,6 @@
                 <ref bean="stripUkfedlabelNamespace"/>
                 <ref bean="stripWayfNamespace"/>
                 
-                <!-- Strip all entity attributes from this source. -->
-                <ref bean="stripMdattrNamespace"/>
-
                 <ref bean="cleanImport"/>
                 <ref bean="stripAAMDUI"/>
                 <ref bean="trimImportElementWhitespace"/>
@@ -1073,8 +1094,8 @@
                                 Compromised key blacklists.
                                 
                                 Again, don't need to check for keys below our minimum key size.
-                                This currently means there are no compromised keys to check for.
                             -->
+                            <ref bean="compromised.2048"/>
                         </list>
                     </property>
                 </bean>
