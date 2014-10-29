@@ -25,8 +25,8 @@
     <properties>
         <mda.version>0.9-SNAPSHOT</mda.version>
         <ukf-mda.version>0.9-SNAPSHOT</ukf-mda.version>
-        <java-support.version>5.0-SNAPSHOT</java-support.version>
-        <spring-extensions.version>2.0-SNAPSHOT</spring-extensions.version>
+        <java-support.version>6.0-SNAPSHOT</java-support.version>
+        <spring-extensions.version>4.0-SNAPSHOT</spring-extensions.version>
         <spring.boot.version>1.1.8.RELEASE</spring.boot.version>
 
         <checkstyle.configLocation>checkstyle.xml</checkstyle.configLocation>
