@@ -34,6 +34,8 @@ import net.shibboleth.metadata.Item;
 import net.shibboleth.metadata.ItemSerializer;
 import net.shibboleth.metadata.pipeline.Pipeline;
 import net.shibboleth.metadata.pipeline.PipelineProcessingException;
+import net.shibboleth.utilities.java.support.annotation.Duration;
+import net.shibboleth.utilities.java.support.annotation.constraint.NonNegative;
 import net.shibboleth.utilities.java.support.component.AbstractIdentifiableInitializableComponent;
 import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
 import net.shibboleth.utilities.java.support.component.ComponentSupport;
@@ -159,8 +161,9 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
     /**
      * Refresh interval for the metadata source, in milliseconds.
      * 
-     * Set to 0 to disable refresh after the initial fetch.
+     * Set to 0 (default) to disable refresh after the initial fetch.
      */
+    @NonNegative @Duration
     private long refreshInterval;
     
     /** Cache of {@link Result}s, indexed by identifier. */
@@ -229,11 +232,11 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
      * 
      * @param refresh the metadata source refresh interval
      */
-    public void setRefreshInterval(final long refresh) {
+    public void setRefreshInterval(@NonNegative @Duration final long refresh) {
         ComponentSupport.ifDestroyedThrowDestroyedComponentException(this);
         ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
 
-        refreshInterval = refresh;
+        refreshInterval = Constraint.isGreaterThanOrEqual(0, refresh, "refresh interval must not be negative");
     }    
     
     /**
