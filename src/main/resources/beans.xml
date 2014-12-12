@@ -138,7 +138,7 @@
         -->
         <property name="viewResolvers">
             <list>
-                <ref bean="groovyTemplateViewResolver"/>
+                <ref bean="groovyMarkupViewResolver"/>
             </list>
         </property>
         
