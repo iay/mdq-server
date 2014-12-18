@@ -815,7 +815,7 @@
     -->
     <bean id="httpClientBuilder"
         class="net.shibboleth.utilities.java.support.httpclient.HttpClientBuilder"
-        p:connectionDisregardSslCertificate="true"
+        p:connectionDisregardTLSCertificate="true"
     />
 
     <!--
