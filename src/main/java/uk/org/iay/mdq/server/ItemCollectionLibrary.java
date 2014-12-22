@@ -117,27 +117,20 @@ public class ItemCollectionLibrary<T> extends AbstractIdentifiableInitializableC
     }
 
     /**
-     * Acquires new metadata by executing the source pipeline, then
-     * replaces any existing item collection with the results.
+     * Index a collection of items into a collection of identified item collections.
+     * 
+     * @param items collection of items to be indexed
+     * @return collection of identified item collections
      */
-    public void refresh() {
-        final Collection<Item<T>> newItemCollection = new ArrayList<>();
-        log.debug("executing source pipeline");
-        try {
-            sourcePipeline.execute(newItemCollection);
-        } catch (PipelineProcessingException e) {
-            log.warn("source pipeline execution error", e);
-            return;
-        }
-        log.debug("source pipeline executed; {} results", newItemCollection.size());
-        
+    @Nonnull
+    private Map<String, IdentifiedItemCollection<T>> indexItems(final Collection<Item<T>> items) {
         // all identified collections by name
         final Map<String, IdentifiedItemCollection<T>> newIdentifiedItemCollections = new HashMap<>();
         
         // temporary map of tagged collections being built
         final Map<String, List<Item<T>>> taggedCollections = new HashMap<>();
         
-        for (final Item<T> item : newItemCollection) {
+        for (final Item<T> item : items) {
             // process the item's unique identifiers
             final List<ItemId> uniqueIds = item.getItemMetadata().get(ItemId.class);
             final List<String> ids = new ArrayList<String>();
@@ -176,13 +169,37 @@ public class ItemCollectionLibrary<T> extends AbstractIdentifiableInitializableC
                 final IdentifiedItemCollection<T> newColl =
                         new IdentifiedItemCollection<>(entry.getValue(), entry.getKey());
                 newIdentifiedItemCollections.put(entry.getKey(), newColl);
+                log.debug("... collection: {}", entry.getKey());
             }
         }
         
         // add in the "all entities" collection
-        newIdentifiedItemCollections.put(ID_ALL, new IdentifiedItemCollection(newItemCollection, ID_ALL));
+        newIdentifiedItemCollections.put(ID_ALL, new IdentifiedItemCollection(items, ID_ALL));
         log.debug("total identifiers: {}", newIdentifiedItemCollections.size());
         
+        return newIdentifiedItemCollections;
+    }
+
+    /**
+     * Acquires new metadata by executing the source pipeline, then
+     * replaces any existing item collection with the results.
+     */
+    public void refresh() {
+        // acquire the items to store
+        final Collection<Item<T>> newItemCollection = new ArrayList<>();
+        log.debug("executing source pipeline");
+        try {
+            sourcePipeline.execute(newItemCollection);
+        } catch (PipelineProcessingException e) {
+            log.warn("source pipeline execution error", e);
+            return;
+        }
+        log.debug("source pipeline executed; {} results", newItemCollection.size());
+        
+        // index the retrieved items
+        final Map<String, IdentifiedItemCollection<T>> newIdentifiedItemCollections = indexItems(newItemCollection);
+        
+        // atomically update the collection we expose
         itemCollectionLock.writeLock().lock();
         try {
             identifiedItemCollections = newIdentifiedItemCollections;
