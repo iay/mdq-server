@@ -169,7 +169,7 @@ public class ItemCollectionLibrary<T> extends AbstractIdentifiableInitializableC
                 final IdentifiedItemCollection<T> newColl =
                         new IdentifiedItemCollection<>(entry.getValue(), entry.getKey());
                 newIdentifiedItemCollections.put(entry.getKey(), newColl);
-                log.debug("... collection: {}", entry.getKey());
+                log.debug("... collection: {} ({})", entry.getKey(), entry.getValue().size());
             }
         }
         
