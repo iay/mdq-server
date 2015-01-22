@@ -16,11 +16,14 @@
 
 package uk.org.iay.mdq.server;
 
+import javax.servlet.Filter;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportResource;
@@ -44,6 +47,21 @@ public class Application {
     @Bean
     public BeanPostProcessor mvcConfigurationPostProcessor() {
         return new MVCConfigurationPostProcessor();
+    }
+    
+    /**
+     * Log all requests to the application.
+     * 
+     * @return a logging {@link Filter}
+     */
+    @Bean
+    @ConditionalOnProperty("log.requests")
+    public Filter logRequests() {
+        final RequestLogger logger = new RequestLogger();
+        logger.setBeforeMessagePrefix("");
+        logger.setBeforeMessageSuffix("");
+        logger.setIncludeClientInfo(true);
+        return logger;
     }
     
     /**
