@@ -27,7 +27,7 @@
         <ukf-mda.version>0.9-SNAPSHOT</ukf-mda.version>
         <java-support.version>7.0.0</java-support.version>
         <spring-extensions.version>5.0.0</spring-extensions.version>
-        <spring.boot.version>1.2.0.RELEASE</spring.boot.version>
+        <spring.boot.version>1.2.1.RELEASE</spring.boot.version>
 
         <checkstyle.configLocation>checkstyle.xml</checkstyle.configLocation>
         <start-class>uk.org.iay.mdq.server.Application</start-class>
