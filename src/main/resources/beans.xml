@@ -71,6 +71,19 @@
                 <bean id="addID" parent="stage_parent"
                     class="net.shibboleth.metadata.dom.saml.GenerateIdStage"/>
                     
+                <!--
+                    Perform an identity transform to ward off signature issues.
+                    
+                    See https://issues.shibboleth.net/jira/browse/MDA-144
+                -->
+                <bean id="identity.transform" parent="XSLTransformationStage">
+                    <property name="XSLResource">
+                        <bean parent="ClassPathResource">
+                            <constructor-arg value="identity.xsl"/>
+                        </bean>
+                    </property>
+                </bean>
+
                 <!-- perform signature or not, depending on profile -->
                 <ref bean="perform.signature"/>
             </list>
