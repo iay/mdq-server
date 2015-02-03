@@ -19,11 +19,20 @@
         Input: empty collection.
         
         Output: collection of individual entity metadata items.
+
+        By default, metadata is sourced from a local XML resource.
     -->
     <bean id="source.SAML" parent="SimplePipeline">
         <property name="stages">
             <list>
-                <ref bean="source.entities"/>
+                <bean parent="DOMResourceSourceStage">
+                    <property name="DOMResource">
+                        <bean parent="ClassPathResource">
+                            <constructor-arg value="dev/entities.xml"/>
+                        </bean>
+                    </property>
+                </bean>
+                <ref bean="disassemble"/>
                 <ref bean="populateItemIds"/>
                 <bean class="net.shibboleth.metadata.pipeline.ItemIdTransformStage">
                     <property name="idTransformers">
@@ -36,26 +45,4 @@
         </property>
     </bean>
 
-    <!--
-        source.entities
-        
-        Stage returning the collection of entities.
-        
-        By default, metadata is sourced from a local XML resource.
-    -->
-    <bean name="source.entities" parent="CompositeStage">
-        <property name="composedStages">
-            <list>
-                <bean parent="DOMResourceSourceStage">
-                    <property name="DOMResource">
-                        <bean parent="ClassPathResource">
-                            <constructor-arg value="dev/entities.xml"/>
-                        </bean>
-                    </property>
-                </bean>
-                <ref bean="disassemble"/>
-            </list>
-        </property>
-    </bean>
-    
 </beans>
