@@ -6,7 +6,7 @@
     <parent>
         <groupId>net.shibboleth</groupId>
         <artifactId>parent-v3</artifactId>
-        <version>7</version>
+        <version>TRUNK-SNAPSHOT</version>
     </parent>
 
     <groupId>uk.org.iay.mdq</groupId>
@@ -23,11 +23,11 @@
     <inceptionYear>2014</inceptionYear>
 
     <properties>
-        <mda.version>0.9-SNAPSHOT</mda.version>
-        <ukf-mda.version>0.9-SNAPSHOT</ukf-mda.version>
-        <java-support.version>7.0.0</java-support.version>
-        <spring-extensions.version>5.0.0</spring-extensions.version>
-        <spring.boot.version>1.2.1.RELEASE</spring.boot.version>
+        <mda.version>0.9.0-SNAPSHOT</mda.version>
+        <ukf-mda.version>0.9.0-SNAPSHOT</ukf-mda.version>
+        <java-support.version>7.1-SNAPSHOT</java-support.version>
+        <spring-extensions.version>5.1-SNAPSHOT</spring-extensions.version>
+        <spring.boot.version>1.2.2.RELEASE</spring.boot.version>
 
         <checkstyle.configLocation>checkstyle.xml</checkstyle.configLocation>
         <start-class>uk.org.iay.mdq.server.Application</start-class>
