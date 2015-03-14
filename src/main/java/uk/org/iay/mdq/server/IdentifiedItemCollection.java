@@ -28,6 +28,13 @@ import net.shibboleth.metadata.Item;
 /**
  * Class representing a {@link Collection} of {@link Item}s
  * associated with a {@link Collection} of identifiers.
+ * 
+ * The {@link #generation} is used as part of the cacheing strategy
+ * used with this class. Each {@link IdentifiedItemCollection}
+ * must ensure that any identically identified collections whose
+ * contents are different must have a different {@link #generation}
+ * value, but the strategy for generating these values is not
+ * specified.
  *
  * @param <T> type of {@link Item} in the collection
  */
@@ -41,6 +48,9 @@ class IdentifiedItemCollection<T> {
     @Nonnull
     private final Collection<String> identifiers;
     
+    /** The source generation this collection is derived from. */
+    private final long generation;
+    
     /**
      * Constructor.
      * 
@@ -48,10 +58,11 @@ class IdentifiedItemCollection<T> {
      *
      * @param item single item to be made into a collection
      * @param keys identifiers to be associated with the collection
+     * @param gen source generation corresponding to this instance
      */
     protected IdentifiedItemCollection(@Nonnull final Item<T> item,
-            @Nonnull final Collection<String> keys) {
-        this(Collections.singletonList(item), keys);
+            @Nonnull final Collection<String> keys, final long gen) {
+        this(Collections.singletonList(item), keys, gen);
     }
     
     /**
@@ -61,10 +72,11 @@ class IdentifiedItemCollection<T> {
      *
      * @param collection items to be associated with the identifier
      * @param key identifier for the item collection.
+     * @param gen source generation corresponding to this instance
      */
     protected IdentifiedItemCollection(@Nonnull final Collection<Item<T>> collection,
-            @Nullable final String key) {
-        this(collection, Collections.singletonList(key));
+            @Nullable final String key, final long gen) {
+        this(collection, Collections.singletonList(key), gen);
     }
 
     /**
@@ -72,11 +84,13 @@ class IdentifiedItemCollection<T> {
      *
      * @param collection {@link Collection} of {@link Item}s to be associated with the identifiers
      * @param keys identifiers to be associated with the item collection
+     * @param gen source generation corresponding to this instance
      */
     protected IdentifiedItemCollection(@Nonnull final Collection<Item<T>> collection,
-            @Nonnull final Collection<String> keys) {
+            @Nonnull final Collection<String> keys, final long gen) {
         items = collection;
         identifiers = new ArrayList<>(keys);
+        generation = gen;
     }
 
     /**
@@ -99,4 +113,12 @@ class IdentifiedItemCollection<T> {
         return identifiers;
     }
 
+    /**
+     * Returns the source generation.
+     * 
+     * @return the source generation
+     */
+    public long getGeneration() {
+        return generation;
+    }
 }

@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -77,6 +78,20 @@ public class ItemCollectionLibrary<T> extends AbstractIdentifiableInitializableC
      * result cache lock.
      */
     private ReadWriteLock itemCollectionLock;
+
+    /**
+     * Current source generation.
+     * 
+     * This is changed on every {@link #refresh} so that clients receiving updated
+     * results can invalidate their caches.
+     */
+    private long generation;
+    
+    /**
+     * Ensures that only one thread can use {@link #doRefresh} at a time. Other threads
+     * wait for that operation to complete, and do not duplicate the work done.
+     */
+    private final Semaphore refreshSemaphore = new Semaphore(1);
 
     /**
      * Sets the {@link Pipeline} used to acquire new metadata.
@@ -137,7 +152,7 @@ public class ItemCollectionLibrary<T> extends AbstractIdentifiableInitializableC
             for (final ItemId uniqueId : uniqueIds) {
                 ids.add(uniqueId.getId());
             }
-            final IdentifiedItemCollection<T> newCollection = new IdentifiedItemCollection<>(item, ids);
+            final IdentifiedItemCollection<T> newCollection = new IdentifiedItemCollection<>(item, ids, generation);
             for (String id : ids) {
                 if (newIdentifiedItemCollections.containsKey(id)) {
                     log.warn("duplicate unique identifier {} ignored", id);
@@ -167,14 +182,14 @@ public class ItemCollectionLibrary<T> extends AbstractIdentifiableInitializableC
             log.debug("tagged collection identifiers: {}", taggedCollections.size());
             for (final Map.Entry<String, List<Item<T>>> entry : taggedCollections.entrySet()) {
                 final IdentifiedItemCollection<T> newColl =
-                        new IdentifiedItemCollection<>(entry.getValue(), entry.getKey());
+                        new IdentifiedItemCollection<>(entry.getValue(), entry.getKey(), generation);
                 newIdentifiedItemCollections.put(entry.getKey(), newColl);
                 log.debug("... collection: {} ({})", entry.getKey(), entry.getValue().size());
             }
         }
         
         // add in the "all entities" collection
-        newIdentifiedItemCollections.put(ID_ALL, new IdentifiedItemCollection(items, ID_ALL));
+        newIdentifiedItemCollections.put(ID_ALL, new IdentifiedItemCollection(items, ID_ALL, generation));
         log.debug("total identifiers: {}", newIdentifiedItemCollections.size());
         
         return newIdentifiedItemCollections;
@@ -184,7 +199,10 @@ public class ItemCollectionLibrary<T> extends AbstractIdentifiableInitializableC
      * Acquires new metadata by executing the source pipeline, then
      * replaces any existing item collection with the results.
      */
-    public void refresh() {
+    private void doRefresh() {
+        // this is a new source generation
+        generation++;
+
         // acquire the items to store
         final Collection<Item<T>> newItemCollection = new ArrayList<>();
         log.debug("executing source pipeline");
@@ -205,6 +223,32 @@ public class ItemCollectionLibrary<T> extends AbstractIdentifiableInitializableC
             identifiedItemCollections = newIdentifiedItemCollections;
         } finally {
             itemCollectionLock.writeLock().unlock();
+        }
+    }
+    
+    /**
+     * Acquire new metadata by executing the source pipeline.
+     * 
+     * If {@link #refresh} is already being executed by another thread, subsequent
+     * callers will wait for the first thread to complete and return without
+     * duplicating the work.
+     */
+    public void refresh() {
+        final boolean acquired = refreshSemaphore.tryAcquire();
+        try {
+            /*
+             * If we were *not* able to acquire the semaphore, some other thread
+             * must be refreshing already. Instead of duplicating that work,
+             * wait for it to complete and then exit without doing anything.
+             */
+            if (!acquired) {
+                refreshSemaphore.acquireUninterruptibly();
+                return;
+            }
+            
+            doRefresh();
+        } finally {
+            refreshSemaphore.release();
         }
     }
     

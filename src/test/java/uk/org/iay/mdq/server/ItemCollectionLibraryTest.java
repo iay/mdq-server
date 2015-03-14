@@ -83,4 +83,59 @@ public class ItemCollectionLibraryTest {
         Assert.assertEquals(3, library.get("three").getItems().size());
     }
 
+    @Test
+    public void testGenerations() throws Exception {
+        final Item<String> item1 = new MockItem("item1");
+        item1.getItemMetadata().put(new ItemId("item1"));
+
+        final Item<String> item2 = new MockItem("item1");
+        item2.getItemMetadata().put(new ItemId("item2"));
+
+        final Item<String> item3 = new MockItem("item1");
+        item3.getItemMetadata().put(new ItemId("item3"));
+
+        final List<Item<String>> items = new ArrayList<>();
+        items.add(item1);
+        items.add(item2);
+        items.add(item3);
+
+        final StaticItemSourceStage<String> sos = new StaticItemSourceStage<>();
+        sos.setId("staticSource");
+        sos.setSourceItems(items);
+        sos.initialize();
+        
+        final List<Stage<String>> stages = new ArrayList<>();
+        stages.add(sos);
+        
+        final SimplePipeline<String> pipeline = new SimplePipeline<>();
+        pipeline.setId("pipeline");
+        pipeline.setStages(stages);
+        pipeline.initialize();
+        
+        final ItemCollectionLibrary<String> library = new ItemCollectionLibrary<>();
+        library.setId("library");
+        library.setSourcePipeline(pipeline);
+        library.initialize();
+        
+        // make a couple of queries on this first generation
+        final IdentifiedItemCollection<String> res1 = library.get("item1");
+        final IdentifiedItemCollection<String> all1 = library.get(ItemCollectionLibrary.ID_ALL);
+        Assert.assertEquals(res1.getGeneration(), all1.getGeneration());
+        Assert.assertEquals(1, res1.getItems().size());
+        Assert.assertEquals(1, res1.getIdentifiers().size());
+        Assert.assertEquals(3, all1.getItems().size());
+        Assert.assertEquals(1, all1.getIdentifiers().size());
+        
+        // refreshing should change the generation
+        library.refresh();
+        final IdentifiedItemCollection<String> res2 = library.get("item1");
+        final IdentifiedItemCollection<String> all2 = library.get(ItemCollectionLibrary.ID_ALL);
+        Assert.assertEquals(res2.getGeneration(), all2.getGeneration());
+        Assert.assertNotEquals(res1.getGeneration(), res2.getGeneration());
+        Assert.assertNotEquals(all1.getGeneration(), all2.getGeneration());
+        Assert.assertEquals(1, res2.getItems().size());
+        Assert.assertEquals(1, res2.getIdentifiers().size());
+        Assert.assertEquals(3, all2.getItems().size());
+        Assert.assertEquals(1, all2.getIdentifiers().size());
+    }
 }
