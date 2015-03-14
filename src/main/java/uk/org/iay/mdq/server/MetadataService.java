@@ -325,18 +325,17 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
     }
 
     /**
-     * Refresh the underlying {@link ItemCollectionLibrary} and invalidate our result cache.
+     * Invalidate our result cache.
      */
-    private void refreshMetadata() {
+    public void clearCache() {
         cacheLock.writeLock().lock();
         try {
-            itemCollectionLibrary.refresh();
             resultCache = new HashMap<>();
         } finally {
             cacheLock.writeLock().unlock();
         }
     }
-    
+
     /** {@inheritDoc} */
     @Override
     protected void doInitialize() throws ComponentInitializationException {
