@@ -70,15 +70,21 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
          */
         private final Collection<String> identifiers;
         
+        /** Source generation for this rendered result. */
+        private final long generation;
+        
         /**
          * Constructor.
          * 
          * @param resultBytes byte array representing the rendered result
          * @param ids identifiers which can be used to retrieve this result
+         * @param gen source generation for this rendered result
          */
         protected ServiceResult(@Nonnull final byte[] resultBytes,
-                @Nullable final Collection<String> ids) {
+                @Nullable final Collection<String> ids,
+                final long gen) {
             representation = new SimpleRepresentation(resultBytes);
+            generation = gen;
             if (ids != null) {
                 identifiers = new ArrayList<>();
                 identifiers.addAll(ids);
@@ -95,6 +101,16 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
         protected ServiceResult() {
             representation = null;
             identifiers = null;
+            generation = 0;
+        }
+        
+        /**
+         * Returns the source generation for this rendered result.
+         * 
+         * @return the source generation
+         */
+        public long getGeneration() {
+            return generation;
         }
         
         @Override
@@ -167,7 +183,7 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
     private long refreshInterval;
     
     /** Cache of {@link Result}s, indexed by identifier. */
-    private Map<String, Result> resultCache = new HashMap<>();
+    private Map<String, ServiceResult> resultCache = new HashMap<>();
     
     /**
      * Lock covering the result cache.
@@ -300,13 +316,19 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
      * @return metadata associated with the particular identifier
      */
     @Nonnull public Result get(@Nonnull final String identifier) {
-        /*
-         * Try and resolve using the cache; a read lock will suffice.
-         */
+        // Get the current identified collection for this query
+        final IdentifiedItemCollection<T> identifiedItemCollection = itemCollectionLibrary.get(identifier);
+
+        // Return a "not found" result if the identifier has no definition.
+        if (identifiedItemCollection == null) {
+            return new ServiceResult();
+        }
+        
+        // Check to see if the cache contains a rendered form for this query
         cacheLock.readLock().lock();
         try {
-            final Result cachedResult = resultCache.get(identifier);
-            if (cachedResult != null) {
+            final ServiceResult cachedResult = resultCache.get(identifier);
+            if (cachedResult != null && cachedResult.getGeneration() == identifiedItemCollection.getGeneration()) {
                 log.debug("cache hit for {}", identifier);
                 return cachedResult;
             }
@@ -315,24 +337,11 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
         }
         
         /*
-         * If the result we want isn't in the cache, acquire a collection of items
-         * we can render.
-         */
-        final IdentifiedItemCollection<T> identifiedItemCollection = itemCollectionLibrary.get(identifier);
-        
-        /*
-         * Return a "not found" result if the identifier has no definition.
-         */
-        if (identifiedItemCollection == null) {
-            return new ServiceResult();
-        }
-        
-        /*
-         * Render the item collection.
+         * If the result we want isn't in the cache, render the item collection.
          */
         final Collection<String> identifiers = identifiedItemCollection.getIdentifiers();
         final byte[] bytes = renderCollection(cloneItemCollection(identifiedItemCollection.getItems()));
-        final Result result = new ServiceResult(bytes, identifiers);
+        final ServiceResult result = new ServiceResult(bytes, identifiers, identifiedItemCollection.getGeneration());
         
         /*
          * Write the result into the cache for each of its
