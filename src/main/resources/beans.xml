@@ -97,6 +97,7 @@
         class="uk.org.iay.mdq.server.ItemCollectionLibrary"
         lazy-init="false">
         <property name="sourcePipeline" ref="source.SAML"/>
+        <property name="refreshInterval" value="${metadataService.SAML.refreshInterval}"/>
     </bean>
 
     <!--
@@ -107,7 +108,6 @@
         lazy-init="false">
         <property name="itemCollectionLibrary" ref="itemCollection.SAML"/>
         <property name="renderPipeline" ref="render.SAML"/>
-        <property name="refreshInterval" value="${metadataService.SAML.refreshInterval}"/>
         <property name="serializer">
             <bean class="net.shibboleth.metadata.dom.DOMElementSerializer"/>
         </property>

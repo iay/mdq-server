@@ -21,7 +21,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -32,11 +34,14 @@ import net.shibboleth.metadata.ItemId;
 import net.shibboleth.metadata.ItemTag;
 import net.shibboleth.metadata.pipeline.Pipeline;
 import net.shibboleth.metadata.pipeline.PipelineProcessingException;
+import net.shibboleth.utilities.java.support.annotation.Duration;
+import net.shibboleth.utilities.java.support.annotation.constraint.NonNegative;
 import net.shibboleth.utilities.java.support.component.AbstractIdentifiableInitializableComponent;
 import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
 import net.shibboleth.utilities.java.support.component.ComponentSupport;
 import net.shibboleth.utilities.java.support.logic.Constraint;
 
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,6 +98,40 @@ public class ItemCollectionLibrary<T> extends AbstractIdentifiableInitializableC
      */
     private final Semaphore refreshSemaphore = new Semaphore(1);
 
+    /**
+     * Refresh interval for the metadata source, in milliseconds.
+     * 
+     * Set to 0 (default) to disable refresh after the initial fetch.
+     */
+    @NonNegative @Duration
+    private long refreshInterval;
+    
+    /**
+     * Executor on which to schedule metadata source refreshes.
+     */
+    private ScheduledThreadPoolExecutor executor;
+    
+    /**
+     * Gets the metadata source refresh interval, in milliseconds.
+     * 
+     * @return the metadata source refresh interval.
+     */
+    public long getRefreshInterval() {
+        return refreshInterval;
+    }
+    
+    /**
+     * Sets the metadata source refresh interval, in milliseconds.
+     * 
+     * @param refresh the metadata source refresh interval
+     */
+    public void setRefreshInterval(@NonNegative @Duration final long refresh) {
+        ComponentSupport.ifDestroyedThrowDestroyedComponentException(this);
+        ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
+
+        refreshInterval = Constraint.isGreaterThanOrEqual(0, refresh, "refresh interval must not be negative");
+    }    
+    
     /**
      * Sets the {@link Pipeline} used to acquire new metadata.
      * 
@@ -265,11 +304,37 @@ public class ItemCollectionLibrary<T> extends AbstractIdentifiableInitializableC
         
         // perform initial metadata refresh
         refresh();        
+
+        // Schedule regular metadata refresh if enabled.
+        if (refreshInterval != 0) {
+            executor = new ScheduledThreadPoolExecutor(1);
+            executor.scheduleWithFixedDelay(
+                    new Runnable() {
+
+                        public void run() {
+                            refresh();
+                            log.debug("next refresh estimated at {}", new DateTime().plus(refreshInterval));
+                        }
+                        
+                    },
+                    refreshInterval, refreshInterval, TimeUnit.MILLISECONDS);
+            log.debug("initial refresh estimated at {}", new DateTime().plus(refreshInterval));
+        }
     }
 
     /** {@inheritDoc} */
     @Override
     protected void doDestroy() {
+        if (executor != null) {
+            executor.shutdownNow();
+            try {
+                executor.awaitTermination(30, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                log.debug("ignored InterruptedException while winding down executor");
+            } finally {
+                executor = null;
+            }
+        }
         identifiedItemCollections = null;
         sourcePipeline = null;
         itemCollectionLock = null;

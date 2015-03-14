@@ -174,14 +174,6 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
      */
     private ItemSerializer<T> serializer;
 
-    /**
-     * Refresh interval for the metadata source, in milliseconds.
-     * 
-     * Set to 0 (default) to disable refresh after the initial fetch.
-     */
-    @NonNegative @Duration
-    private long refreshInterval;
-    
     /** Cache of {@link Result}s, indexed by identifier. */
     private Map<String, ServiceResult> resultCache = new HashMap<>();
     
@@ -193,11 +185,6 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
      */
     private ReadWriteLock cacheLock;
 
-    /**
-     * Executor on which to schedule metadata source refreshes.
-     */
-    private ScheduledThreadPoolExecutor executor;
-    
     /**
      * Sets the {@link ItemCollectionLibrary} used to acquire new metadata.
      * 
@@ -234,27 +221,6 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
         serializer = Constraint.isNotNull(itemSerializer, "serializer may not be null");
     }
 
-    /**
-     * Gets the metadata source refresh interval, in milliseconds.
-     * 
-     * @return the metadata source refresh interval.
-     */
-    public long getRefreshInterval() {
-        return refreshInterval;
-    }
-    
-    /**
-     * Sets the metadata source refresh interval, in milliseconds.
-     * 
-     * @param refresh the metadata source refresh interval
-     */
-    public void setRefreshInterval(@NonNegative @Duration final long refresh) {
-        ComponentSupport.ifDestroyedThrowDestroyedComponentException(this);
-        ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
-
-        refreshInterval = Constraint.isGreaterThanOrEqual(0, refresh, "refresh interval must not be negative");
-    }    
-    
     /**
      * Clones an {@link Item} {@link Collection} so that its elements can be mutated
      * without changing the originals.
@@ -389,37 +355,11 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
         }
 
         cacheLock = new ReentrantReadWriteLock();
-        
-        // Schedule regular metadata refresh if enabled.
-        if (refreshInterval != 0) {
-            executor = new ScheduledThreadPoolExecutor(1);
-            executor.scheduleWithFixedDelay(
-                    new Runnable() {
-
-                        public void run() {
-                            refreshMetadata();
-                            log.debug("next refresh estimated at {}", new DateTime().plus(refreshInterval));
-                        }
-                        
-                    },
-                    refreshInterval, refreshInterval, TimeUnit.MILLISECONDS);
-            log.debug("initial refresh estimated at {}", new DateTime().plus(refreshInterval));
-        }
     }
 
     /** {@inheritDoc} */
     @Override
     protected void doDestroy() {
-        if (executor != null) {
-            executor.shutdownNow();
-            try {
-                executor.awaitTermination(30, TimeUnit.SECONDS);
-            } catch (InterruptedException e) {
-                log.debug("ignored InterruptedException while winding down executor");
-            } finally {
-                executor = null;
-            }
-        }
         renderPipeline = null;
         serializer = null;
         resultCache = null;
