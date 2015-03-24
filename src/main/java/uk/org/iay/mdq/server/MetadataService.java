@@ -29,7 +29,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import net.shibboleth.metadata.Item;
-import net.shibboleth.metadata.ItemSerializer;
 import net.shibboleth.metadata.pipeline.Pipeline;
 import net.shibboleth.metadata.pipeline.PipelineProcessingException;
 import net.shibboleth.utilities.java.support.component.AbstractIdentifiableInitializableComponent;
@@ -163,11 +162,8 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
     /**
      * The serializer to use to convert the rendered metadata into
      * an octet stream.
-     * 
-     * This should really be part of the render pipeline itself but
-     * we need a new stage to do that.
      */
-    private ItemSerializer<T> serializer;
+    private ItemCollectionSerializer<T> serializer;
 
     /** Cache of {@link Result}s, indexed by identifier. */
     private Map<String, ServiceResult> resultCache = new HashMap<>();
@@ -205,11 +201,11 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
     }
     
     /**
-     * Sets the {@link ItemSerializer} used to serialize rendered results.
+     * Sets the {@link ItemCollectionSerializer} used to serialize rendered results.
      * 
-     * @param itemSerializer the new {@link ItemSerializer} to use
+     * @param itemSerializer the new {@link ItemCollectionSerializer} to use
      */
-    public void setSerializer(@Nonnull final ItemSerializer<T> itemSerializer) {
+    public void setSerializer(@Nonnull final ItemCollectionSerializer<T> itemSerializer) {
         ComponentSupport.ifDestroyedThrowDestroyedComponentException(this);
         ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
 
@@ -245,9 +241,7 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
             renderPipeline.execute(items);
             log.debug("items rendered, resulting collection has {} elements", items.size());
             try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
-                for (Item<T> item : items) {
-                    serializer.serialize(item, os);
-                }
+                serializer.serializeCollection(items, os);
                 return os.toByteArray();
             }
         } catch (IOException e) {

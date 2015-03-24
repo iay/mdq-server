@@ -42,14 +42,14 @@ public class MetadataServiceTest {
         service.setId("test");
         service.setItemCollectionLibrary(icl);
         service.setRenderPipeline(new SimplePipeline<String>());
-        service.setSerializer(new ItemSerializer<String>(){
+        service.setSerializer(new SimpleItemCollectionSerializer<String>(new ItemSerializer<String>(){
             public void serialize(Item<String> item, OutputStream output) {
                 try {
                     output.write(item.unwrap().getBytes());
                 } catch (IOException e) {
                     // do nothing
                 }
-            }});
+            }}));
         service.initialize();
         
         // first call should get the generation 1 result
