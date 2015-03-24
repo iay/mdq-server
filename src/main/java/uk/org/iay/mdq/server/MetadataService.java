@@ -168,12 +168,7 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
     /** Cache of {@link Result}s, indexed by identifier. */
     private Map<String, ServiceResult> resultCache = new HashMap<>();
     
-    /**
-     * Lock covering the result cache.
-     * 
-     * Lock ordering: this lock should be taken, if required, *after* the
-     * item collection lock.
-     */
+    /** Lock covering the result cache. */
     private ReadWriteLock cacheLock;
 
     /**
