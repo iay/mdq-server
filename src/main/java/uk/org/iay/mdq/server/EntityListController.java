@@ -16,20 +16,17 @@
 
 package uk.org.iay.mdq.server;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-
+import javax.annotation.Nonnull;
 import javax.annotation.Resource;
-
-import net.shibboleth.metadata.ItemCollectionSerializer;
+import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.w3c.dom.Element;
 
 /**
@@ -45,32 +42,42 @@ public class EntityListController {
     private final Logger log = LoggerFactory.getLogger(EntityListController.class);
 
     /**
-     * {@link ItemCollectionLibrary} from which we fetch the entities to list.
+     * {@link MetadataService} from which we acquire metadata.
      */
-    @Resource(name = "itemCollection.SAML")
-    private ItemCollectionLibrary<Element> library;
+    @Resource(name = "metadataService.entityList")
+    private MetadataService<Element> metadataService;
 
-    /** Whether we should pretty-print the resulting JSON. Default value: <code>true</code>. */
-    @Value("${entityList.prettyPrinting:true}")
-    private boolean prettyPrinting;
-
+    /**
+     * Determines whether we are handling a request for the default media type.
+     * This is either:
+     *    * a request with no Accept header at all
+     *    * a request with an Accept header of just the "all" notation
+     * 
+     * @param request the HTTP request being handled
+     * @return <code>true</code> if we are handling a request for the default media type
+     */
+    private boolean isDefaultMediaType(@Nonnull final HttpServletRequest request) {
+        final String acceptHeader = request.getHeader("Accept");
+        return acceptHeader == null || MediaType.ALL_VALUE.equals(acceptHeader);
+    }
+    
     /**
      * List all entities as a JSON object.
      * 
-     * @return the {@link String} representation of the JSON object to be returned
+     * @param model {@link Model} containing attributes for the view
+     * @param request the HTTP request being handled
+     * 
+     * @return name of the Spring view to render
      */
-    @RequestMapping(value="", method=RequestMethod.GET, produces="application/json")
-    @ResponseBody
-    byte[] queryAllEntities() {
+    @RequestMapping(produces={"application/json", "text/html"})
+    String queryAllEntities(@Nonnull final Model model,
+            @Nonnull final HttpServletRequest request) {
         log.debug("queried for entity list");
-        final IdentifiedItemCollection<Element> entities = library.getAll();
-        try (final ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
-            final ItemCollectionSerializer ser = new JSONEntityListCollectionSerializer(prettyPrinting);
-            ser.serializeCollection(entities.getItems(), bos);
-            return bos.toByteArray();
-        } catch (final IOException e) {
-            log.debug("error closing stream", e);
-            return new byte[]{};
+        model.addAttribute("result", metadataService.getAll());
+        if (isDefaultMediaType(request)) {
+            return "JSONResultRawView";
+        } else {
+            return "queryResult";
         }
     }
     

@@ -101,7 +101,7 @@
     </bean>
 
     <!--
-        Metadata lookup service.
+        SAML metadata lookup service.
     -->
     <bean id="metadataService.SAML" parent="component_parent"
         class="uk.org.iay.mdq.server.MetadataService"
@@ -116,6 +116,28 @@
             </bean>
         </property>
     </bean>
+    
+    <!--
+        JSON entity list lookup service.
+    -->
+    <bean id="metadataService.entityList" parent="component_parent"
+        class="uk.org.iay.mdq.server.MetadataService"
+        lazy-init="false">
+        <property name="itemCollectionLibrary" ref="itemCollection.SAML"/>
+        <property name="renderPipeline">
+            <bean parent="SimplePipeline"/>
+        </property>
+        <property name="serializer">
+            <bean class="uk.org.iay.mdq.server.JSONEntityListCollectionSerializer"
+                c:_="${entityList.prettyPrinting:true}"/>
+        </property>
+    </bean>
+
+    <!--
+        Raw view of Result instances in JSON.
+    -->
+    <bean id="JSONResultRawView" class="uk.org.iay.mdq.server.ResultRawView"
+        c:_="application/json"/>
 
     <!--
         Plain text view for query results.
@@ -155,6 +177,7 @@
         -->
         <property name="viewResolvers">
             <list>
+                <ref bean="beanNameViewResolver"/>
                 <ref bean="groovyMarkupViewResolver"/>
             </list>
         </property>
@@ -166,6 +189,7 @@
         <property name="defaultViews">
             <list>
                 <ref bean="queryResultRaw"/>
+                <ref bean="JSONResultRawView"/>
                 <ref bean="queryResultText"/>
             </list>
         </property>
