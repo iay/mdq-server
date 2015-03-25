@@ -52,7 +52,7 @@ public class EntitiesController {
      * 
      * @param model {@link Model} containing attributes for the view
      * 
-     * @return an aggregate of all known entities
+     * @return name of the Spring view to render
      */
     @RequestMapping("")
     String queryAllEntities(@Nonnull final Model model) {
@@ -67,7 +67,7 @@ public class EntitiesController {
      * @param model {@link Model} containing attributes for the view
      * @param id identifier to query for
      * 
-     * @return the metadata for the identified entity or entities
+     * @return name of the Spring view to render
      */
     @RequestMapping("/{id:.*}")
     String queryByIdentifier(@Nonnull final Model model, @PathVariable final String id) {
