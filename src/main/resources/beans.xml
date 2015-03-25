@@ -109,7 +109,7 @@
         <property name="itemCollectionLibrary" ref="itemCollection.SAML"/>
         <property name="renderPipeline" ref="render.SAML"/>
         <property name="serializer">
-            <bean class="uk.org.iay.mdq.server.SimpleItemCollectionSerializer">
+            <bean class="net.shibboleth.metadata.SimpleItemCollectionSerializer">
                 <constructor-arg>
                     <bean class="net.shibboleth.metadata.dom.DOMElementSerializer"/>
                 </constructor-arg>

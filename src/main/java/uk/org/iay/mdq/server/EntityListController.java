@@ -16,17 +16,12 @@
 
 package uk.org.iay.mdq.server;
 
-import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 import javax.annotation.Resource;
-import javax.json.Json;
-import javax.json.stream.JsonGenerator;
-import javax.json.stream.JsonGeneratorFactory;
 
-import net.shibboleth.metadata.Item;
-import net.shibboleth.metadata.dom.saml.SAMLMetadataSupport;
+import net.shibboleth.metadata.ItemCollectionSerializer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,43 +55,23 @@ public class EntityListController {
     private boolean prettyPrinting;
 
     /**
-     * Write a JSON object corresponding to the {@link Item} to the {@link JsonGenerator}.
-     * 
-     * @param gen JSON generator to write to
-     * @param entity the SAML entity descriptor
-     */
-    private void writeEntity(final JsonGenerator gen, final Element entity) {
-        if (SAMLMetadataSupport.isEntityDescriptor(entity)) {
-            gen.writeStartObject();
-            gen.write("entityID", entity.getAttribute("entityID"));
-            gen.writeEnd();
-        }
-    }
-
-    /**
      * List all entities as a JSON object.
      * 
      * @return the {@link String} representation of the JSON object to be returned
      */
     @RequestMapping(value="", method=RequestMethod.GET, produces="application/json")
     @ResponseBody
-    String queryAllEntities() {
+    byte[] queryAllEntities() {
         log.debug("queried for entity list");
         final IdentifiedItemCollection<Element> entities = library.getAll();
-        final StringWriter sw = new StringWriter();
-        final Map<String, String> generatorConfig = new HashMap<>();
-        if (prettyPrinting) {
-            generatorConfig.put(JsonGenerator.PRETTY_PRINTING, "true");
+        try (final ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+            final ItemCollectionSerializer ser = new JSONEntityListCollectionSerializer(prettyPrinting);
+            ser.serializeCollection(entities.getItems(), bos);
+            return bos.toByteArray();
+        } catch (final IOException e) {
+            log.debug("error closing stream", e);
+            return new byte[]{};
         }
-        final JsonGeneratorFactory factory = Json.createGeneratorFactory(generatorConfig);
-        final JsonGenerator gen = factory.createGenerator(sw);
-        gen.writeStartArray();
-        for (final Item<Element> item : entities.getItems()) {
-            writeEntity(gen, item.unwrap());
-        }
-        gen.writeEnd();
-        gen.close();
-        return sw.toString();
     }
     
 }

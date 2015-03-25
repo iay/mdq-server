@@ -11,6 +11,7 @@ import java.util.List;
 import net.shibboleth.metadata.Item;
 import net.shibboleth.metadata.ItemSerializer;
 import net.shibboleth.metadata.MockItem;
+import net.shibboleth.metadata.SimpleItemCollectionSerializer;
 import net.shibboleth.metadata.pipeline.SimplePipeline;
 
 import org.testng.Assert;
