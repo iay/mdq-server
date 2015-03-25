@@ -19,6 +19,7 @@ package uk.org.iay.mdq.server;
 import java.io.OutputStream;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
@@ -31,9 +32,13 @@ import javax.xml.namespace.QName;
 import net.shibboleth.metadata.Item;
 import net.shibboleth.metadata.ItemCollectionSerializer;
 import net.shibboleth.metadata.dom.saml.SAMLMetadataSupport;
+import net.shibboleth.utilities.java.support.xml.AttributeSupport;
 import net.shibboleth.utilities.java.support.xml.ElementSupport;
+import net.shibboleth.utilities.java.support.xml.XMLConstants;
 
 import org.w3c.dom.Element;
+
+import uk.org.ukfederation.mda.validate.mdui.MDUISupport;
 
 /**
  * An {@link ItemCollectionSerializer} that serializes a collection of SAML entities
@@ -46,6 +51,9 @@ class JSONEntityListCollectionSerializer implements ItemCollectionSerializer<Ele
 
     /** QName of the SPSSODescriptor element. */
     private static final QName SP_SSO_DESCRIPTOR_NAME = new QName(SAMLMetadataSupport.MD_NS, "SPSSODescriptor");
+
+    /** QName of the mdui:UIInfo element. */
+    private static final QName MDUI_UIINFO_NAME = new QName(MDUISupport.MDUI_NS, "UIInfo");
 
     /** Configured JSON generator factory. */
     private final JsonGeneratorFactory factory;
@@ -62,6 +70,33 @@ class JSONEntityListCollectionSerializer implements ItemCollectionSerializer<Ele
         }
         factory = Json.createGeneratorFactory(generatorConfig);
     }
+    
+    /**
+     * Extract an English language display name for a role descriptor.
+     * 
+     * The first mdui:DisplayName with an xml:lang="en" is returned.
+     * 
+     * @param role SAML role descriptor to process
+     * @return a display name for the role descriptor, or <code>null</code>
+     */
+    @Nullable
+    private String extractDisplayName(@Nonnull final Element role) {
+        final Element extensions = ElementSupport.getFirstChildElement(role, SAMLMetadataSupport.EXTENSIONS_NAME);
+        if (extensions != null) {
+            final Element mdui = ElementSupport.getFirstChildElement(extensions, MDUI_UIINFO_NAME);
+            if (mdui != null) {
+                final List<Element> displayNames = ElementSupport.getChildElements(mdui, MDUISupport.MDUI_DISPLAY_NAME);
+                for (final Element displayName : displayNames) {
+                    final String lang = AttributeSupport.getAttributeValue(displayName,
+                            XMLConstants.XML_LANG_ATTRIB_NAME);
+                    if ("en".equals(lang)) {
+                        return displayName.getTextContent();
+                    }
+                }
+            }
+        }
+        return null;
+    }
 
     /**
      * Write a JSON object corresponding to a SAML role descriptor.
@@ -73,6 +108,10 @@ class JSONEntityListCollectionSerializer implements ItemCollectionSerializer<Ele
         if (role != null) {
             gen.writeStartObject();
                 gen.write("type", role.getLocalName());
+                final String displayName = extractDisplayName(role);
+                if (displayName != null) {
+                    gen.write("displayName", displayName);
+                }
             gen.writeEnd();
         }
     }
