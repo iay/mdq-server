@@ -17,6 +17,7 @@
 package uk.org.iay.mdq.server;
 
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -51,6 +52,10 @@ class JSONEntityListCollectionSerializer implements ItemCollectionSerializer<Ele
 
     /** QName of the SPSSODescriptor element. */
     private static final QName SP_SSO_DESCRIPTOR_NAME = new QName(SAMLMetadataSupport.MD_NS, "SPSSODescriptor");
+
+    /** QName of the AttributeAuthorityDescriptor element. */
+    private static final QName AA_DESCRIPTOR_NAME =
+            new QName(SAMLMetadataSupport.MD_NS, "AttributeAuthorityDescriptor");
 
     /** QName of the mdui:UIInfo element. */
     private static final QName MDUI_UIINFO_NAME = new QName(MDUISupport.MDUI_NS, "UIInfo");
@@ -99,6 +104,21 @@ class JSONEntityListCollectionSerializer implements ItemCollectionSerializer<Ele
     }
 
     /**
+     * Extract the first role descriptor of the given type, and append it to the list
+     * of roles to be displayed.
+     * 
+     * @param roles {@link List} of roles to be displayed
+     * @param entity {@link Element} representing the entity
+     * @param name {@link QName} for the role to be extracted
+     */
+    private void extractRole(final List<Element> roles, final Element entity, final QName name) {
+        final Element role = ElementSupport.getFirstChildElement(entity, name);
+        if (role != null) {
+            roles.add(role);
+        }
+    }
+
+    /**
      * Write a JSON object corresponding to a SAML role descriptor.
      * 
      * @param gen JSON generator to write to
@@ -126,12 +146,15 @@ class JSONEntityListCollectionSerializer implements ItemCollectionSerializer<Ele
         if (SAMLMetadataSupport.isEntityDescriptor(entity)) {
             gen.writeStartObject();
             gen.write("entityID", entity.getAttribute("entityID"));
-            final Element idp = ElementSupport.getFirstChildElement(entity, IDP_SSO_DESCRIPTOR_NAME);
-            final Element sp = ElementSupport.getFirstChildElement(entity, SP_SSO_DESCRIPTOR_NAME);
-            if (idp != null || sp != null) {
+            final List<Element> roles = new ArrayList<>();
+            extractRole(roles, entity, IDP_SSO_DESCRIPTOR_NAME);
+            extractRole(roles, entity, SP_SSO_DESCRIPTOR_NAME);
+            extractRole(roles, entity, AA_DESCRIPTOR_NAME);
+            if (!roles.isEmpty()) {
                 gen.writeStartArray("roles");
-                    writeRole(gen, idp);
-                    writeRole(gen, sp);
+                    for (final Element role : roles) {
+                        writeRole(gen, role);
+                    }
                 gen.writeEnd();
             }
             gen.writeEnd();
