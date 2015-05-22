@@ -33,6 +33,7 @@ import javax.xml.namespace.QName;
 import net.shibboleth.metadata.Item;
 import net.shibboleth.metadata.ItemCollectionSerializer;
 import net.shibboleth.metadata.dom.saml.SAMLMetadataSupport;
+import net.shibboleth.metadata.dom.saml.mdrpi.RegistrationAuthority;
 import net.shibboleth.utilities.java.support.xml.AttributeSupport;
 import net.shibboleth.utilities.java.support.xml.ElementSupport;
 import net.shibboleth.utilities.java.support.xml.XMLConstants;
@@ -44,6 +45,9 @@ import uk.org.ukfederation.mda.validate.mdui.MDUISupport;
 /**
  * An {@link ItemCollectionSerializer} that serializes a collection of SAML entities
  * into a JSON representation.
+ * 
+ * The generation of <code>registrarID</code> members relies on {@link RegistrationAuthority}
+ * item metadata.
  */
 class JSONEntityListCollectionSerializer implements ItemCollectionSerializer<Element> {
 
@@ -141,11 +145,15 @@ class JSONEntityListCollectionSerializer implements ItemCollectionSerializer<Ele
      * 
      * @param gen JSON generator to write to
      * @param entity the SAML entity descriptor
+     * @param registrationAuthority the registration authority responsible for the entity, or <code>null</code>.
      */
-    private void writeEntity(final JsonGenerator gen, final Element entity) {
+    private void writeEntity(final JsonGenerator gen, final Element entity, final String registrationAuthority) {
         if (SAMLMetadataSupport.isEntityDescriptor(entity)) {
             gen.writeStartObject();
             gen.write("entityID", entity.getAttribute("entityID"));
+            if (registrationAuthority != null) {
+                gen.write("registrarID", registrationAuthority);
+            }
             final List<Element> roles = new ArrayList<>();
             extractRole(roles, entity, IDP_SSO_DESCRIPTOR_NAME);
             extractRole(roles, entity, SP_SSO_DESCRIPTOR_NAME);
@@ -161,13 +169,29 @@ class JSONEntityListCollectionSerializer implements ItemCollectionSerializer<Ele
         }
     }
 
+    /**
+     * Extract the registration authority for an entity, if present.
+     * 
+     * @param item entity from which to extract the registration authority
+     * @return registration authority name, or <code>null</code>
+     */
+    @Nullable
+    private String extractRegistrationAuthority(@Nonnull final Item<Element> item) {
+        final List<RegistrationAuthority> registrars = item.getItemMetadata().get(RegistrationAuthority.class);
+        if (registrars.isEmpty()) {
+            return null;
+        } else {
+            return registrars.get(0).getRegistrationAuthority();
+        }
+    }
+
     @Override
     public void serializeCollection(@Nonnull final Collection<Item<Element>> items,
             @Nonnull final OutputStream output) {
         final JsonGenerator gen = factory.createGenerator(output);
         gen.writeStartArray();
             for (final Item<Element> item : items) {
-                writeEntity(gen, item.unwrap());
+                writeEntity(gen, item.unwrap(), extractRegistrationAuthority(item));
             }
         gen.writeEnd();
         gen.close();

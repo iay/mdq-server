@@ -34,6 +34,7 @@
                 </bean>
                 <ref bean="disassemble"/>
                 <ref bean="populateItemIds"/>
+                <ref bean="populateRegistrationAuthorities"/>
                 <bean class="net.shibboleth.metadata.pipeline.ItemIdTransformStage">
                     <property name="idTransformers">
                         <list>
