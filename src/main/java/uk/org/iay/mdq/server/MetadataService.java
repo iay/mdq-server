@@ -22,8 +22,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -170,7 +170,7 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
     private Map<String, ServiceResult> resultCache = new HashMap<>();
     
     /** Lock covering the result cache. */
-    private ReadWriteLock cacheLock;
+    private Lock cacheLock;
 
     /**
      * Sets the {@link ItemCollectionLibrary} used to acquire new metadata.
@@ -276,15 +276,22 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
         }
         
         // Check to see if the cache contains a rendered form for this query
-        cacheLock.readLock().lock();
+        cacheLock.lock();
         try {
             final ServiceResult cachedResult = resultCache.get(identifier);
-            if (cachedResult != null && cachedResult.getGeneration() == identifiedItemCollection.getGeneration()) {
-                log.debug("cache hit for {}", identifier);
-                return cachedResult;
+            if (cachedResult != null) {
+                if (cachedResult.getGeneration() == identifiedItemCollection.getGeneration()) {
+                    // Generation of cached result matches; still valid
+                    log.debug("cache hit for {}", identifier);
+                    return cachedResult;
+                } else {
+                    // Generation of cached result does not match; invalidate
+                    log.debug("cache invalidation for {}", identifier);
+                    resultCache.remove(identifier);
+                }
             }
         } finally {
-            cacheLock.readLock().unlock();
+            cacheLock.unlock();
         }
         
         /*
@@ -298,14 +305,14 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
          * Write the result into the cache for each of its
          * potential identifiers.
          */
-        cacheLock.writeLock().lock();
+        cacheLock.lock();
         try {
             for (String id : identifiers) {
                 resultCache.put(id, result);
             }
             return result;
         } finally {
-            cacheLock.writeLock().unlock();
+            cacheLock.unlock();
         }
     }
 
@@ -313,11 +320,11 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
      * Invalidate our result cache.
      */
     public void clearCache() {
-        cacheLock.writeLock().lock();
+        cacheLock.lock();
         try {
             resultCache = new HashMap<>();
         } finally {
-            cacheLock.writeLock().unlock();
+            cacheLock.unlock();
         }
     }
 
@@ -338,7 +345,7 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
             throw new ComponentInitializationException("serializer must be supplied");
         }
 
-        cacheLock = new ReentrantReadWriteLock();
+        cacheLock = new ReentrantLock();
     }
 
     /** {@inheritDoc} */
