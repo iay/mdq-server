@@ -382,38 +382,27 @@ public class ItemCollectionLibrary<T> extends AbstractIdentifiableInitializableC
 
         itemCollectionLock.readLock().lock();
         try {
-            if (lastRefreshed == null) {
-                /*
-                 * Either a refresh (even the initial one) has never succeeded,
-                 * or the component has since been shut down.
-                 */
-                builder.down();
-            } else {
-                /*
-                 * At least one refresh has succeeded in the past.
-                 */
-                final Instant now = new Instant();
-                final Period age = new Period(lastRefreshed, now);
+            final Instant now = new Instant();
+            final Period age = new Period(lastRefreshed, now);
 
-                builder.withDetail("generation", generation);
-                builder.withDetail("identifiers", identifiedItemCollections.size());
-                builder.withDetail("lastRefreshed", lastRefreshed.toString());
-                builder.withDetail("age", age.toString());
-                
-                if (nextRefresh != null) {
-                    builder.withDetail("nextRefresh", nextRefresh.toString());
-                }
+            builder.up();
+            builder.withDetail("generation", generation);
+            builder.withDetail("identifiers", identifiedItemCollections.size());
+            builder.withDetail("lastRefreshed", lastRefreshed.toString());
+            builder.withDetail("age", age.toString());
+            
+            if (refreshInterval != 0) {
+                builder.withDetail("nextRefresh", nextRefresh.toString());
 
                 /*
                  * Work out whether a refresh has succeeded recently, or if we're running
                  * in a degraded mode with out-of-date collections.
                  */
-                if ((refreshInterval != 0) && (age.getMillis() > 2*refreshInterval)) {
+                if (age.getMillis() > 2*refreshInterval) {
                     builder.status("DEGRADED");
-                } else {
-                    builder.up();
                 }
             }
+
             return builder.build();
         } finally {
             itemCollectionLock.readLock().unlock();
