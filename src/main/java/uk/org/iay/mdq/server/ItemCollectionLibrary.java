@@ -29,6 +29,14 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.annotation.Nonnull;
 
+import org.joda.time.DateTime;
+import org.joda.time.Instant;
+import org.joda.time.Period;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.actuate.health.Health;
+import org.springframework.boot.actuate.health.HealthIndicator;
+
 import net.shibboleth.metadata.Item;
 import net.shibboleth.metadata.ItemId;
 import net.shibboleth.metadata.ItemTag;
@@ -40,10 +48,6 @@ import net.shibboleth.utilities.java.support.component.AbstractIdentifiableIniti
 import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
 import net.shibboleth.utilities.java.support.component.ComponentSupport;
 import net.shibboleth.utilities.java.support.logic.Constraint;
-
-import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Sources metadata from a {@link Pipeline} and allows lookup on the results.
@@ -58,7 +62,8 @@ import org.slf4j.LoggerFactory;
  *
  * @param <T> item type of the metadata served
  */
-public class ItemCollectionLibrary<T> extends AbstractIdentifiableInitializableComponent {
+public class ItemCollectionLibrary<T> extends AbstractIdentifiableInitializableComponent
+    implements HealthIndicator {
     
     /** The identifier used to represent "all entities". */
     public static final String ID_ALL = null;
@@ -76,11 +81,11 @@ public class ItemCollectionLibrary<T> extends AbstractIdentifiableInitializableC
      */
     private Map<String, IdentifiedItemCollection<T>> identifiedItemCollections = new HashMap<>();
     
+    /** Time the last refresh operation completed. */
+    private Instant lastRefreshed;
+
     /**
-     * Lock covering the {@link #identifiedItemCollections}.
-     * 
-     * Lock ordering: this lock should be taken, if required, *before* the
-     * result cache lock.
+     * Lock covering {@link #identifiedItemCollections}, {@link #lastRefreshed} and {@link #generation}.
      */
     private ReadWriteLock itemCollectionLock;
 
@@ -260,6 +265,7 @@ public class ItemCollectionLibrary<T> extends AbstractIdentifiableInitializableC
         itemCollectionLock.writeLock().lock();
         try {
             identifiedItemCollections = newIdentifiedItemCollections;
+            lastRefreshed = new Instant();
         } finally {
             itemCollectionLock.writeLock().unlock();
         }
@@ -338,7 +344,28 @@ public class ItemCollectionLibrary<T> extends AbstractIdentifiableInitializableC
         identifiedItemCollections = null;
         sourcePipeline = null;
         itemCollectionLock = null;
+        lastRefreshed = null;
         super.doDestroy();
+    }
+
+    @Override
+    public Health health() {
+        final Health.Builder builder = new Health.Builder();
+        itemCollectionLock.readLock().lock();
+        try {
+            if (lastRefreshed == null) {
+                builder.down();
+            } else {
+                builder.up();
+                builder.withDetail("generation", generation);
+                builder.withDetail("collections", identifiedItemCollections.size());
+                builder.withDetail("lastRefreshed", lastRefreshed.toString());
+                builder.withDetail("age", new Period(lastRefreshed, new Instant()).toString());
+            }
+            return builder.build();
+        } finally {
+            itemCollectionLock.readLock().unlock();
+        }
     }
 
 }
