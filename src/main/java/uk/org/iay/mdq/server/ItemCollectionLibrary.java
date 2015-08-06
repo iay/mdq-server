@@ -362,7 +362,7 @@ public class ItemCollectionLibrary<T> extends AbstractIdentifiableInitializableC
             } else {
                 builder.up();
                 builder.withDetail("generation", generation);
-                builder.withDetail("collections", identifiedItemCollections.size());
+                builder.withDetail("identifiers", identifiedItemCollections.size());
                 builder.withDetail("lastRefreshed", lastRefreshed.toString());
                 builder.withDetail("age", new Period(lastRefreshed, new Instant()).toString());
             }
