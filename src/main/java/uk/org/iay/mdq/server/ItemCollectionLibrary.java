@@ -318,7 +318,11 @@ public class ItemCollectionLibrary<T> extends AbstractIdentifiableInitializableC
                     new Runnable() {
 
                         public void run() {
-                            refresh();
+                            try {
+                                refresh();
+                            } catch (Throwable e) {
+                                log.error("uncaught exception in refresh", e);
+                            }
                             log.debug("next refresh estimated at {}", new DateTime().plus(refreshInterval));
                         }
                         
