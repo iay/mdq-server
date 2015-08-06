@@ -29,7 +29,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.annotation.Nonnull;
 
-import org.joda.time.DateTime;
 import org.joda.time.Instant;
 import org.joda.time.Period;
 import org.slf4j.Logger;
@@ -83,9 +82,15 @@ public class ItemCollectionLibrary<T> extends AbstractIdentifiableInitializableC
     
     /** Time the last refresh operation completed. */
     private Instant lastRefreshed;
+    
+    /** Time the next refresh is expected to occur. */
+    private Instant nextRefresh;
 
     /**
-     * Lock covering {@link #identifiedItemCollections}, {@link #lastRefreshed} and {@link #generation}.
+     * Lock covering the collections database.
+     * 
+     * Covers {@link #identifiedItemCollections}, {@link #lastRefreshed}, {@link #nextRefresh}
+     * and {@link #generation}.
      */
     private ReadWriteLock itemCollectionLock;
 
@@ -297,6 +302,20 @@ public class ItemCollectionLibrary<T> extends AbstractIdentifiableInitializableC
         }
     }
     
+    /**
+     * Estimate when the next refresh is expected to occur.
+     */
+    private void computeNextRefresh() {
+        final Instant next = new Instant().plus(refreshInterval);
+        itemCollectionLock.writeLock().lock();
+        try {
+            nextRefresh = next;
+        } finally {
+            itemCollectionLock.writeLock().unlock();
+        }
+        log.debug("next refresh estimated at {}", next);
+    }
+
     /** {@inheritDoc} */
     @Override
     protected void doInitialize() throws ComponentInitializationException {
@@ -320,15 +339,15 @@ public class ItemCollectionLibrary<T> extends AbstractIdentifiableInitializableC
                         public void run() {
                             try {
                                 refresh();
+                                computeNextRefresh();
                             } catch (Throwable e) {
                                 log.error("uncaught exception in refresh", e);
                             }
-                            log.debug("next refresh estimated at {}", new DateTime().plus(refreshInterval));
                         }
                         
                     },
                     refreshInterval, refreshInterval, TimeUnit.MILLISECONDS);
-            log.debug("initial refresh estimated at {}", new DateTime().plus(refreshInterval));
+            computeNextRefresh();
         }
     }
 
@@ -355,16 +374,45 @@ public class ItemCollectionLibrary<T> extends AbstractIdentifiableInitializableC
     @Override
     public Health health() {
         final Health.Builder builder = new Health.Builder();
+        
+        // return immediately if the component is not active
+        if (isDestroyed() || !isInitialized()) {
+            return builder.down().build();
+        }
+
         itemCollectionLock.readLock().lock();
         try {
             if (lastRefreshed == null) {
+                /*
+                 * Either a refresh (even the initial one) has never succeeded,
+                 * or the component has since been shut down.
+                 */
                 builder.down();
             } else {
-                builder.up();
+                /*
+                 * At least one refresh has succeeded in the past.
+                 */
+                final Instant now = new Instant();
+                final Period age = new Period(lastRefreshed, now);
+
                 builder.withDetail("generation", generation);
                 builder.withDetail("identifiers", identifiedItemCollections.size());
                 builder.withDetail("lastRefreshed", lastRefreshed.toString());
-                builder.withDetail("age", new Period(lastRefreshed, new Instant()).toString());
+                builder.withDetail("age", age.toString());
+                
+                if (nextRefresh != null) {
+                    builder.withDetail("nextRefresh", nextRefresh.toString());
+                }
+
+                /*
+                 * Work out whether a refresh has succeeded recently, or if we're running
+                 * in a degraded mode with out-of-date collections.
+                 */
+                if ((refreshInterval != 0) && (age.getMillis() > 2*refreshInterval)) {
+                    builder.status("DEGRADED");
+                } else {
+                    builder.up();
+                }
             }
             return builder.build();
         } finally {
