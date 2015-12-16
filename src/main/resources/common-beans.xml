@@ -13,12 +13,12 @@
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
-    
+
     <!--
         Enable property placeholder replacement from system properties only.
     -->
     <context:property-placeholder/>
-    
+
     <!--
         ***********************************
         ***                             ***
@@ -224,13 +224,12 @@
         Parent for registration authority filtering stages.
     -->
     <bean id="EntityRegistrationAuthorityFilterStage" abstract="true" parent="stage_parent"
-        class="net.shibboleth.metadata.dom.saml.EntityRegistrationAuthorityFilterStage"/>
+        class="net.shibboleth.metadata.dom.saml.mdrpi.EntityRegistrationAuthorityFilterStage"/>
     
     <!-- *** Parent beans for Shibboleth spring-extensions factory beans. *** -->
 
-    <!-- anticipates name change in spring-extensions bundled with MDA 0.9 -->
     <bean id="DOMDocumentFactoryBean" abstract="true"
-        class="net.shibboleth.ext.spring.factory.DomDocumentFactoryBean"/>
+        class="net.shibboleth.ext.spring.factory.DOMDocumentFactoryBean"/>
     
     <bean id="PrivateKeyFactoryBean" abstract="true"
         class="net.shibboleth.ext.spring.factory.PrivateKeyFactoryBean"/>
@@ -246,9 +245,15 @@
 
     <!-- *** Parent beans for Shibboleth MDA components. *** -->
 
+    <bean id="ElementWhitespaceTrimmingStage" abstract="true" parent="stage_parent"
+        class="net.shibboleth.metadata.dom.ElementWhitespaceTrimmingStage"/>
+    
     <bean id="EntityFilterStage" abstract="true" parent="stage_parent"
         class="net.shibboleth.metadata.dom.saml.EntityFilterStage"/>
 
+    <bean id="NamespacesStrippingStage" abstract="true" parent="stage_parent"
+        class="net.shibboleth.metadata.dom.NamespacesStrippingStage"/>
+    
     <bean id="PipelineMergeStage" abstract="true" parent="stage_parent"
         class="net.shibboleth.metadata.pipeline.PipelineMergeStage"/>
 
@@ -261,43 +266,50 @@
     <bean id="XPathItemSelectionStrategy" abstract="true"
         class="net.shibboleth.metadata.dom.XPathItemSelectionStrategy"/>
     
-    <!-- *** Parent beans for ukf-mda. *** -->
+    <!-- *** Parent beans for entity attribute handling. -->
     
-    <bean id="ElementWhitespaceTrimmingStage" abstract="true" parent="stage_parent"
-        class="uk.org.ukfederation.mda.dom.ElementWhitespaceTrimmingStage"/>
-    
-    <bean id="X509ValidationStage" abstract="true" parent="stage_parent"
-        class="uk.org.ukfederation.mda.validate.X509ValidationStage"/>
-
     <bean id="EntityAttributeFilteringStage" abstract="true" parent="stage_parent"
-        class="uk.org.ukfederation.mda.dom.saml.mdattr.EntityAttributeFilteringStage"/>
-
+        class="net.shibboleth.metadata.dom.saml.mdattr.EntityAttributeFilteringStage"/>
+    
     <bean id="EntityCategoryMatcher" abstract="true"
-        class="uk.org.ukfederation.mda.dom.saml.mdattr.EntityCategoryMatcher"/>
-
+        class="net.shibboleth.metadata.dom.saml.mdattr.EntityCategoryMatcher"/>
+    
     <bean id="EntityCategorySupportMatcher" abstract="true"
-        class="uk.org.ukfederation.mda.dom.saml.mdattr.EntityCategorySupportMatcher"/>
-
+        class="net.shibboleth.metadata.dom.saml.mdattr.EntityCategorySupportMatcher"/>
+    
     <bean id="MultiPredicateMatcher" abstract="true"
-        class="uk.org.ukfederation.mda.dom.saml.mdattr.MultiPredicateMatcher"/>
-
+        class="net.shibboleth.metadata.dom.saml.mdattr.MultiPredicateMatcher"/>
+    
     <bean id="RegistrationAuthorityMatcher" abstract="true"
-        class="uk.org.ukfederation.mda.dom.saml.mdattr.RegistrationAuthorityMatcher"/>
+        class="net.shibboleth.metadata.dom.saml.mdattr.RegistrationAuthorityMatcher"/>
+    
+    <!-- *** Parent beans for X.509 Certificate validation. -->
+
+    <bean id="X509ValidationStage" abstract="true" parent="stage_parent"
+        class="net.shibboleth.metadata.dom.ds.X509ValidationStage"/>
     
     <bean id="validator_parent" abstract="true" parent="component_parent"/>
+    
+    <bean id="X509RSAExponentValidator" abstract="true" parent="validator_parent"
+        class="net.shibboleth.metadata.validate.x509.X509RSAExponentValidator"/>
+    
+    <bean id="X509RSAKeyLengthValidator" abstract="true" parent="validator_parent"
+        class="net.shibboleth.metadata.validate.x509.X509RSAKeyLengthValidator"/>
+    
+    <bean id="X509RSAOpenSSLBlacklistValidator" abstract="true" parent="validator_parent"
+        class="net.shibboleth.metadata.validate.x509.X509RSAOpenSSLBlacklistValidator"/>
+
+    <!-- *** Parent beans for ukf-mda. *** -->
+
+    <bean id="EntityAttributeAddingStage" abstract="true" parent="stage_parent"
+        class="uk.org.ukfederation.mda.dom.saml.mdattr.EntityAttributeAddingStage"/>
+
+    <bean id="SAMLStringElementCheckingStage" abstract="true" parent="stage_parent"
+        class="uk.org.ukfederation.mda.dom.saml.SAMLStringElementCheckingStage"/>
 
     <bean id="X509ConsistentNameValidator" abstract="true" parent="validator_parent"
         class="uk.org.ukfederation.mda.validate.X509ConsistentNameValidator"/>
-    
-    <bean id="X509RSAExponentValidator" abstract="true" parent="validator_parent"
-        class="uk.org.ukfederation.mda.validate.X509RSAExponentValidator"/>
-    
-    <bean id="X509RSAKeyLengthValidator" abstract="true" parent="validator_parent"
-        class="uk.org.ukfederation.mda.validate.X509RSAKeyLengthValidator"/>
-    
-    <bean id="X509RSAOpenSSLBlacklistValidator" abstract="true" parent="validator_parent"
-        class="uk.org.ukfederation.mda.validate.X509RSAOpenSSLBlacklistValidator"/>
-    
+        
     <!-- *** Default Shibboleth component bean id property from Spring bean id *** -->
     <bean class="net.shibboleth.ext.spring.config.IdentifiableBeanPostProcessor" lazy-init="false"/>
     
@@ -314,27 +326,28 @@
         
         One String bean for each of the common namespaces, named by its prefix.
     -->
-    <bean id="alg_namespace"        parent="String" c:_0="urn:oasis:names:tc:SAML:metadata:algsupport"/>
-    <bean id="ds_namespace"         parent="String" c:_0="http://www.w3.org/2000/09/xmldsig#"/>
-    <bean id="dsig11_namespace"     parent="String" c:_0="http://www.w3.org/2009/xmldsig11#"/>
-    <bean id="hoksso_namespace"     parent="String" c:_0="urn:oasis:names:tc:SAML:2.0:profiles:holder-of-key:SSO:browser"/>
-    <bean id="icmd_namespace"       parent="String" c:_0="http://id.incommon.org/metadata"/>
-    <bean id="idpdisc_namespace"    parent="String" c:_0="urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol"/>
-    <bean id="init_namespace"       parent="String" c:_0="urn:oasis:names:tc:SAML:profiles:SSO:request-init"/>
-    <bean id="md_namespace"         parent="String" c:_0="urn:oasis:names:tc:SAML:2.0:metadata"/>
-    <bean id="mdattr_namespace"     parent="String" c:_0="urn:oasis:names:tc:SAML:metadata:attribute"/>
-    <bean id="mdrpi_namespace"      parent="String" c:_0="urn:oasis:names:tc:SAML:metadata:rpi"/>
-    <bean id="mdui_namespace"       parent="String" c:_0="urn:oasis:names:tc:SAML:metadata:ui"/>
-    <bean id="saml_namespace"       parent="String" c:_0="urn:oasis:names:tc:SAML:2.0:assertion"/>
-    <bean id="samlp_namespace"      parent="String" c:_0="urn:oasis:names:tc:SAML:2.0:protocol"/>
-    <bean id="shibmd_namespace"     parent="String" c:_0="urn:mace:shibboleth:metadata:1.0"/>
-    <bean id="ukfedlabel_namespace" parent="String" c:_0="http://ukfederation.org.uk/2006/11/label"/>
-    <bean id="wayf_namespace"       parent="String" c:_0="http://sdss.ac.uk/2006/06/WAYF"/>
-    <bean id="xenc_namespace"       parent="String" c:_0="http://www.w3.org/2001/04/xmlenc#"/>
-    <bean id="xenc11_namespace"     parent="String" c:_0="http://www.w3.org/2009/xmlenc11#"/>
-    <bean id="xs_namespace"         parent="String" c:_0="http://www.w3.org/2001/XMLSchema"/>
-    <bean id="xsi_namespace"        parent="String" c:_0="http://www.w3.org/2001/XMLSchema-instance"/>
-    <bean id="xsl_namespace"        parent="String" c:_0="http://www.w3.org/1999/XSL/Transform"/>
+    <bean id="alg_namespace"        parent="String" c:_="urn:oasis:names:tc:SAML:metadata:algsupport"/>
+    <bean id="ds_namespace"         parent="String" c:_="http://www.w3.org/2000/09/xmldsig#"/>
+    <bean id="dsig11_namespace"     parent="String" c:_="http://www.w3.org/2009/xmldsig11#"/>
+    <bean id="hoksso_namespace"     parent="String" c:_="urn:oasis:names:tc:SAML:2.0:profiles:holder-of-key:SSO:browser"/>
+    <bean id="icmd_namespace"       parent="String" c:_="http://id.incommon.org/metadata"/>
+    <bean id="idpdisc_namespace"    parent="String" c:_="urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol"/>
+    <bean id="init_namespace"       parent="String" c:_="urn:oasis:names:tc:SAML:profiles:SSO:request-init"/>
+    <bean id="md_namespace"         parent="String" c:_="urn:oasis:names:tc:SAML:2.0:metadata"/>
+    <bean id="mdattr_namespace"     parent="String" c:_="urn:oasis:names:tc:SAML:metadata:attribute"/>
+    <bean id="mdrpi_namespace"      parent="String" c:_="urn:oasis:names:tc:SAML:metadata:rpi"/>
+    <bean id="mdui_namespace"       parent="String" c:_="urn:oasis:names:tc:SAML:metadata:ui"/>
+    <bean id="saml_namespace"       parent="String" c:_="urn:oasis:names:tc:SAML:2.0:assertion"/>
+    <bean id="samlp_namespace"      parent="String" c:_="urn:oasis:names:tc:SAML:2.0:protocol"/>
+    <bean id="shibmd_namespace"     parent="String" c:_="urn:mace:shibboleth:metadata:1.0"/>
+    <bean id="ukfedlabel_namespace" parent="String" c:_="http://ukfederation.org.uk/2006/11/label"/>
+    <bean id="wayf_namespace"       parent="String" c:_="http://sdss.ac.uk/2006/06/WAYF"/>
+    <bean id="xenc_namespace"       parent="String" c:_="http://www.w3.org/2001/04/xmlenc#"/>
+    <bean id="xenc11_namespace"     parent="String" c:_="http://www.w3.org/2009/xmlenc11#"/>
+    <bean id="xml_namespace"        parent="String" c:_="http://www.w3.org/XML/1998/namespace"/>
+    <bean id="xs_namespace"         parent="String" c:_="http://www.w3.org/2001/XMLSchema"/>
+    <bean id="xsi_namespace"        parent="String" c:_="http://www.w3.org/2001/XMLSchema-instance"/>
+    <bean id="xsl_namespace"        parent="String" c:_="http://www.w3.org/1999/XSL/Transform"/>
     
     <!--
         commonNamespaces
@@ -433,13 +446,7 @@
         used in an XML document.
     -->
     <bean id="normaliseNamespaces" parent="XSLTransformationStage"
-        p:id="normaliseNamespaces">
-        <property name="XSLResource">
-            <bean parent="ClassPathResource">
-                <constructor-arg value="ns_norm.xsl"/>
-            </bean>
-        </property>
-    </bean>
+        p:XSLResource="classpath:ns_norm.xsl"/>
     
     <!--
         ***************************************************
@@ -457,9 +464,47 @@
     <!--
         Federation registrationAuthority URIs.
     -->
-    <bean id="hr_eduhr_registrar" parent="String" c:_0="http://www.srce.hr"/>
-    <bean id="il_iif_registrar"   parent="String" c:_0="http://iif.iucc.ac.il"/>
-    <bean id="jp_gakunin_registrar" parent="String" c:_0="https://www.gakunin.jp"/>
+    <bean id="ar_mate_registrar"         parent="String" c:_="http://www.federacionmate.gob.ar"/>
+    <bean id="am_afire_registrar"        parent="String" c:_="http://afire.asnet.am"/>
+    <bean id="at_aconet_registrar"       parent="String" c:_="http://eduid.at"/>
+    <bean id="au_aaf_registrar"          parent="String" c:_="http://aaf.edu.au/"/>
+    <bean id="be_belnet_registrar"       parent="String" c:_="http://federation.belnet.be/"/>
+    <bean id="br_cafe_registrar"         parent="String" c:_="http://cafe.rnp.br"/>
+    <bean id="ca_caf_registrar"          parent="String" c:_="http://www.canarie.ca"/>
+    <bean id="ch_switchaai_registrar"    parent="String" c:_="http://rr.aai.switch.ch/"/>
+    <bean id="cl_cofre_registrar"        parent="String" c:_="http://cofre.reuna.cl"/>
+    <bean id="co_colfire_registrar"      parent="String" c:_="http://colfire.co"/>
+    <bean id="cz_eduid_registrar"        parent="String" c:_="http://www.eduid.cz/"/>
+    <bean id="de_dfnaai_registrar"       parent="String" c:_="https://www.aai.dfn.de"/>    
+    <bean id="dk_wayf_registrar"         parent="String" c:_="https://www.wayf.dk"/>    
+    <bean id="ec_minga_registrar"        parent="String" c:_="https://minga.cedia.org.ec"/>
+    <bean id="ee_taat_registrar"         parent="String" c:_="http://taat.edu.ee"/>
+    <bean id="es_sir_registrar"          parent="String" c:_="http://www.rediris.es/"/>
+    <bean id="fi_haka_registrar"         parent="String" c:_="http://www.csc.fi/haka"/>
+    <bean id="fr_renater_registrar"      parent="String" c:_="https://federation.renater.fr/"/>
+    <bean id="ge_gif_registrar"          parent="String" c:_="https://mtd.gif.grena.ge"/>
+    <bean id="gr_grnet_registrar"        parent="String" c:_="http://aai.grnet.gr/"/>
+    <bean id="hr_eduhr_registrar"        parent="String" c:_="http://www.srce.hr"/>
+    <bean id="hu_eduid_registrar"        parent="String" c:_="http://eduid.hu"/>
+    <bean id="ie_edugate_registrar"      parent="String" c:_="http://www.heanet.ie"/>
+    <bean id="il_iif_registrar"          parent="String" c:_="http://iif.iucc.ac.il"/>
+    <bean id="it_idem_registrar"         parent="String" c:_="http://www.idem.garr.it/"/>
+    <bean id="jp_gakunin_registrar"      parent="String" c:_="https://www.gakunin.jp"/>
+    <bean id="lt_litnet_registrar"       parent="String" c:_="https://fedi.litnet.lt"/>
+    <bean id="lu_eduid_registrar"        parent="String" c:_="http://eduid.lu"/>
+    <bean id="lv_laife_registrar"        parent="String" c:_="http://laife.lanet.lv/"/>
+    <bean id="md_leaf_registrar"         parent="String" c:_="http://federations.renam.md/"/>
+    <bean id="nl_surfconext_registrar"   parent="String" c:_="http://www.surfconext.nl/"/>
+    <bean id="no_feide_registrar"        parent="String" c:_="http://feide.no/"/>
+    <bean id="pl_pionier_registrar"      parent="String" c:_="https://aai.pionier.net.pl"/>
+    <bean id="pt_rctsaai_registrar"      parent="String" c:_="https://www.fccn.pt"/>
+    <bean id="se_swamid_registrar"       parent="String" c:_="http://www.swamid.se/"/>
+    <bean id="si_arnes_registrar"        parent="String" c:_="http://aai.arnes.si"/>
+    <bean id="ua_peano_registrar"        parent="String" c:_="https://peano.uran.ua"/>
+    <bean id="uk_ukf_registrar"          parent="String" c:_="http://ukfederation.org.uk"/>
+    <bean id="us_incommon_registrar"     parent="String" c:_="https://incommon.org"/>
+
+    
     
     <!--
         identificationStrategy
@@ -467,12 +512,12 @@
         Standard item identifier strategy.
     -->
     <bean id="identificationStrategy" class="uk.org.ukfederation.mda.UKItemIdentificationStrategy">
-        <property name="ignoredAuthorities">
+        <property name="ignoredRegistrationAuthorities">
             <set>
-                <value>http://ukfederation.org.uk</value>
+                <ref bean="uk_ukf_registrar"/>
             </set>
         </property>
-        <property name="displayNames">
+        <property name="registrationAuthorityDisplayNames">
             <map>
                 <!--
                     eduGAIN participant registration authority display names as country codes.
@@ -481,37 +526,49 @@
                     
                     http://www.edugain.org/technical/status.php
                 -->
-                <entry key="http://eduid.at"                  value="AT"/>
-                <entry key="http://federation.belnet.be/"     value="BE"/>
-                <entry key="http://cafe.rnp.br"               value="BR"/>
-                <entry key="http://www.canarie.ca"            value="CA"/>
-                <entry key="http://cofre.reuna.cl"            value="CL"/>
+                <entry key-ref="at_aconet_registrar"          value="AT"/>
+                <entry key-ref="be_belnet_registrar"          value="BE"/>
+                <entry key-ref="br_cafe_registrar"            value="BR"/>
+                <entry key-ref="ca_caf_registrar"             value="CA"/>
+                <entry key-ref="cl_cofre_registrar"           value="CL"/>
+                <entry key-ref="co_colfire_registrar"         value="CO"/>
                 <entry key-ref="hr_eduhr_registrar"           value="HR"/>
-                <entry key="http://www.eduid.cz/"             value="CZ"/>
-                <entry key="https://www.wayf.dk"              value="DK"/>
-                <entry key="http://www.csc.fi/haka"           value="FI"/>
-                <entry key="https://federation.renater.fr/"   value="FR"/>
-                <entry key="https://www.aai.dfn.de"           value="DE"/>
-                <entry key="http://aai.grnet.gr/"             value="GR"/>
-                <entry key="http://eduid.hu"                  value="HU"/>
-                <entry key="http://www.heanet.ie"             value="IE"/>
-                <entry key="http://www.idem.garr.it/"         value="IT"/>
+                <entry key-ref="cz_eduid_registrar"           value="CZ"/>
+                <entry key-ref="dk_wayf_registrar"            value="DK"/>
+                <entry key-ref="ec_minga_registrar"           value="EC"/>
+                <entry key-ref="ee_taat_registrar"            value="EE"/>
+                <entry key-ref="fi_haka_registrar"            value="FI"/>
+                <entry key-ref="fr_renater_registrar"         value="FR"/>
+                <entry key-ref="ge_gif_registrar"             value="GE"/>
+                <entry key-ref="de_dfnaai_registrar"          value="DE"/>
+                <entry key-ref="gr_grnet_registrar"           value="GR"/>
+                <entry key-ref="hu_eduid_registrar"           value="HU"/>
+                <entry key-ref="ie_edugate_registrar"         value="IE"/>
+                <entry key-ref="il_iif_registrar"             value="IL"/>
+                <entry key-ref="it_idem_registrar"            value="IT"/>
                 <entry key-ref="jp_gakunin_registrar"         value="JP"/>
-                <entry key="http://laife.lanet.lv/"           value="LV"/>
-                <entry key="http://feide.no/"                 value="NO"/>
-                <entry key="http://aai.pionier.net.pl"        value="PL"/>
-                <entry key="http://aai.arnes.si"              value="SI"/>
-                <entry key="http://www.rediris.es/"           value="ES"/>
-                <entry key="http://www.swamid.se/"            value="SE"/>
-                <entry key="http://rr.aai.switch.ch/"         value="CH"/>
-                <entry key="http://www.surfconext.nl/"        value="NL"/>
-                <entry key="http://ukfederation.org.uk"       value="UK"/>
+                <entry key-ref="lv_laife_registrar"           value="LV"/>
+                <entry key-ref="lt_litnet_registrar"          value="LT"/>
+                <entry key-ref="lu_eduid_registrar"           value="LU"/>
+                <entry key-ref="md_leaf_registrar"            value="MD"/>
+                <entry key-ref="no_feide_registrar"           value="NO"/>
+                <entry key-ref="pl_pionier_registrar"         value="PL"/>
+                <entry key-ref="pt_rctsaai_registrar"         value="PT"/>
+                <entry key-ref="si_arnes_registrar"           value="SI"/>
+                <entry key-ref="es_sir_registrar"             value="ES"/>
+                <entry key-ref="se_swamid_registrar"          value="SE"/>
+                <entry key-ref="ch_switchaai_registrar"       value="CH"/>
+                <entry key-ref="nl_surfconext_registrar"      value="NL"/>
+                <entry key-ref="us_incommon_registrar"        value="US"/>
+                <entry key-ref="ua_peano_registrar"           value="UA"/>
+                <entry key-ref="uk_ukf_registrar"             value="UK"/>
                 
-                <!-- Joining eduGAIN -->
-                <entry key="https://incommon.org"             value="US"/>
+                <!-- eduGAIN voting-only members -->
+                <entry key-ref="ar_mate_registrar"            value="AR"/>
+                <entry key-ref="am_afire_registrar"           value="AM"/>
+                <entry key-ref="au_aaf_registrar"             value="AU"/>
                 
                 <!-- eduGAIN candidates -->
-                <entry key-ref="il_iif_registrar"             value="IL"/>
             </map>
         </property>
     </bean>
@@ -525,7 +582,7 @@
     <bean id="errorAnnouncer" parent="stage_parent"
         class="net.shibboleth.metadata.pipeline.StatusMetadataLoggingStage"
         p:id="errorAnnouncer">
-        <property name="identifierStrategy" ref="identificationStrategy"/>
+        <property name="identificationStrategy" ref="identificationStrategy"/>
         <property name="selectionRequirements">
             <list>
                 <value>#{T(net.shibboleth.metadata.ErrorStatus)}</value>
@@ -542,7 +599,7 @@
     <bean id="errorRemover" parent="stage_parent"
         class="net.shibboleth.metadata.pipeline.ItemMetadataFilterStage"
         p:id="errorRemover">
-        <property name="identifierStrategy" ref="identificationStrategy"/>
+        <property name="identificationStrategy" ref="identificationStrategy"/>
         <property name="selectionRequirements">
             <list>
                 <value>#{T(net.shibboleth.metadata.ErrorStatus)}</value>
@@ -558,7 +615,7 @@
     <bean id="errorTerminator" parent="stage_parent"
         class="net.shibboleth.metadata.pipeline.ItemMetadataTerminationStage"
         p:id="errorTerminator">
-        <property name="identifierStrategy" ref="identificationStrategy"/>
+        <property name="identificationStrategy" ref="identificationStrategy"/>
         <property name="selectionRequirements">
             <list>
                 <value>#{T(net.shibboleth.metadata.ErrorStatus)}</value>
@@ -611,10 +668,17 @@
     <!--
         QNames for SAML metadata elements.
     -->
+    <bean id="md-Company"                 parent="QName" c:_0-ref="md_namespace" c:_1="Company"/>
     <bean id="md-EmailAddress"            parent="QName" c:_0-ref="md_namespace" c:_1="EmailAddress"/>
+    <bean id="md-GivenName"               parent="QName" c:_0-ref="md_namespace" c:_1="GivenName"/>
     <bean id="md-NameIDFormat"            parent="QName" c:_0-ref="md_namespace" c:_1="NameIDFormat"/>
     <bean id="md-OrganizationDisplayName" parent="QName" c:_0-ref="md_namespace" c:_1="OrganizationDisplayName"/>
+    <bean id="md-OrganizationName"        parent="QName" c:_0-ref="md_namespace" c:_1="OrganizationName"/>
     <bean id="md-OrganizationURL"         parent="QName" c:_0-ref="md_namespace" c:_1="OrganizationURL"/>
+    <bean id="md-ServiceDescription"      parent="QName" c:_0-ref="md_namespace" c:_1="ServiceDescription"/>
+    <bean id="md-ServiceName"             parent="QName" c:_0-ref="md_namespace" c:_1="ServiceName"/>
+    <bean id="md-SurName"                 parent="QName" c:_0-ref="md_namespace" c:_1="SurName"/>
+    <bean id="md-TelephoneNumber"         parent="QName" c:_0-ref="md_namespace" c:_1="TelephoneNumber"/>
 
     <!--
         Basic EntitiesDescriptor disassembler pipeline stage.
@@ -640,8 +704,8 @@
     <!--
         Remove any empty Extensions elements.
     -->
-    <bean id="removeEmptyExtensions" parent="EmptyContainerStrippingStage"
-        p:id="removeEmptyExtensions"
+    <bean id="stripEmptyExtensions" parent="EmptyContainerStrippingStage"
+        p:id="stripEmptyExtensions"
         p:elementName="Extensions"
         p:elementNamespace-ref="md_namespace"/>
     
@@ -724,13 +788,8 @@
         Any registrationAuthority already present on an entity in this
         channel must match the known registration authority value.
     -->
-    <bean id="default_regauth_parent" abstract="true" parent="XSLTransformationStage">
-        <property name="XSLResource">
-            <bean parent="ClassPathResource">
-                <constructor-arg value="default_regauth.xsl"/>
-            </bean>
-        </property>
-    </bean>
+    <bean id="default_regauth_parent" abstract="true" parent="XSLTransformationStage"
+        p:XSLResource="classpath:default_regauth.xsl"/>
     
 
 
@@ -741,9 +800,15 @@
         ***                                         ***
         ***********************************************
     -->
-    
-    <bean id="mdui-InformationURL" parent="QName" c:_0-ref="mdui_namespace" c:_1="InformationURL"/>
-    <bean id="mdui-Logo"           parent="QName" c:_0-ref="mdui_namespace" c:_1="Logo"/>
+
+    <bean id="mdui-Description"     parent="QName" c:_0-ref="mdui_namespace" c:_1="Description"/>
+    <bean id="mdui-DisplayName"     parent="QName" c:_0-ref="mdui_namespace" c:_1="DisplayName"/>
+    <bean id="mdui-DomainHint"      parent="QName" c:_0-ref="mdui_namespace" c:_1="DomainHint"/>
+    <bean id="mdui-GeolocationHint" parent="QName" c:_0-ref="mdui_namespace" c:_1="GeolocationHint"/>
+    <bean id="mdui-InformationURL"  parent="QName" c:_0-ref="mdui_namespace" c:_1="InformationURL"/>
+    <bean id="mdui-IPHint"          parent="QName" c:_0-ref="mdui_namespace" c:_1="IPHint"/>
+    <bean id="mdui-Keywords"        parent="QName" c:_0-ref="mdui_namespace" c:_1="Keywords"/>
+    <bean id="mdui-Logo"            parent="QName" c:_0-ref="mdui_namespace" c:_1="Logo"/>
 
     <bean id="stripMDUIDiscoHints" parent="ElementStrippingStage"
         p:id="stripMDUIDiscoHints"
@@ -756,14 +821,26 @@
         Remove all MDUI metadata from attribute authority roles.
     -->
     <bean id="stripAAMDUI" parent="XSLTransformationStage"
-        p:id="stripAAMDUI">
-        <property name="XSLResource">
-            <bean parent="ClassPathResource">
-                <constructor-arg value="strip-aa-mdui.xsl"/>
-            </bean>
-        </property>
-    </bean>
+        p:XSLResource="classpath:strip-aa-mdui.xsl"/>
     
+    <!--
+        stripMDUILogoData
+        
+        Remove all mdui:Logo elements containing data: URLs.
+    -->
+    <bean id="stripMDUILogoData" parent="XSLTransformationStage"
+        p:XSLResource="classpath:strip-mdui-logo-data.xsl"/>
+
+    <!--
+        stripEmptyMDUIUIInfo
+        
+        Remove any empty mdui:UIInfo container elements.
+    -->
+    <bean id="stripEmptyMDUIUIInfo" parent="EmptyContainerStrippingStage"
+        p:id="stripEmptyMDUIUIInfo">
+        <property name="elementNamespace" ref="mdui_namespace"/>
+        <property name="elementName" value="UIInfo"/>
+    </bean>
     
     <!--
         *****************************************************
@@ -773,6 +850,8 @@
         *****************************************************
     -->
     
+    <bean id="shibmd-Scope" parent="QName" c:_0-ref="shibmd_namespace" c:_1="Scope"/>
+
     <bean id="stripShibScope" parent="ElementStrippingStage"
         p:id="stripShibScope"
         p:elementName="Scope"
@@ -812,10 +891,22 @@
         httpClientBuilder
         
         Factory for the httpClient bean below.
+        
+        Sets the option to ignore validation of a server's TLS credentials.
+        
+        Sets socket and connection timeouts explicitly (to 100s) to
+        override the tight defaults in java-support, see:
+        
+            https://github.com/ukf/ukf-meta/issues/1
+            https://issues.shibboleth.net/jira/browse/JSPT-48
+            
+        These options can be removed once the underlying issue has been resolved.
     -->
     <bean id="httpClientBuilder"
         class="net.shibboleth.utilities.java.support.httpclient.HttpClientBuilder"
         p:connectionDisregardTLSCertificate="true"
+        p:socketTimeout="100000"
+        p:connectionTimeout="100000"
     />
 
     <!--
@@ -922,6 +1013,10 @@
         <bean parent="ClassPathResource">
             <!-- no imports -->
             <constructor-arg value="schema/uk-fed-label.xsd"/>
+        </bean>
+        <bean parent="ClassPathResource">
+            <!-- no imports -->
+            <constructor-arg value="schema/uk-wayf.xsd"/>
         </bean>
         <bean parent="ClassPathResource">
             <!-- imports xenc-schema.xsd -->
@@ -1056,22 +1151,38 @@
                 <ref bean="populateRegistrationAuthorities"/>
 
                 <!--
-                    The following two namespaces are always stripped because they are
-                    specific to the UK registrar and can't be valid when imported from
-                    some other source.
+                    Strip all elements and attributes that are in namespaces
+                    other than the ones we accept from partners.
                 -->
-                <ref bean="stripUkfedlabelNamespace"/>
-                <ref bean="stripWayfNamespace"/>
-                
+                <bean id="whitelistImportedNamespaces" parent="NamespacesStrippingStage"
+                    p:id="whitelistImportedNamespaces" p:whitelisting="true">
+                    <property name="namespaces">
+                        <set>
+                            <ref bean="alg_namespace"/>
+                            <ref bean="ds_namespace"/>
+                            <ref bean="hoksso_namespace"/>
+                            <ref bean="icmd_namespace"/>
+                            <ref bean="idpdisc_namespace"/>
+                            <ref bean="init_namespace"/>
+                            <ref bean="md_namespace"/>
+                            <ref bean="mdattr_namespace"/>
+                            <ref bean="mdrpi_namespace"/>
+                            <ref bean="mdui_namespace"/>
+                            <ref bean="saml_namespace"/>
+                            <ref bean="shibmd_namespace"/>
+                            <ref bean="xenc_namespace"/>
+                            <ref bean="xml_namespace"/>
+                        </set>
+                    </property>
+                </bean>
+
                 <ref bean="cleanImport"/>
                 <ref bean="stripAAMDUI"/>
                 <ref bean="trimImportElementWhitespace"/>
-                <ref bean="removeEmptyExtensions"/>
+                <ref bean="stripEmptyExtensions"/>
                 <ref bean="checkSchemas"/>
-                <!--
                 <ref bean="CHECK_imported"/>
-                -->
-                
+
                 <bean parent="X509ValidationStage"
                     p:id="checkCertificates">
                     <property name="validators">
