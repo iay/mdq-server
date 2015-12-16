@@ -21,6 +21,7 @@ import javax.servlet.Filter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.boot.Banner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -84,7 +85,7 @@ public class Application {
         /*
          * Customize the application.
          */
-        app.setShowBanner(false);
+        app.setBannerMode(Banner.Mode.OFF);
         
         /*
          * Start the application.
