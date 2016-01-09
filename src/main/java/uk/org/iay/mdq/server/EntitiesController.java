@@ -21,7 +21,6 @@ import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,7 +33,6 @@ import org.w3c.dom.Element;
  * This implementation assumes that encoded "/" characters in identifiers
  * are parsed correctly by Spring.
  */
-@Controller
 @RequestMapping(value = "/entities", method = RequestMethod.GET)
 public class EntitiesController {
 

@@ -105,6 +105,11 @@
     </bean>
     
     <!--
+        Controller for the /entities endpoint.
+    -->
+    <bean id="entitiesController" class="uk.org.iay.mdq.server.EntitiesController"/>
+    
+    <!--
         JSON entity list lookup service.
     -->
     <bean id="metadataService.entityList" parent="component_parent"
@@ -119,6 +124,11 @@
                 c:_="${entityList.prettyPrinting:true}"/>
         </property>
     </bean>
+
+    <!--
+        Controller for the /x-entity-list endpoint.
+    -->
+    <bean id="entityListController" class="uk.org.iay.mdq.server.EntityListController"/>
 
     <!--
         Raw view of Result instances in JSON.
@@ -205,6 +215,8 @@
         <bean id="perform.signature" parent="CompositeStage"/>
     </beans>
     <beans profile="sign">
+
+        <bean id="certificateController" class="uk.org.iay.mdq.server.CertificateController"/>
 
         <bean id="certificateResource" parent="FileSystemResource">
             <constructor-arg value="${sign.certificate}"/>
