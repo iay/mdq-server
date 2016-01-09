@@ -97,8 +97,7 @@
         
         Combines all check_future_N stages.
     -->
-    <bean id="check_future" parent="CompositeStage"
-        p:id="check_future">
+    <bean id="check_future" parent="CompositeStage">
         <property name="composedStages">
             <list>
                 <ref bean="check_future_0"/>
@@ -224,8 +223,7 @@
         
         Composite check for the MDRPI specification.
     -->
-    <bean id="check_mdrpi" parent="CompositeStage"
-        p:id="check_mdrpi">
+    <bean id="check_mdrpi" parent="CompositeStage">
         <property name="composedStages">
             <list>
                 <ref bean="check_mdrpi_xslt"/>
@@ -267,7 +265,6 @@
     -->
     <bean id="check_mdui_iphint" parent="stage_parent"
         class="uk.org.ukfederation.mda.validate.mdui.IPHintValidationStage"
-        p:id="check_mdui_iphint"
         p:checkingNetworks="true"/>
     
     <!--
@@ -309,8 +306,7 @@
             mdui_dn_en_present
             mdui_dn_en_match
     -->
-    <bean id="check_mdui" parent="CompositeStage"
-        p:id="check_mdui">
+    <bean id="check_mdui" parent="CompositeStage">
         <property name="composedStages">
             <list>
                 <ref bean="check_mdui_iphint"/>
@@ -417,8 +413,7 @@
         yet expired.  Does not put an upper bound on validUntil intervals.
     -->
     <bean id="check_validUntil" parent="stage_parent"
-        class="net.shibboleth.metadata.dom.saml.ValidateValidUntilStage"
-        p:id="check_validUntil">
+        class="net.shibboleth.metadata.dom.saml.ValidateValidUntilStage">
         <!--
             The validUntil attribute must be present.
         -->
@@ -508,7 +503,6 @@
         items in the item collection.
     -->
     <bean id="check_dup_display" parent="stage_parent"
-        p:id="check_dup_display"
         p:identificationStrategy-ref="identificationStrategy"
         class="uk.org.ukfederation.mda.IdPDisplayNameDuplicateDetectingStage"/>
     
@@ -563,8 +557,7 @@
     <!--
         CHECK_std
     -->
-    <bean id="CHECK_std" parent="CompositeStage"
-        p:id="CHECK_std">
+    <bean id="CHECK_std" parent="CompositeStage">
         <property name="composedStages">
             <list>
                 <ref bean="check_adfs"/>
@@ -596,8 +589,7 @@
     <!--
         CHECK_imported
     -->
-    <bean id="CHECK_imported" parent="CompositeStage"
-        p:id="CHECK_imported">
+    <bean id="CHECK_imported" parent="CompositeStage">
         <property name="composedStages">
             <list>
                 <ref bean="CHECK_std"/>

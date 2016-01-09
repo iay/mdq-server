@@ -389,7 +389,7 @@
         Remove the algorithm support namespace.
     -->
     <bean id="stripAlgNamespace" parent="NamespaceStrippingStage"
-        p:id="stripAlgNamespace" p:namespace-ref="alg_namespace"/>
+        p:namespace-ref="alg_namespace"/>
     
     <!--
         stripIdpdiscNamespace
@@ -397,7 +397,7 @@
         Remove the IdP discovery namespace.
     -->
     <bean id="stripIdpdiscNamespace" parent="NamespaceStrippingStage"
-        p:id="stripIdpdiscNamespace" p:namespace-ref="idpdisc_namespace"/>
+        p:namespace-ref="idpdisc_namespace"/>
 
     <!--
         stripInitNamespace
@@ -405,7 +405,7 @@
         Remove the session initiation namespace.
     -->
     <bean id="stripInitNamespace" parent="NamespaceStrippingStage"
-        p:id="stripInitNamespace" p:namespace-ref="init_namespace"/>
+        p:namespace-ref="init_namespace"/>
     
     <!--
         stripMdattrNamespace
@@ -413,7 +413,7 @@
         Remove the namespace used by the entity attributes extension.
     -->
     <bean id="stripMdattrNamespace" parent="NamespaceStrippingStage"
-        p:id="stripMdattrNamespace" p:namespace-ref="mdattr_namespace"/>
+        p:namespace-ref="mdattr_namespace"/>
     
     <!--
         stripMdrpiNamespace
@@ -421,7 +421,7 @@
         Remove the namespace used by the registration and publication metdata extension.
     -->
     <bean id="stripMdrpiNamespace" parent="NamespaceStrippingStage"
-        p:id="stripMdrpiNamespace" p:namespace-ref="mdrpi_namespace"/>
+        p:namespace-ref="mdrpi_namespace"/>
     
     <!--
         stripUkfedlabelNamespace
@@ -429,7 +429,7 @@
         Remove the UK federation label namespace.
     -->
     <bean id="stripUkfedlabelNamespace" parent="NamespaceStrippingStage"
-        p:id="stripUkfedlabelNamespace" p:namespace-ref="ukfedlabel_namespace"/>
+        p:namespace-ref="ukfedlabel_namespace"/>
     
     <!--
         stripWayfNamespace
@@ -437,7 +437,7 @@
         Remove the UK federation WAYF namespace.
     -->
     <bean id="stripWayfNamespace" parent="NamespaceStrippingStage"
-        p:id="stripWayfNamespace" p:namespace-ref="wayf_namespace"/>
+        p:namespace-ref="wayf_namespace"/>
     
     <!--
         normaliseNamespaces
@@ -580,8 +580,7 @@
         but takes no action on them.
     -->
     <bean id="errorAnnouncer" parent="stage_parent"
-        class="net.shibboleth.metadata.pipeline.StatusMetadataLoggingStage"
-        p:id="errorAnnouncer">
+        class="net.shibboleth.metadata.pipeline.StatusMetadataLoggingStage">
         <property name="identificationStrategy" ref="identificationStrategy"/>
         <property name="selectionRequirements">
             <list>
@@ -597,8 +596,7 @@
         This pipeline stage removes any items marked with an error status.
     -->
     <bean id="errorRemover" parent="stage_parent"
-        class="net.shibboleth.metadata.pipeline.ItemMetadataFilterStage"
-        p:id="errorRemover">
+        class="net.shibboleth.metadata.pipeline.ItemMetadataFilterStage">
         <property name="identificationStrategy" ref="identificationStrategy"/>
         <property name="selectionRequirements">
             <list>
@@ -613,8 +611,7 @@
         This pipeline stage causes CLI termination if any item is marked with an error status.
     -->
     <bean id="errorTerminator" parent="stage_parent"
-        class="net.shibboleth.metadata.pipeline.ItemMetadataTerminationStage"
-        p:id="errorTerminator">
+        class="net.shibboleth.metadata.pipeline.ItemMetadataTerminationStage">
         <property name="identificationStrategy" ref="identificationStrategy"/>
         <property name="selectionRequirements">
             <list>
@@ -629,8 +626,7 @@
         Announce any errors or warnings encountered, then remove
         any items that had errors.  Items with warnings are retained.
     -->
-    <bean id="errorAnnouncingFilter" parent="CompositeStage"
-        p:id="errorAnnouncingFilter">
+    <bean id="errorAnnouncingFilter" parent="CompositeStage">
         <property name="composedStages">
             <list>
                 <ref bean="errorAnnouncer"/>
@@ -645,8 +641,7 @@
         A pipeline stage that checks for any errors, and then announces
         and filters any encountered.
     -->
-    <bean id="errorTerminatingFilter" parent="CompositeStage"
-        p:id="errorTerminatingFilter">
+    <bean id="errorTerminatingFilter" parent="CompositeStage">
         <property name="composedStages">
             <list>
                 <ref bean="errorAnnouncer"/>
@@ -684,28 +679,24 @@
         Basic EntitiesDescriptor disassembler pipeline stage.
     -->
     <bean id="disassemble" parent="stage_parent"
-        class="net.shibboleth.metadata.dom.saml.EntitiesDescriptorDisassemblerStage"
-        p:id="disassemble"/>
+        class="net.shibboleth.metadata.dom.saml.EntitiesDescriptorDisassemblerStage"/>
     
     <!--
         Basic EntitiesDescriptor assembler pipeline stage.
     -->
     <bean id="assemble" parent="stage_parent"
-        class="net.shibboleth.metadata.dom.saml.EntitiesDescriptorAssemblerStage"
-        p:id="assemble"/>
+        class="net.shibboleth.metadata.dom.saml.EntitiesDescriptorAssemblerStage"/>
     
     <!--
         Populate ItemId values from entities.
     -->
     <bean id="populateItemIds" parent="stage_parent"
-        class="net.shibboleth.metadata.dom.saml.EntityDescriptorItemIdPopulationStage"
-        p:id="populateItemIds"/>
+        class="net.shibboleth.metadata.dom.saml.EntityDescriptorItemIdPopulationStage"/>
 
     <!--
         Remove any empty Extensions elements.
     -->
     <bean id="stripEmptyExtensions" parent="EmptyContainerStrippingStage"
-        p:id="stripEmptyExtensions"
         p:elementName="Extensions"
         p:elementNamespace-ref="md_namespace"/>
     
@@ -714,52 +705,42 @@
     -->
     
     <bean id="stripArtifactResolutionService" parent="ElementStrippingStage"
-        p:id="stripArtifactResolutionService"
         p:elementName="ArtifactResolutionService"
         p:elementNamespace-ref="md_namespace"/>
     
     <bean id="stripAssertionConsumerService" parent="ElementStrippingStage"
-        p:id="stripAssertionConsumerService"
         p:elementName="AssertionConsumerService"
         p:elementNamespace-ref="md_namespace"/>
     
     <bean id="stripAttributeAuthorityDescriptor" parent="ElementStrippingStage"
-        p:id="stripAttributeAuthorityDescriptor"
         p:elementName="AttributeAuthorityDescriptor"
         p:elementNamespace-ref="md_namespace"/>
     
     <bean id="stripAttributeConsumingService" parent="ElementStrippingStage"
-        p:id="stripAttributeConsumingService"
         p:elementName="AttributeConsumingService"
         p:elementNamespace-ref="md_namespace"/>
     
     <bean id="stripContactPerson" parent="ElementStrippingStage"
-        p:id="stripContactPerson"
         p:elementName="ContactPerson"
         p:elementNamespace-ref="md_namespace"/>
     
     <bean id="stripKeyDescriptor" parent="ElementStrippingStage"
-        p:id="stripKeyDescriptor"
         p:elementName="KeyDescriptor"
         p:elementNamespace-ref="md_namespace"/>
     
     <bean id="stripManageNameIDService" parent="ElementStrippingStage"
-        p:id="stripManageNameIDService"
         p:elementName="ManageNameIDService"
         p:elementNamespace-ref="md_namespace"/>
     
     <bean id="stripNameIDFormat" parent="ElementStrippingStage"
-        p:id="stripNameIDFormat"
         p:elementName="NameIDFormat"
         p:elementNamespace-ref="md_namespace"/>
     
     <bean id="stripSingleLogoutService" parent="ElementStrippingStage"
-        p:id="stripSingleLogoutService"
         p:elementName="SingleLogoutService"
         p:elementNamespace-ref="md_namespace"/>
     
     <bean id="stripSingleSignOnService" parent="ElementStrippingStage"
-        p:id="stripSingleSignOnService"
         p:elementName="SingleSignOnService"
         p:elementNamespace-ref="md_namespace"/>
     
@@ -777,8 +758,7 @@
         Populate RegistrationAuthority values from entities.
     -->
     <bean id="populateRegistrationAuthorities" parent="stage_parent"
-        class="net.shibboleth.metadata.dom.saml.mdrpi.RegistrationAuthorityPopulationStage"
-        p:id="populateRegistrationAuthorities"/>
+        class="net.shibboleth.metadata.dom.saml.mdrpi.RegistrationAuthorityPopulationStage"/>
     
     <!--
         default_regauth_parent
@@ -811,7 +791,6 @@
     <bean id="mdui-Logo"            parent="QName" c:_0-ref="mdui_namespace" c:_1="Logo"/>
 
     <bean id="stripMDUIDiscoHints" parent="ElementStrippingStage"
-        p:id="stripMDUIDiscoHints"
         p:elementName="DiscoHints"
         p:elementNamespace-ref="mdui_namespace"/>
     
@@ -836,8 +815,7 @@
         
         Remove any empty mdui:UIInfo container elements.
     -->
-    <bean id="stripEmptyMDUIUIInfo" parent="EmptyContainerStrippingStage"
-        p:id="stripEmptyMDUIUIInfo">
+    <bean id="stripEmptyMDUIUIInfo" parent="EmptyContainerStrippingStage">
         <property name="elementNamespace" ref="mdui_namespace"/>
         <property name="elementName" value="UIInfo"/>
     </bean>
@@ -853,7 +831,6 @@
     <bean id="shibmd-Scope" parent="QName" c:_0-ref="shibmd_namespace" c:_1="Scope"/>
 
     <bean id="stripShibScope" parent="ElementStrippingStage"
-        p:id="stripShibScope"
         p:elementName="Scope"
         p:elementNamespace-ref="shibmd_namespace"/>
     
@@ -873,7 +850,6 @@
         Remove all ds:KeyName elements.
     -->
     <bean id="stripKeyNames" parent="ElementStrippingStage"
-        p:id="stripKeyNames"
         p:elementName="KeyName"
         p:elementNamespace-ref="ds_namespace"/>
     
@@ -1046,8 +1022,7 @@
         A pipeline stage that checks against all the common schemas, as above.
     -->
     <bean id="checkSchemas" parent="stage_parent"
-        class="net.shibboleth.metadata.dom.XMLSchemaValidationStage"
-        p:id="checkSchemas">
+        class="net.shibboleth.metadata.dom.XMLSchemaValidationStage">
         <property name="schemaResources" ref="schemaResources"/>
     </bean>
 
@@ -1058,13 +1033,7 @@
     -->
     
     <bean id="stripComments" parent="XSLTransformationStage"
-        p:id="stripComments">
-        <property name="XSLResource">
-            <bean parent="ClassPathResource">
-                <constructor-arg value="strip-comments.xsl"/>
-            </bean>
-        </property>
-    </bean>
+        p:XSLResource="classpath:strip-comments.xsl"/>
     
     <!--
         everythingSelector
@@ -1102,13 +1071,7 @@
         meaning when added by the UK federation registrar.
     -->
     <bean id="cleanImport" parent="XSLTransformationStage"
-        p:id="cleanImport">
-        <property name="XSLResource">
-            <bean parent="ClassPathResource">
-                <constructor-arg value="clean-import.xsl"/>
-            </bean>
-        </property>
-    </bean>
+        p:XSLResource="classpath:clean-import.xsl"/>
     
     <!--
         trimImportElementWhitespace
@@ -1118,8 +1081,7 @@
         but repairing the metadata on the fly is often easier than
         asking for it to be corrected at source.
     -->
-    <bean id="trimImportElementWhitespace" parent="ElementWhitespaceTrimmingStage"
-        p:id="trimImportElementWhitespace">
+    <bean id="trimImportElementWhitespace" parent="ElementWhitespaceTrimmingStage">
         <property name="elementNames">
             <set>
                 <ref bean="md-EmailAddress"/>
@@ -1143,8 +1105,7 @@
         errors.  No announcement or removal of those entities is performed here;
         that is left to the caller.
     -->
-    <bean id="standardImportActions" parent="CompositeStage"
-        p:id="standardImportActions">
+    <bean id="standardImportActions" parent="CompositeStage">
         <property name="composedStages">
             <list>
                 <ref bean="populateItemIds"/>
@@ -1155,7 +1116,7 @@
                     other than the ones we accept from partners.
                 -->
                 <bean id="whitelistImportedNamespaces" parent="NamespacesStrippingStage"
-                    p:id="whitelistImportedNamespaces" p:whitelisting="true">
+                    p:whitelisting="true">
                     <property name="namespaces">
                         <set>
                             <ref bean="alg_namespace"/>
@@ -1183,8 +1144,7 @@
                 <ref bean="checkSchemas"/>
                 <ref bean="CHECK_imported"/>
 
-                <bean parent="X509ValidationStage"
-                    p:id="checkCertificates">
+                <bean id="checkCertificates" parent="X509ValidationStage">
                     <property name="validators">
                         <list>
                             <!-- Error on RSA key length less than 2048 bits. -->
@@ -1222,8 +1182,7 @@
         are currently ending up in files, build an EntitiesDescriptor and normalise the
         namespaces in the document ready for serialisation.
     -->
-    <bean id="standardImportTail" parent="CompositeStage"
-        p:id="standardImportTail">
+    <bean id="standardImportTail" parent="CompositeStage">
         <property name="composedStages">
             <list>
                 <!-- announce and remove any entities with errors -->
