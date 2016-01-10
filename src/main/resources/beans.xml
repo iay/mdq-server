@@ -216,7 +216,8 @@
     </beans>
     <beans profile="sign">
 
-        <bean id="certificateController" class="uk.org.iay.mdq.server.CertificateController"
+        <bean id="certificateController" parent="component_parent"
+            class="uk.org.iay.mdq.server.CertificateController"
             p:certificateResource="${sign.certificate}"/>
 
         <bean id="perform.signature" parent="XMLSignatureSigningStage">

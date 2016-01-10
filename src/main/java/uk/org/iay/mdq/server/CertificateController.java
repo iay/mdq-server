@@ -20,7 +20,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import javax.annotation.concurrent.ThreadSafe;
 import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
@@ -31,11 +31,17 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.google.common.io.ByteStreams;
 
+import net.shibboleth.utilities.java.support.annotation.constraint.NonnullAfterInit;
+import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
+import net.shibboleth.utilities.java.support.component.ComponentSupport;
+import net.shibboleth.utilities.java.support.logic.Constraint;
+
 /**
  * Controller for the <code>/x-certificate</code> endpoint.
  */
+@ThreadSafe
 @RequestMapping(value = "/x-certificate", method = RequestMethod.GET)
-public class CertificateController {
+public class CertificateController extends AbstractController {
 
     /** Class logger. */
     private final Logger log = LoggerFactory.getLogger(CertificateController.class);
@@ -50,7 +56,7 @@ public class CertificateController {
      * 
      * @return {@link Resource} from which we are reading the certificate
      */
-    @Nullable public Resource getCertificateResource() {
+    @NonnullAfterInit public Resource getCertificateResource() {
         return certificateResource;
     }
 
@@ -60,7 +66,11 @@ public class CertificateController {
      * @param resource {@link Resource} from which to read the certificate.
      */
     public void setCertificateResource(@Nonnull final Resource resource) {
-        certificateResource = resource;
+        ComponentSupport.ifDestroyedThrowDestroyedComponentException(this);
+        ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
+
+        certificateResource = Constraint.isNotNull(resource,
+                "certificate resource can not be null");
     }
 
     /**
@@ -73,10 +83,22 @@ public class CertificateController {
     @RequestMapping("")
     void getCertificate(@Nonnull final HttpServletResponse response) throws Exception {
         log.debug("queried for certificate");
+
+        ComponentSupport.ifDestroyedThrowDestroyedComponentException(this);
+        ComponentSupport.ifNotInitializedThrowUninitializedComponentException(this);
+
         try (final InputStream in = certificateResource.getInputStream()) {
             final OutputStream out = response.getOutputStream();
             response.setContentType("text/plain");
             ByteStreams.copy(in, out);
+        }
+    }
+
+    @Override
+    protected void doInitialize() throws ComponentInitializationException {
+        super.doInitialize();
+        if (certificateResource == null) {
+            throw new ComponentInitializationException("certificate resource can not be null");
         }
     }
 
