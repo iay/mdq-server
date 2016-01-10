@@ -216,26 +216,15 @@
     </beans>
     <beans profile="sign">
 
-        <bean id="certificateController" class="uk.org.iay.mdq.server.CertificateController"/>
-
-        <bean id="certificateResource" parent="FileSystemResource">
-            <constructor-arg value="${sign.certificate}"/>
-        </bean>
+        <bean id="certificateController" class="uk.org.iay.mdq.server.CertificateController"
+            p:certificateResource="${sign.certificate}"/>
 
         <bean id="perform.signature" parent="XMLSignatureSigningStage">
             <property name="certificates">
-                <bean parent="X509CertificateFactoryBean">
-                    <property name="resource" ref="certificateResource"/>
-                </bean>
+                <bean parent="X509CertificateFactoryBean" p:resource="${sign.certificate}"/>
             </property>
             <property name="privateKey">
-                <bean parent="PrivateKeyFactoryBean">
-                    <property name="resource">
-                        <bean parent="FileSystemResource">
-                            <constructor-arg value="${sign.key}"/>
-                        </bean>
-                    </property>
-                </bean>
+                <bean parent="PrivateKeyFactoryBean" p:resource="${sign.key}"/>
             </property>
         </bean>
     </beans>

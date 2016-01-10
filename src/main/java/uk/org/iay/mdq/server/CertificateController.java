@@ -20,11 +20,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -43,9 +43,26 @@ public class CertificateController {
     /**
      * {@link Resource} from which we read the certificate.
      */
-    @Autowired
     private Resource certificateResource;
     
+    /**
+     * Gets the {@link Resource} from which we are reading the certificate.
+     * 
+     * @return {@link Resource} from which we are reading the certificate
+     */
+    @Nullable public Resource getCertificateResource() {
+        return certificateResource;
+    }
+
+    /**
+     * Sets the {@link Resource} from which to read the certificate.
+     * 
+     * @param resource {@link Resource} from which to read the certificate.
+     */
+    public void setCertificateResource(@Nonnull final Resource resource) {
+        certificateResource = resource;
+    }
+
     /**
      * Returns the certificate being used for signing responses.
      * 

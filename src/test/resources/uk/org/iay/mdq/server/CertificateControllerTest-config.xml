@@ -15,8 +15,7 @@
     <mvc:annotation-driven/>
     <mvc:default-servlet-handler/>
     
-    <bean id="certificateController" class="uk.org.iay.mdq.server.CertificateController"/>
-    <bean id="certificateResource" class="org.springframework.core.io.ClassPathResource"
-        c:path="/uk/org/iay/mdq/server/CertificateControllerTest-cert.pem"/>
+    <bean id="certificateController" class="uk.org.iay.mdq.server.CertificateController"
+        p:certificateResource="classpath:uk/org/iay/mdq/server/CertificateControllerTest-cert.pem"/>
     
 </beans>
