@@ -73,10 +73,11 @@ public class CertificateController {
     @RequestMapping("")
     void getCertificate(@Nonnull final HttpServletResponse response) throws Exception {
         log.debug("queried for certificate");
-        final InputStream in = certificateResource.getInputStream();
-        final OutputStream out = response.getOutputStream();
-        response.setContentType("text/plain");
-        ByteStreams.copy(in, out);
+        try (final InputStream in = certificateResource.getInputStream()) {
+            final OutputStream out = response.getOutputStream();
+            response.setContentType("text/plain");
+            ByteStreams.copy(in, out);
+        }
     }
 
 }
