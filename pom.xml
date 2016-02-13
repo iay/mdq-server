@@ -347,6 +347,14 @@
     </developers>
 
     <distributionManagement>
+        <repository>
+            <id>iay-release</id>
+            <url>https://apps.iay.org.uk/nexus/content/repositories/releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>iay-snapshot</id>
+            <url>https://apps.iay.org.uk/nexus/content/repositories/snapshots</url>
+        </snapshotRepository>
         <site>
             <id>website</id>
             <url>scpexe://iay@iay.org.uk/home/iay/mdq-server.projects.iay.org.uk/</url>
