@@ -298,7 +298,7 @@
                 <spring.profiles.active>dev</spring.profiles.active>
             </properties>
         </profile>
-        
+
         <profile>
             <id>prod</id>
             <properties>
@@ -322,6 +322,13 @@
                 <enabled>false</enabled>
             </releases>
         </repository>
+        <repository>
+            <id>iay-thirdparty</id>
+            <url>https://apps.iay.org.uk/nexus/content/repositories/thirdparty</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
     </repositories>
 
     <scm>
@@ -329,7 +336,7 @@
         <developerConnection>scm:git:ssh:git@github.com:iay/mdq-server.git</developerConnection>
         <url>https://github.com/iay/mdq-server</url>
     </scm>
-    
+
     <developers>
         <developer>
             <id>iay</id>
