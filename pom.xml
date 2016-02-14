@@ -323,8 +323,8 @@
             </releases>
         </repository>
         <repository>
-            <id>iay-thirdparty</id>
-            <url>https://apps.iay.org.uk/nexus/content/repositories/thirdparty</url>
+            <id>ukf</id>
+            <url>https://apps.iay.org.uk/nexus/content/repositories/ukf</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
