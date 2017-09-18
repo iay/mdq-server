@@ -27,8 +27,8 @@
         <ukf-mda.version>0.9.4</ukf-mda.version>
         <java-support.version>7.3.0</java-support.version>
         <spring-extensions.version>5.3.0</spring-extensions.version>
-        <spring.version>4.3.7.RELEASE</spring.version>
-        <spring.boot.version>1.5.2.RELEASE</spring.boot.version>
+        <spring.version>4.3.10.RELEASE</spring.version>
+        <spring.boot.version>1.5.7.RELEASE</spring.boot.version>
 
         <checkstyle.configLocation>checkstyle.xml</checkstyle.configLocation>
         <start-class>uk.org.iay.mdq.server.Application</start-class>
