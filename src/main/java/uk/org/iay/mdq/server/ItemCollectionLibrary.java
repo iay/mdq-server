@@ -197,7 +197,7 @@ public class ItemCollectionLibrary<T> extends AbstractIdentifiableInitializableC
         for (final Item<T> item : items) {
             // process the item's unique identifiers
             final List<ItemId> uniqueIds = item.getItemMetadata().get(ItemId.class);
-            final List<String> ids = new ArrayList<String>();
+            final List<String> ids = new ArrayList<>();
             for (final ItemId uniqueId : uniqueIds) {
                 ids.add(uniqueId.getId());
             }

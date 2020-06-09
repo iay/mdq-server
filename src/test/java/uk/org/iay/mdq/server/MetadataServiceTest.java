@@ -43,7 +43,7 @@ public class MetadataServiceTest {
         service.setId("test");
         service.setItemCollectionLibrary(icl);
         service.setRenderPipeline(new SimplePipeline<String>());
-        service.setSerializer(new SimpleItemCollectionSerializer<String>(new ItemSerializer<String>(){
+        service.setSerializer(new SimpleItemCollectionSerializer<>(new ItemSerializer<String>(){
             public void serialize(Item<String> item, OutputStream output) {
                 try {
                     output.write(item.unwrap().getBytes());
