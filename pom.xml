@@ -11,7 +11,7 @@
 
     <groupId>uk.org.iay.mdq</groupId>
     <artifactId>mdq-server</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Metadata Query Server</name>
