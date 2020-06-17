@@ -238,7 +238,7 @@ public class ItemCollectionLibrary<T> extends AbstractIdentifiableInitializableC
         }
         
         // add in the "all entities" collection
-        newIdentifiedItemCollections.put(ID_ALL, new IdentifiedItemCollection(items, ID_ALL, generation));
+        newIdentifiedItemCollections.put(ID_ALL, new IdentifiedItemCollection<>(items, ID_ALL, generation));
         log.debug("total identifiers: {}", newIdentifiedItemCollections.size());
         
         return newIdentifiedItemCollections;

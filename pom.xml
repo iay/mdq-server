@@ -6,7 +6,7 @@
     <parent>
         <groupId>net.shibboleth</groupId>
         <artifactId>parent</artifactId>
-        <version>7.11.1-SNAPSHOT</version>
+        <version>11.1.0-SNAPSHOT</version>
     </parent>
 
     <groupId>uk.org.iay.mdq</groupId>
@@ -27,8 +27,7 @@
         <ukf-mda.version>0.9.4</ukf-mda.version>
         <java-support.version>7.3.0</java-support.version>
         <spring-extensions.version>5.3.0</spring-extensions.version>
-        <spring.version>4.3.10.RELEASE</spring.version>
-        <spring.boot.version>1.5.22.RELEASE</spring.boot.version>
+        <spring.boot.version>2.3.1.RELEASE</spring.boot.version>
 
         <checkstyle.configLocation>checkstyle.xml</checkstyle.configLocation>
         <start-class>uk.org.iay.mdq.server.Application</start-class>
@@ -65,7 +64,6 @@
         <dependency>
             <groupId>javax.annotation</groupId>
             <artifactId>javax.annotation-api</artifactId>
-            <version>1.2</version>
         </dependency>
         <dependency>
             <groupId>javax.json</groupId>
@@ -118,11 +116,12 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
-            <!--
-                Override version from parent project for
-                Jetty 9 and Spring Boot 1.2.
-            -->
-            <version>3.1.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <!-- Constants referenced by Spring Health class. -->
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
             <scope>provided</scope>
         </dependency>
 
@@ -146,7 +145,7 @@
         </dependency>
         <dependency>
             <groupId>org.glassfish</groupId>
-            <artifactId>javax.json</artifactId>
+            <artifactId>jakarta.json</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -203,12 +202,17 @@
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
+            <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>${spring.groupId}</groupId>
             <artifactId>spring-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest</artifactId>
             <scope>test</scope>
         </dependency>
 
@@ -340,7 +344,7 @@
         <developer>
             <id>iay</id>
             <name>Ian Young</name>
-            <organizationUrl>http://iay.org.uk/</organizationUrl>
+            <organizationUrl>https://iay.org.uk/</organizationUrl>
             <timezone>0</timezone>
         </developer>
     </developers>
