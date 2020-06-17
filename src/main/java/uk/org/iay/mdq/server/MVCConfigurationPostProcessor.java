@@ -26,13 +26,20 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
  * This means you can't use URL-encoded "/" characters (%2f) within
  * identifiers.
  * 
- * See, for example, https://jira.springsource.org/browse/SPR-11101
+ * <p>
+ * See, for example, <a href="https://jira.springsource.org/browse/SPR-11101">
+ * SPR-11101</a>.
+ * </p>
  * 
+ * <p>
  * To fix this, poke the bean responsible until it does what we want.
  * Fortunately, the implementation looks at the appropriate properties
  * on every request so we can do this even after the application has started.
+ * </p>
  *
- * Originally from <a href="https://gist.github.com/MikeN123/8873622"/>.
+ * <p>
+ * Originally from <a href="https://gist.github.com/MikeN123/8873622">this Gist</a>.
+ * </p>
  */
 public class MVCConfigurationPostProcessor implements BeanPostProcessor, PriorityOrdered {
  
