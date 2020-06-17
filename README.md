@@ -10,6 +10,8 @@ technology.
 The intention is to help debug the MDQ specification during its development, but as much as makes sense of
 the software developed here will be contributed to the main line Shibboleth MDA codebase once mature.
 
+![Continuous Integration](https://github.com/iay/mdq-server/workflows/Continuous%20Integration/badge.svg)
+
 ## Copyright and License
 
 The entire package is Copyright (C) 2014, Ian A. Young.
