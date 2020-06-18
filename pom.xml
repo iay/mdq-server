@@ -265,6 +265,9 @@
                     <arguments>
                         <argument>--spring.profiles.active=${spring.profiles.active}</argument>
                     </arguments>
+                    <layers>
+                        <enabled>true</enabled>
+                    </layers>
                 </configuration>
                 <executions>
                     <execution>
