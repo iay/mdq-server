@@ -336,6 +336,13 @@
                 <enabled>true</enabled>
             </releases>
         </repository>
+        <repository>
+            <id>ukf-snapshots</id>
+            <url>https://apps.iay.org.uk/nexus/content/repositories/ukf-snapshots</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
     </repositories>
 
     <scm>
