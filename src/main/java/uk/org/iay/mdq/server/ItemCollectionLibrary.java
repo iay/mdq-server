@@ -16,6 +16,8 @@
 
 package uk.org.iay.mdq.server;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -29,8 +31,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.annotation.Nonnull;
 
-import org.joda.time.Instant;
-import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.actuate.health.Health;
@@ -41,12 +41,12 @@ import net.shibboleth.metadata.ItemId;
 import net.shibboleth.metadata.ItemTag;
 import net.shibboleth.metadata.pipeline.Pipeline;
 import net.shibboleth.metadata.pipeline.PipelineProcessingException;
-import net.shibboleth.utilities.java.support.annotation.Duration;
 import net.shibboleth.utilities.java.support.annotation.constraint.NonNegative;
 import net.shibboleth.utilities.java.support.component.AbstractIdentifiableInitializableComponent;
 import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
 import net.shibboleth.utilities.java.support.component.ComponentSupport;
 import net.shibboleth.utilities.java.support.logic.Constraint;
+import net.shibboleth.utilities.java.support.logic.ConstraintViolationException;
 
 /**
  * Sources metadata from a {@link Pipeline} and allows lookup on the results.
@@ -109,12 +109,12 @@ public class ItemCollectionLibrary<T> extends AbstractIdentifiableInitializableC
     private final Semaphore refreshSemaphore = new Semaphore(1);
 
     /**
-     * Refresh interval for the metadata source, in milliseconds.
+     * Refresh interval for the metadata source.
      * 
-     * Set to 0 (default) to disable refresh after the initial fetch.
+     * Set to {@link Duration#ZERO} (default) to disable refresh after the initial fetch.
      */
-    @NonNegative @Duration
-    private long refreshInterval;
+    @Nonnull @NonNegative
+    private Duration refreshInterval = Duration.ZERO;
     
     /**
      * Executor on which to schedule metadata source refreshes.
@@ -122,24 +122,27 @@ public class ItemCollectionLibrary<T> extends AbstractIdentifiableInitializableC
     private ScheduledThreadPoolExecutor executor;
     
     /**
-     * Gets the metadata source refresh interval, in milliseconds.
+     * Gets the metadata source refresh interval.
      * 
      * @return the metadata source refresh interval.
      */
-    public long getRefreshInterval() {
+    @Nonnull @NonNegative public Duration getRefreshInterval() {
         return refreshInterval;
     }
     
     /**
-     * Sets the metadata source refresh interval, in milliseconds.
+     * Sets the metadata source refresh interval.
      * 
      * @param refresh the metadata source refresh interval
      */
-    public void setRefreshInterval(@NonNegative @Duration final long refresh) {
+    public void setRefreshInterval(@Nonnull @NonNegative final Duration refresh) {
         ComponentSupport.ifDestroyedThrowDestroyedComponentException(this);
         ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
 
-        refreshInterval = Constraint.isGreaterThanOrEqual(0, refresh, "refresh interval must not be negative");
+        if (refresh.isNegative()) {
+            throw new ConstraintViolationException("refresh interval must not be negative");
+        }
+        refreshInterval = refresh;
     }    
     
     /**
@@ -270,7 +273,7 @@ public class ItemCollectionLibrary<T> extends AbstractIdentifiableInitializableC
         itemCollectionLock.writeLock().lock();
         try {
             identifiedItemCollections = newIdentifiedItemCollections;
-            lastRefreshed = new Instant();
+            lastRefreshed = Instant.now();
         } finally {
             itemCollectionLock.writeLock().unlock();
         }
@@ -306,7 +309,7 @@ public class ItemCollectionLibrary<T> extends AbstractIdentifiableInitializableC
      * Estimate when the next refresh is expected to occur.
      */
     private void computeNextRefresh() {
-        final Instant next = new Instant().plus(refreshInterval);
+        final Instant next = Instant.now().plus(refreshInterval);
         itemCollectionLock.writeLock().lock();
         try {
             nextRefresh = next;
@@ -331,7 +334,7 @@ public class ItemCollectionLibrary<T> extends AbstractIdentifiableInitializableC
         refresh();        
 
         // Schedule regular metadata refresh if enabled.
-        if (refreshInterval != 0) {
+        if (!refreshInterval.isZero()) {
             executor = new ScheduledThreadPoolExecutor(1);
             executor.scheduleWithFixedDelay(
                     new Runnable() {
@@ -346,7 +349,7 @@ public class ItemCollectionLibrary<T> extends AbstractIdentifiableInitializableC
                         }
                         
                     },
-                    refreshInterval, refreshInterval, TimeUnit.MILLISECONDS);
+                    refreshInterval.toMillis(), refreshInterval.toMillis(), TimeUnit.MILLISECONDS);
             computeNextRefresh();
         }
     }
@@ -382,8 +385,7 @@ public class ItemCollectionLibrary<T> extends AbstractIdentifiableInitializableC
 
         itemCollectionLock.readLock().lock();
         try {
-            final Instant now = new Instant();
-            final Period age = new Period(lastRefreshed, now);
+            final var age = Duration.between(lastRefreshed, Instant.now());
 
             builder.up();
             builder.withDetail("generation", generation);
@@ -391,14 +393,15 @@ public class ItemCollectionLibrary<T> extends AbstractIdentifiableInitializableC
             builder.withDetail("lastRefreshed", lastRefreshed.toString());
             builder.withDetail("age", age.toString());
             
-            if (refreshInterval != 0) {
+            if (!refreshInterval.isZero()) {
                 builder.withDetail("nextRefresh", nextRefresh.toString());
 
                 /*
                  * Work out whether a refresh has succeeded recently, or if we're running
                  * in a degraded mode with out-of-date collections.
                  */
-                if (age.getMillis() > 2*refreshInterval) {
+                final var ageThreshold = refreshInterval.multipliedBy(2);
+                if (age.compareTo(ageThreshold) > 0) {
                     builder.status("DEGRADED");
                 }
             }

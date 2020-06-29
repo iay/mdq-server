@@ -1,6 +1,7 @@
 
 package uk.org.iay.mdq.server;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -9,7 +10,7 @@ import net.shibboleth.metadata.Item;
 import net.shibboleth.metadata.ItemId;
 import net.shibboleth.metadata.ItemTag;
 import net.shibboleth.metadata.MockItem;
-import net.shibboleth.metadata.pipeline.BaseStage;
+import net.shibboleth.metadata.pipeline.AbstractStage;
 import net.shibboleth.metadata.pipeline.SimplePipeline;
 import net.shibboleth.metadata.pipeline.Stage;
 import net.shibboleth.metadata.pipeline.StageProcessingException;
@@ -148,7 +149,7 @@ public class ItemCollectionLibraryTest {
      *
      * @param <T> type of item to operate on
      */
-    static class NPEAfterNStage<T> extends BaseStage<T> implements Stage<T> {
+    static class NPEAfterNStage<T> extends AbstractStage<T> implements Stage<T> {
 
         private long count;
         
@@ -167,7 +168,7 @@ public class ItemCollectionLibraryTest {
     
     @Test
     public void testHealthRefreshing() throws Exception {
-        final long refreshInterval = 100; // 1/10 second
+        final Duration refreshInterval = Duration.ofMillis(100); // 1/10 second
 
         final Item<String> item1 = new MockItem("item1");
         item1.getItemMetadata().put(new ItemId("item1"));
@@ -200,9 +201,9 @@ public class ItemCollectionLibraryTest {
         Assert.assertEquals(library.health().getStatus(), Status.DOWN);
         library.initialize();
         Assert.assertEquals(library.health().getStatus(), Status.UP);
-        Thread.sleep(refreshInterval);
+        Thread.sleep(refreshInterval.toMillis());
         Assert.assertEquals(library.health().getStatus(), Status.UP);
-        Thread.sleep(3 * refreshInterval);
+        Thread.sleep(3 * refreshInterval.toMillis());
         Assert.assertEquals(library.health().getStatus(), new Status("DEGRADED"));
         
         library.destroy();

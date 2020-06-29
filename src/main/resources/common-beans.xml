@@ -20,6 +20,16 @@
     <context:property-placeholder/>
 
     <!--
+        Pick up Shibboleth MDA beans.
+    -->
+    <import resource="classpath:net/shibboleth/metadata/beans.xml"/>
+        
+    <!--
+        Pick up UK federation MDA beans.
+    -->
+    <import resource="classpath:uk/org/ukfederation/mda/beans.xml"/>
+    
+    <!--
         ***********************************
         ***                             ***
         ***   P A R E N T   B E A N S   ***
@@ -303,9 +313,6 @@
 
     <bean id="EntityAttributeAddingStage" abstract="true" parent="stage_parent"
         class="uk.org.ukfederation.mda.dom.saml.mdattr.EntityAttributeAddingStage"/>
-
-    <bean id="SAMLStringElementCheckingStage" abstract="true" parent="stage_parent"
-        class="uk.org.ukfederation.mda.dom.saml.SAMLStringElementCheckingStage"/>
 
     <bean id="X509ConsistentNameValidator" abstract="true" parent="validator_parent"
         class="uk.org.ukfederation.mda.validate.X509ConsistentNameValidator"/>

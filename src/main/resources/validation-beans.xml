@@ -263,8 +263,7 @@
         
         Checks for the mdui:IPHint element.
     -->
-    <bean id="check_mdui_iphint" parent="stage_parent"
-        class="uk.org.ukfederation.mda.validate.mdui.IPHintValidationStage"
+    <bean id="check_mdui_iphint" parent="mda.IPHintValidationStage"
         p:checkingNetworks="true"/>
     
     <!--
@@ -376,7 +375,7 @@
     <!--
         check_saml_strings
     -->
-    <bean id="check_saml_strings" parent="SAMLStringElementCheckingStage">
+    <bean id="check_saml_strings" parent="mda.SAMLStringElementCheckingStage">
         <property name="elementNames">
             <set>
                 <ref bean="md-Company"/>
