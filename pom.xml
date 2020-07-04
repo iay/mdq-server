@@ -31,7 +31,7 @@
 
         <image.library>ianayoung</image.library>
         <image.name>${project.artifactId}</image.name>
-        <image.tag>${project.version}</image.tag>
+        <image.tag>latest</image.tag>
 
         <checkstyle.configLocation>checkstyle.xml</checkstyle.configLocation>
         <start-class>uk.org.iay.mdq.server.Application</start-class>
