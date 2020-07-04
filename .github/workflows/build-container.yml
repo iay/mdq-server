@@ -1,0 +1,42 @@
+#
+# Container build workflow.
+#
+# Every time something is pushed to the "master" branch, run tests and
+# build a container image. Push the container image to Docker Hub.
+#
+name: Build Container
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+
+  build-container:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - uses: actions/checkout@v2
+
+    - name: Setup Java JDK
+      uses: actions/setup-java@v1.3.0
+      with:
+        java-version: 11
+
+    - uses: actions/cache@v2
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+
+    - name: Test, then build container
+      run: mvn -B -Prelease clean verify spring-boot:build-image
+
+    - name: log in to Docker Hub
+      run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: push to Docker Hub
+      run: docker push ianayoung/mdq-server:latest
