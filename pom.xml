@@ -29,6 +29,10 @@
         <spring-extensions.version>6.0.0</spring-extensions.version>
         <spring.boot.version>2.3.1.RELEASE</spring.boot.version>
 
+        <image.library>ianayoung</image.library>
+        <image.name>${project.artifactId}</image.name>
+        <image.tag>${project.version}</image.tag>
+
         <checkstyle.configLocation>checkstyle.xml</checkstyle.configLocation>
         <start-class>uk.org.iay.mdq.server.Application</start-class>
     </properties>
@@ -264,6 +268,9 @@
                     <layers>
                         <enabled>true</enabled>
                     </layers>
+                    <image>
+                        <name>${image.library}/${image.name}:${image.tag}</name>
+                    </image>
                 </configuration>
                 <executions>
                     <execution>
