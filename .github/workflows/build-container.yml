@@ -1,14 +1,14 @@
 #
 # Container build workflow.
 #
-# Every time something is pushed to the "master" branch, run tests and
+# Every time something is pushed to the "main" branch, run tests and
 # build a container image. Push the container image to Docker Hub.
 #
 name: Build Container
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
 
