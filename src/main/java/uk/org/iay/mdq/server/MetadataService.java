@@ -21,12 +21,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.shibboleth.metadata.Item;
 import net.shibboleth.metadata.ItemCollectionSerializer;
@@ -36,9 +40,6 @@ import net.shibboleth.utilities.java.support.component.AbstractIdentifiableIniti
 import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
 import net.shibboleth.utilities.java.support.component.ComponentSupport;
 import net.shibboleth.utilities.java.support.logic.Constraint;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Sources metadata from an {@link ItemCollectionLibrary} and allows lookup on the results.
@@ -216,8 +217,8 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
      * 
      * @return cloned {@link Collection} of {@link Item}s
      */
-    private Collection<Item<T>> cloneItemCollection(@Nonnull final Collection<Item<T>> collection) {
-        final Collection<Item<T>> newItems = new ArrayList<>();
+    private List<Item<T>> cloneItemCollection(@Nonnull final List<Item<T>> collection) {
+        final List<Item<T>> newItems = new ArrayList<>();
         for (Item<T> item : collection) {
             newItems.add(item.copy());
         }
@@ -231,7 +232,7 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
      * 
      * @return rendered query result
      */
-    private byte[] renderCollection(@Nonnull final Collection<Item<T>> items) {
+    private byte[] renderCollection(@Nonnull final List<Item<T>> items) {
         try {
             log.debug("rendering collection of {} elements", items.size());
             renderPipeline.execute(items);

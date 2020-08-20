@@ -19,7 +19,6 @@ package uk.org.iay.mdq.server;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -190,7 +189,7 @@ public class ItemCollectionLibrary<T> extends AbstractIdentifiableInitializableC
      * @return collection of identified item collections
      */
     @Nonnull
-    private Map<String, IdentifiedItemCollection<T>> indexItems(final Collection<Item<T>> items) {
+    private Map<String, IdentifiedItemCollection<T>> indexItems(final List<Item<T>> items) {
         // all identified collections by name
         final Map<String, IdentifiedItemCollection<T>> newIdentifiedItemCollections = new HashMap<>();
         
@@ -256,7 +255,7 @@ public class ItemCollectionLibrary<T> extends AbstractIdentifiableInitializableC
         generation++;
 
         // acquire the items to store
-        final Collection<Item<T>> newItemCollection = new ArrayList<>();
+        final List<Item<T>> newItemCollection = new ArrayList<>();
         log.debug("executing source pipeline");
         try {
             sourcePipeline.execute(newItemCollection);

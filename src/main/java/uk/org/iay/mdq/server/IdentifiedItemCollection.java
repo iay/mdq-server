@@ -19,6 +19,7 @@ package uk.org.iay.mdq.server;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -26,8 +27,8 @@ import javax.annotation.Nullable;
 import net.shibboleth.metadata.Item;
 
 /**
- * Class representing a {@link Collection} of {@link Item}s
- * associated with a {@link Collection} of identifiers.
+ * Class representing a {@link List} of {@link Item}s
+ * associated with a collection of identifiers.
  * 
  * The {@link #generation} is used as part of the cacheing strategy
  * used with this class. Each {@link IdentifiedItemCollection}
@@ -42,7 +43,7 @@ class IdentifiedItemCollection<T> {
     
     /** The {@link Collection} of {@link Item}s. */
     @Nonnull
-    private final Collection<Item<T>> items;
+    private final List<Item<T>> items;
     
     /** The identifiers associated with the item collection. */
     @Nonnull
@@ -74,7 +75,7 @@ class IdentifiedItemCollection<T> {
      * @param key identifier for the item collection.
      * @param gen source generation corresponding to this instance
      */
-    protected IdentifiedItemCollection(@Nonnull final Collection<Item<T>> collection,
+    protected IdentifiedItemCollection(@Nonnull final List<Item<T>> collection,
             @Nullable final String key, final long gen) {
         this(collection, Collections.singletonList(key), gen);
     }
@@ -86,7 +87,7 @@ class IdentifiedItemCollection<T> {
      * @param keys identifiers to be associated with the item collection
      * @param gen source generation corresponding to this instance
      */
-    protected IdentifiedItemCollection(@Nonnull final Collection<Item<T>> collection,
+    protected IdentifiedItemCollection(@Nonnull final List<Item<T>> collection,
             @Nonnull final Collection<String> keys, final long gen) {
         items = collection;
         identifiers = new ArrayList<>(keys);
@@ -99,7 +100,7 @@ class IdentifiedItemCollection<T> {
      * @return {@link Collection} of {@link Item}s.
      */
     @Nonnull
-    public Collection<Item<T>> getItems() {
+    public List<Item<T>> getItems() {
         return items;
     }
 

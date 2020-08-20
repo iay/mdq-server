@@ -3,8 +3,11 @@ package uk.org.iay.mdq.server;
 
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+
+import org.springframework.boot.actuate.health.Status;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 import net.shibboleth.metadata.Item;
 import net.shibboleth.metadata.ItemId;
@@ -15,10 +18,6 @@ import net.shibboleth.metadata.pipeline.SimplePipeline;
 import net.shibboleth.metadata.pipeline.Stage;
 import net.shibboleth.metadata.pipeline.StageProcessingException;
 import net.shibboleth.metadata.pipeline.StaticItemSourceStage;
-
-import org.springframework.boot.actuate.health.Status;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class ItemCollectionLibraryTest {
 
@@ -154,7 +153,7 @@ public class ItemCollectionLibraryTest {
         private long count;
         
         @Override
-        protected void doExecute(Collection<Item<T>> itemCollection) throws StageProcessingException {
+        protected void doExecute(List<Item<T>> itemCollection) throws StageProcessingException {
             if (count ==0) {
                 throw new NullPointerException("synthetic NPE");
             }
