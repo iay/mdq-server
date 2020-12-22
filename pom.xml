@@ -6,7 +6,7 @@
     <parent>
         <groupId>net.shibboleth</groupId>
         <artifactId>parent</artifactId>
-        <version>11.1.0-SNAPSHOT</version>
+        <version>11.2.0-SNAPSHOT</version>
     </parent>
 
     <groupId>uk.org.iay.mdq</groupId>
@@ -23,6 +23,8 @@
     <inceptionYear>2014</inceptionYear>
 
     <properties>
+	<maven.compiler.source>1.11</maven.compiler.source>
+	<maven.compiler.target>1.11</maven.compiler.target>
         <mda.version>0.10.0-SNAPSHOT</mda.version>
         <ukf-mda.version>0.10.0-SNAPSHOT</ukf-mda.version>
         <java-support.version>8.0.0</java-support.version>
