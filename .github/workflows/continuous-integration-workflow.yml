@@ -8,6 +8,12 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  #
+  # Run every Saturday whether there have been changes or not.
+  # Hopefully this will keep us in sync with upstream changes.
+  #
+  schedule:
+    - cron: '17 8 * * SAT'
 
 jobs:
   build:
