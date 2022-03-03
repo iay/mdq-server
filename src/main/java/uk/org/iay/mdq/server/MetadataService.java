@@ -53,17 +53,23 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
      */
     public class ServiceResult implements Result {
 
-        /** The default, uncompressed {@link Representation} for the {@link Result}. */
-        @Nonnull
+        /**
+         * The default, uncompressed {@link Representation} for the {@link Result}.
+         *
+         * <p><code>null</code> is used if no results were found.</p>
+         */
+        @Nullable
         private final Representation representation;
 
         /** Other compressed {@link Representation}s, generated on demand. */
+        @Nonnull
         private final Map<String, Representation> representations = new HashMap<>();
         
         /**
          * The identifiers which can be used to retrieve this {@link Result}.
          * <code>null</code> will be used for the "not found" and "all entities" results.
          */
+        @Nullable
         private final Collection<String> identifiers;
         
         /** Source generation for this rendered result. */
