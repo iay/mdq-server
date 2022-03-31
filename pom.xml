@@ -6,7 +6,7 @@
     <parent>
         <groupId>net.shibboleth</groupId>
         <artifactId>parent</artifactId>
-        <version>11.2.2-SNAPSHOT</version>
+        <version>11.3.0-SNAPSHOT</version>
     </parent>
 
     <groupId>uk.org.iay.mdq</groupId>
@@ -27,7 +27,7 @@
         <ukf-mda.version>0.10.0-SNAPSHOT</ukf-mda.version>
         <java-support.version>8.2.0</java-support.version>
         <spring-extensions.version>6.1.0</spring-extensions.version>
-        <spring.boot.version>2.6.4</spring.boot.version>
+        <spring.boot.version>2.6.6</spring.boot.version>
 
         <image.library>ianayoung</image.library>
         <image.name>${project.artifactId}</image.name>
