@@ -279,6 +279,11 @@
                     </layers>
                     <image>
                         <name>${image.library}/${image.name}:${image.tag}</name>
+                        <buildpacks>
+                            <buildpack>paketo-buildpacks/ca-certificates</buildpack>
+                            <buildpack>gcr.io/paketo-buildpacks/amazon-corretto</buildpack>
+                            <buildpack>paketo-buildpacks/java</buildpack>
+                        </buildpacks>
                     </image>
                 </configuration>
                 <executions>
