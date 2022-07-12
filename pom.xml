@@ -6,7 +6,7 @@
     <parent>
         <groupId>net.shibboleth</groupId>
         <artifactId>parent</artifactId>
-        <version>11.3.2</version>
+        <version>11.3.3</version>
     </parent>
 
     <groupId>uk.org.iay.mdq</groupId>
@@ -27,7 +27,8 @@
         <ukf-mda.version>0.10.0-SNAPSHOT</ukf-mda.version>
         <java-support.version>8.3.1</java-support.version>
         <spring-extensions.version>6.2.0</spring-extensions.version>
-        <spring.boot.version>2.6.7</spring.boot.version>
+        <spring.boot.version>2.7.1</spring.boot.version>
+        <jetty.version>10.0.6</jetty.version>
 
         <image.library>ianayoung</image.library>
         <image.name>${project.artifactId}</image.name>
@@ -181,6 +182,14 @@
                     <groupId>org.eclipse.jetty.orbit</groupId>
                     <artifactId>javax.servlet</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.eclipse.jetty.websocket</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
             </exclusions>
             <scope>runtime</scope>
         </dependency>
@@ -197,6 +206,18 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-properties-migrator</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-servlets</artifactId>
+            <version>${jetty.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-webapp</artifactId>
+            <version>${jetty.version}</version>
             <scope>runtime</scope>
         </dependency>
 
@@ -241,6 +262,50 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-http</artifactId>
+                <version>${jetty.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-io</artifactId>
+                <version>${jetty.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-security</artifactId>
+                <version>${jetty.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-server</artifactId>
+                <version>${jetty.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-servlet</artifactId>
+                <version>${jetty.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-util</artifactId>
+                <version>${jetty.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-xml</artifactId>
+                <version>${jetty.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
