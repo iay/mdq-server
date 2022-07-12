@@ -28,7 +28,7 @@
         <java-support.version>8.3.1</java-support.version>
         <spring-extensions.version>6.2.0</spring-extensions.version>
         <spring.boot.version>2.7.1</spring.boot.version>
-        <jetty.version>10.0.6</jetty.version>
+        <jetty.version>10.0.11</jetty.version>
 
         <image.library>ianayoung</image.library>
         <image.name>${project.artifactId}</image.name>
