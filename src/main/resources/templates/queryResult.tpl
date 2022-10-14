@@ -15,8 +15,8 @@ html {
         } else {
             h2('Result Returned')
             Collection<String> ids = result.getIdentifiers();
-            p("Identifiers: ${ids.size}");
-            if (ids.size != 0) {
+            p("Identifiers: ${ids.size()}");
+            if (ids.size() != 0) {
                 ul {
                    for (id in ids) {
                        if (id == null) {
