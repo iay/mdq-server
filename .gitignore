@@ -2,3 +2,6 @@ target/
 test-output/
 signing.key
 signing.crt
+.project
+.classpath
+.settings/
