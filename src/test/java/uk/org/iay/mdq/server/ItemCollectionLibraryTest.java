@@ -148,7 +148,7 @@ public class ItemCollectionLibraryTest {
      *
      * @param <T> type of item to operate on
      */
-    static class NPEAfterNStage<T> extends AbstractStage<T> implements Stage<T> {
+    static class NPEAfterNStage<T> extends AbstractStage<T> {
 
         private long count;
         
