@@ -5,6 +5,6 @@
 # Note that I use `ianayoung` on Docker Hub.
 #
 docker buildx build \
-    --tag ianayoung/mdq-server:latest \
+    --tag iay/mdq-server:latest \
     --output=type=docker \
     .
