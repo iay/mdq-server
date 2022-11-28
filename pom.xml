@@ -336,8 +336,7 @@
             </plugin>
 
             <!--
-                Ask Spring Boot to enhance the resulting .jar so that it is
-                directly executable.
+                Build a directly executable, layered JAR.
             -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -350,14 +349,6 @@
                     <layers>
                         <enabled>true</enabled>
                     </layers>
-                    <image>
-                        <name>${image.library}/${image.name}:${image.tag}</name>
-                        <buildpacks>
-                            <buildpack>paketo-buildpacks/ca-certificates</buildpack>
-                            <buildpack>gcr.io/paketo-buildpacks/amazon-corretto</buildpack>
-                            <buildpack>paketo-buildpacks/java</buildpack>
-                        </buildpacks>
-                    </image>
                 </configuration>
                 <executions>
                     <execution>

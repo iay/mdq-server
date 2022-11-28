@@ -8,36 +8,45 @@ name: Build Container
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
 
   build-container:
-
     runs-on: ubuntu-latest
-
     steps:
 
-    - uses: actions/checkout@v3
+    - name: Checkout
+      uses: actions/checkout@v3
 
-    - name: Setup Java JDK
-      uses: actions/setup-java@v1.4.3
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v2
       with:
-        java-version: 17
+        platforms: arm64
 
-    - uses: actions/cache@v2
+    - name: Set up Docker Buildx
+      id: buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Inspect builder
+      run: |
+        echo "Name:      ${{ steps.buildx.outputs.name }}"
+        echo "Endpoint:  ${{ steps.buildx.outputs.endpoint }}"
+        echo "Status:    ${{ steps.buildx.outputs.status }}"
+        echo "Flags:     ${{ steps.buildx.outputs.flags }}"
+        echo "Platforms: ${{ steps.buildx.outputs.platforms }}"
+
+    - name: Login to DockerHub
+      uses: docker/login-action@v2
       with:
-        path: ~/.m2/repository
-        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-        restore-keys: |
-          ${{ runner.os }}-maven-
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    - name: Test, then build container
-      run: mvn -B -Prelease clean verify spring-boot:build-image
-
-    - name: log in to Docker Hub
-      run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-
-    - name: push to Docker Hub
-      run: docker push ianayoung/mdq-server:latest
+    - name: Build and push
+      run: |
+        docker buildx build --platform=linux/amd64,linux/arm64 \
+          --push \
+          --tag ${{ secrets.DOCKERHUB_USERNAME }}/mdq-server:latest \
+          .

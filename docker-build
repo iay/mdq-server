@@ -1,0 +1,10 @@
+#!/bin/bash
+#
+# Build the image into the local image list under the iay namespace.
+#
+# Note that I use `ianayoung` on Docker Hub.
+#
+docker buildx build \
+    --tag ianayoung/mdq-server:latest \
+    --output=type=docker \
+    .
