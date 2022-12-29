@@ -28,7 +28,7 @@
         <java-support.version>8.3.1</java-support.version>
         <spring-extensions.version>6.2.0</spring-extensions.version>
         <spring.boot.version>2.7.6</spring.boot.version>
-        <jetty.version>10.0.12</jetty.version>
+        <jetty.version>10.0.13</jetty.version>
 
         <slf4j.version>1.7.36</slf4j.version>
         <logback.version>1.2.11</logback.version>
