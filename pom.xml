@@ -6,7 +6,7 @@
     <parent>
         <groupId>net.shibboleth</groupId>
         <artifactId>parent</artifactId>
-        <version>11.3.5-SNAPSHOT</version>
+        <version>11.3.6-SNAPSHOT</version>
     </parent>
 
     <groupId>uk.org.iay.mdq</groupId>
