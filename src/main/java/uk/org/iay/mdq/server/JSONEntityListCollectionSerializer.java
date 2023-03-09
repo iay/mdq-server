@@ -52,17 +52,17 @@ import uk.org.ukfederation.mda.validate.mdui.MDUISupport;
 class JSONEntityListCollectionSerializer implements ItemCollectionSerializer<Element> {
 
     /** QName of the IDPSSODescriptor element. */
-    private static final QName IDP_SSO_DESCRIPTOR_NAME = new QName(SAMLMetadataSupport.MD_NS, "IDPSSODescriptor");
+    private static final @Nonnull QName IDP_SSO_DESCRIPTOR_NAME = new QName(SAMLMetadataSupport.MD_NS, "IDPSSODescriptor");
 
     /** QName of the SPSSODescriptor element. */
-    private static final QName SP_SSO_DESCRIPTOR_NAME = new QName(SAMLMetadataSupport.MD_NS, "SPSSODescriptor");
+    private static final @Nonnull QName SP_SSO_DESCRIPTOR_NAME = new QName(SAMLMetadataSupport.MD_NS, "SPSSODescriptor");
 
     /** QName of the AttributeAuthorityDescriptor element. */
-    private static final QName AA_DESCRIPTOR_NAME =
+    private static final @Nonnull QName AA_DESCRIPTOR_NAME =
             new QName(SAMLMetadataSupport.MD_NS, "AttributeAuthorityDescriptor");
 
     /** QName of the mdui:UIInfo element. */
-    private static final QName MDUI_UIINFO_NAME = new QName(MDUISupport.MDUI_NS, "UIInfo");
+    private static final @Nonnull QName MDUI_UIINFO_NAME = new QName(MDUISupport.MDUI_NS, "UIInfo");
 
     /** Configured JSON generator factory. */
     private final JsonGeneratorFactory factory;
@@ -115,7 +115,8 @@ class JSONEntityListCollectionSerializer implements ItemCollectionSerializer<Ele
      * @param entity {@link Element} representing the entity
      * @param name {@link QName} for the role to be extracted
      */
-    private void extractRole(final List<Element> roles, final Element entity, final QName name) {
+    private void extractRole(final List<Element> roles,
+            final @Nonnull Element entity, final @Nonnull QName name) {
         final Element role = ElementSupport.getFirstChildElement(entity, name);
         if (role != null) {
             roles.add(role);

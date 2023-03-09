@@ -27,10 +27,10 @@ import org.cryptacular.util.HashUtil;
 public abstract class BaseRepresentation implements Representation {
 
     /** Bytes representing a rendered result. */
-    private final byte[] bytes;
+    private final @Nonnull byte[] bytes;
     
     /** ETag value for this representation. */
-    private final String etag;
+    private final @Nonnull String etag;
     
     /**
      * Constructor.
@@ -43,12 +43,12 @@ public abstract class BaseRepresentation implements Representation {
     }
 
     @Override
-    public String getETag() {
+    public @Nonnull String getETag() {
         return etag;
     }
 
     @Override
-    public byte[] getBytes() {
+    public @Nonnull byte[] getBytes() {
         return bytes;
     }
 

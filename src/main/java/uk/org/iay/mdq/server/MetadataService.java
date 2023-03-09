@@ -70,7 +70,7 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
          * <code>null</code> will be used for the "not found" and "all entities" results.
          */
         @Nullable
-        private final Collection<String> identifiers;
+        private final @Nonnull Collection<String> identifiers;
         
         /** Source generation for this rendered result. */
         private final long generation;

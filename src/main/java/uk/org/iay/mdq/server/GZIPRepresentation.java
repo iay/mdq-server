@@ -52,7 +52,7 @@ public class GZIPRepresentation extends BaseRepresentation {
      * @param repBytes <code>byte</code> array to be compressed
      * @return compressed <code>byte</code> array
      */
-    private static byte[] compress(@Nonnull final byte[] repBytes) {
+    private static @Nonnull byte[] compress(@Nonnull final byte[] repBytes) {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (OutputStream compos = new GZIPOutputStream(baos)) {
             compos.write(repBytes);

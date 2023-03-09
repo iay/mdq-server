@@ -5,6 +5,8 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import org.springframework.boot.actuate.health.Status;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -153,7 +155,7 @@ public class ItemCollectionLibraryTest {
         private long count;
         
         @Override
-        protected void doExecute(List<Item<T>> itemCollection) throws StageProcessingException {
+        protected void doExecute(final @Nonnull List<Item<T>> itemCollection) throws StageProcessingException {
             if (count ==0) {
                 throw new NullPointerException("synthetic NPE");
             }
@@ -167,7 +169,7 @@ public class ItemCollectionLibraryTest {
     
     @Test
     public void testHealthRefreshing() throws Exception {
-        final Duration refreshInterval = Duration.ofMillis(100); // 1/10 second
+        final @Nonnull Duration refreshInterval = Duration.ofMillis(100); // 1/10 second
 
         final Item<String> item1 = new MockItem("item1");
         item1.getItemMetadata().put(new ItemId("item1"));

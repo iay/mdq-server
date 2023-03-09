@@ -70,7 +70,7 @@ public class EntitiesController {
      * @return name of the Spring view to render
      */
     @RequestMapping("/{id:.*}")
-    String queryByIdentifier(@Nonnull final Model model, @PathVariable final String id) {
+    String queryByIdentifier(@Nonnull final Model model, @PathVariable final @Nonnull String id) {
         log.debug("query by identifier, id=" + id);
         model.addAttribute("result", metadataService.get(id));
         return "queryResult";
