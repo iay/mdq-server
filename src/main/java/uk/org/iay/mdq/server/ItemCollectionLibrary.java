@@ -40,12 +40,12 @@ import net.shibboleth.metadata.ItemId;
 import net.shibboleth.metadata.ItemTag;
 import net.shibboleth.metadata.pipeline.Pipeline;
 import net.shibboleth.metadata.pipeline.PipelineProcessingException;
-import net.shibboleth.utilities.java.support.annotation.constraint.NonNegative;
-import net.shibboleth.utilities.java.support.component.AbstractIdentifiableInitializableComponent;
-import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
-import net.shibboleth.utilities.java.support.component.ComponentSupport;
-import net.shibboleth.utilities.java.support.logic.Constraint;
-import net.shibboleth.utilities.java.support.logic.ConstraintViolationException;
+import net.shibboleth.shared.annotation.constraint.NonNegative;
+import net.shibboleth.shared.component.AbstractIdentifiableInitializableComponent;
+import net.shibboleth.shared.component.ComponentInitializationException;
+import net.shibboleth.shared.component.ComponentSupport;
+import net.shibboleth.shared.logic.Constraint;
+import net.shibboleth.shared.logic.ConstraintViolationException;
 
 /**
  * Sources metadata from a {@link Pipeline} and allows lookup on the results.

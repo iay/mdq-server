@@ -16,7 +16,7 @@
     <mvc:default-servlet-handler/>
     
     <!-- *** Default Shibboleth component bean id property from Spring bean id *** -->
-    <bean class="net.shibboleth.ext.spring.config.IdentifiableBeanPostProcessor" lazy-init="false"/>
+    <bean class="net.shibboleth.shared.spring.config.IdentifiableBeanPostProcessor" lazy-init="false"/>
 
     <bean id="certificateController" class="uk.org.iay.mdq.server.CertificateController"
         p:certificateResource="classpath:uk/org/iay/mdq/server/CertificateControllerTest-cert.pem"

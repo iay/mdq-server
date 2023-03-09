@@ -6,7 +6,7 @@
     <parent>
         <groupId>net.shibboleth</groupId>
         <artifactId>parent</artifactId>
-        <version>11.3.6-SNAPSHOT</version>
+        <version>17.0.0-SNAPSHOT</version>
     </parent>
 
     <groupId>uk.org.iay.mdq</groupId>
@@ -23,15 +23,16 @@
     <inceptionYear>2014</inceptionYear>
 
     <properties>
-        <mda.version>0.10.0-SNAPSHOT</mda.version>
-        <ukf-mda.version>0.10.0-SNAPSHOT</ukf-mda.version>
-        <java-support.version>8.3.1</java-support.version>
-        <spring-extensions.version>6.2.0</spring-extensions.version>
-        <spring.boot.version>2.7.6</spring.boot.version>
-        <jetty.version>10.0.13</jetty.version>
+        <spec.location>${project.basedir}/swagger/swagger.yaml</spec.location>
 
-        <slf4j.version>1.7.36</slf4j.version>
-        <logback.version>1.2.11</logback.version>
+        <mda.version>0.10.0-SNAPSHOT</mda.version>
+        <shib-shared.groupId>net.shibboleth</shib-shared.groupId>
+        <shib-shared.version>9.0.0-SNAPSHOT</shib-shared.version>
+
+        <spring.boot.version>3.0.3</spring.boot.version>
+
+        <ukf-mda.version>0.10.0-SNAPSHOT</ukf-mda.version>
+        <jetty.version>11.0.14</jetty.version>
 
         <image.library>ianayoung</image.library>
         <image.name>${project.artifactId}</image.name>
@@ -51,9 +52,9 @@
             <version>${mda.version}</version>
         </dependency>
         <dependency>
-            <groupId>net.shibboleth.utilities</groupId>
-            <artifactId>java-support</artifactId>
-            <version>${java-support.version}</version>
+            <groupId>${shib-shared.groupId}</groupId>
+            <artifactId>shib-support</artifactId>
+            <version>${shib-shared.version}</version>
         </dependency>
         <dependency>
             <groupId>uk.org.ukfederation</groupId>
@@ -70,12 +71,12 @@
             <artifactId>guava</artifactId>
         </dependency>
         <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>javax.annotation-api</artifactId>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>javax.json</groupId>
-            <artifactId>javax.json-api</artifactId>
+            <groupId>jakarta.json</groupId>
+            <artifactId>jakarta.json-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.cryptacular</groupId>
@@ -122,8 +123,8 @@
         <!-- Provided Dependencies -->
 
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -146,9 +147,15 @@
             <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>net.shibboleth.ext</groupId>
-            <artifactId>spring-extensions</artifactId>
-            <version>${spring-extensions.version}</version>
+            <groupId>${shib-shared.groupId}</groupId>
+            <artifactId>shib-security-spring</artifactId>
+            <version>${shib-shared.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>${shib-shared.groupId}</groupId>
+            <artifactId>shib-spring</artifactId>
+            <version>${shib-shared.version}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -158,7 +165,7 @@
         </dependency>
         <dependency>
             <groupId>${httpclient.groupId}</groupId>
-            <artifactId>httpclient</artifactId>
+            <artifactId>${httpclient.artifactId}</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -183,7 +190,7 @@
             <exclusions>
                 <exclusion>
                     <groupId>org.eclipse.jetty.orbit</groupId>
-                    <artifactId>javax.servlet</artifactId>
+                    <artifactId>jakarta.servlet</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>org.eclipse.jetty</groupId>

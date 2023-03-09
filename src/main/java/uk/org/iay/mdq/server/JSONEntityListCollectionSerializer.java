@@ -34,9 +34,9 @@ import net.shibboleth.metadata.Item;
 import net.shibboleth.metadata.ItemCollectionSerializer;
 import net.shibboleth.metadata.dom.saml.SAMLMetadataSupport;
 import net.shibboleth.metadata.dom.saml.mdrpi.RegistrationAuthority;
-import net.shibboleth.utilities.java.support.xml.AttributeSupport;
-import net.shibboleth.utilities.java.support.xml.ElementSupport;
-import net.shibboleth.utilities.java.support.xml.XMLConstants;
+import net.shibboleth.shared.xml.AttributeSupport;
+import net.shibboleth.shared.xml.ElementSupport;
+import net.shibboleth.shared.xml.XMLConstants;
 
 import org.w3c.dom.Element;
 

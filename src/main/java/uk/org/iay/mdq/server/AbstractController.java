@@ -16,7 +16,7 @@
 
 package uk.org.iay.mdq.server;
 
-import net.shibboleth.utilities.java.support.component.AbstractIdentifiableInitializableComponent;
+import net.shibboleth.shared.component.AbstractIdentifiableInitializableComponent;
 
 /**
  * Abstract base class used for Spring MVC controller beans.

@@ -13,11 +13,11 @@
     <bean id="conversionService" class="org.springframework.context.support.ConversionServiceFactoryBean">
         <property name="converters">
             <set>
-                <bean class="net.shibboleth.ext.spring.config.StringToDurationConverter" />
-                <bean class="net.shibboleth.ext.spring.config.StringToIPRangeConverter" />
-                <bean class="net.shibboleth.ext.spring.config.BooleanToPredicateConverter" />
-                <bean class="net.shibboleth.ext.spring.config.StringBooleanToPredicateConverter" />
-                <bean class="net.shibboleth.ext.spring.config.StringToResourceConverter" />
+                <bean class="net.shibboleth.shared.spring.config.StringToDurationConverter" />
+                <bean class="net.shibboleth.shared.spring.config.StringToIPRangeConverter" />
+                <bean class="net.shibboleth.shared.spring.config.BooleanToPredicateConverter" />
+                <bean class="net.shibboleth.shared.spring.config.StringBooleanToPredicateConverter" />
+                <bean class="net.shibboleth.shared.spring.config.StringToResourceConverter" />
             </set>
         </property>
     </bean>
@@ -103,12 +103,7 @@
             </bean>
         </property>
     </bean>
-    
-    <!--
-        Controller for the /entities endpoint.
-    -->
-    <bean id="entitiesController" class="uk.org.iay.mdq.server.EntitiesController"/>
-    
+
     <!--
         JSON entity list lookup service.
     -->
@@ -124,11 +119,6 @@
                 c:_="${entityList.prettyPrinting:true}"/>
         </property>
     </bean>
-
-    <!--
-        Controller for the /x-entity-list endpoint.
-    -->
-    <bean id="entityListController" class="uk.org.iay.mdq.server.EntityListController"/>
 
     <!--
         Raw view of Result instances in JSON.
@@ -217,7 +207,7 @@
     <beans profile="sign">
 
         <bean id="certificateController" parent="component_parent"
-            class="uk.org.iay.mdq.server.CertificateController"
+            class="uk.org.iay.mdq.server.CertificateController" lazy-init="false"
             p:certificateResource="${sign.certificate}"/>
 
         <bean id="perform.signature" parent="XMLSignatureSigningStage">

@@ -17,12 +17,13 @@
 package uk.org.iay.mdq.server;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -33,6 +34,7 @@ import org.w3c.dom.Element;
  * 
  * Experimental list of known entity names.
  */
+@Controller
 @RequestMapping(value = "/x-entity-list", method = RequestMethod.GET)
 public class EntityListController {
 

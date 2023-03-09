@@ -16,7 +16,7 @@
 
 package uk.org.iay.mdq.server;
 
-import javax.servlet.Filter;
+import jakarta.servlet.Filter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +27,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.core.env.Environment;
 
@@ -35,6 +37,8 @@ import org.springframework.core.env.Environment;
  */
 //Checkstyle: FinalClass|HideUtilityClassConstructor OFF (required for Spring Boot)
 @SpringBootApplication
+@ComponentScan(excludeFilters={
+    @ComponentScan.Filter(type=FilterType.ASSIGNABLE_TYPE, value=CertificateController.class)})
 @ImportResource("classpath:beans.xml")
 public class Application {
 // Checkstyle: FinalClass|HideUtilityClassConstructor ON
