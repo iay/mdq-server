@@ -38,7 +38,6 @@ import net.shibboleth.metadata.pipeline.Pipeline;
 import net.shibboleth.metadata.pipeline.PipelineProcessingException;
 import net.shibboleth.shared.component.AbstractIdentifiableInitializableComponent;
 import net.shibboleth.shared.component.ComponentInitializationException;
-import net.shibboleth.shared.component.ComponentSupport;
 import net.shibboleth.shared.logic.Constraint;
 
 /**
@@ -185,9 +184,7 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
      * @param library the new source {@link ItemCollectionLibrary}
      */
     public void setItemCollectionLibrary(@Nonnull final ItemCollectionLibrary<T> library) {
-        ComponentSupport.ifDestroyedThrowDestroyedComponentException(this);
-        ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
-
+        checkSetterPreconditions();
         itemCollectionLibrary = Constraint.isNotNull(library, "source library may not be null");
     }
     
@@ -197,9 +194,7 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
      * @param pipeline the new render {@link Pipeline}
      */
     public void setRenderPipeline(@Nonnull final Pipeline<T> pipeline) {
-        ComponentSupport.ifDestroyedThrowDestroyedComponentException(this);
-        ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
-
+        checkSetterPreconditions();
         renderPipeline = Constraint.isNotNull(pipeline, "render pipeline may not be null");
     }
     
@@ -209,9 +204,7 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
      * @param itemSerializer the new {@link ItemCollectionSerializer} to use
      */
     public void setSerializer(@Nonnull final ItemCollectionSerializer<T> itemSerializer) {
-        ComponentSupport.ifDestroyedThrowDestroyedComponentException(this);
-        ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
-
+        checkSetterPreconditions();
         serializer = Constraint.isNotNull(itemSerializer, "serializer may not be null");
     }
 

@@ -43,7 +43,6 @@ import net.shibboleth.metadata.pipeline.PipelineProcessingException;
 import net.shibboleth.shared.annotation.constraint.NonNegative;
 import net.shibboleth.shared.component.AbstractIdentifiableInitializableComponent;
 import net.shibboleth.shared.component.ComponentInitializationException;
-import net.shibboleth.shared.component.ComponentSupport;
 import net.shibboleth.shared.logic.Constraint;
 import net.shibboleth.shared.logic.ConstraintViolationException;
 
@@ -135,27 +134,23 @@ public class ItemCollectionLibrary<T> extends AbstractIdentifiableInitializableC
      * @param refresh the metadata source refresh interval
      */
     public void setRefreshInterval(@Nonnull @NonNegative final Duration refresh) {
-        ComponentSupport.ifDestroyedThrowDestroyedComponentException(this);
-        ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
-
+        checkSetterPreconditions();
         if (refresh.isNegative()) {
             throw new ConstraintViolationException("refresh interval must not be negative");
         }
         refreshInterval = refresh;
-    }    
-    
+    }
+
     /**
      * Sets the {@link Pipeline} used to acquire new metadata.
      * 
      * @param pipeline the new source {@link Pipeline}
      */
     public void setSourcePipeline(@Nonnull final Pipeline<T> pipeline) {
-        ComponentSupport.ifDestroyedThrowDestroyedComponentException(this);
-        ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
-
+        checkSetterPreconditions();
         sourcePipeline = Constraint.isNotNull(pipeline, "source pipeline may not be null");
     }
-    
+
     /**
      * Query for metadata for all known entities.
      * 

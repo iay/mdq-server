@@ -34,7 +34,6 @@ import com.google.common.io.ByteStreams;
 
 import net.shibboleth.shared.annotation.constraint.NonnullAfterInit;
 import net.shibboleth.shared.component.ComponentInitializationException;
-import net.shibboleth.shared.component.ComponentSupport;
 import net.shibboleth.shared.logic.Constraint;
 
 /**
@@ -68,9 +67,7 @@ public class CertificateController extends AbstractController {
      * @param resource {@link Resource} from which to read the certificate.
      */
     public void setCertificateResource(@Nonnull final Resource resource) {
-        ComponentSupport.ifDestroyedThrowDestroyedComponentException(this);
-        ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
-
+        checkSetterPreconditions();
         certificateResource = Constraint.isNotNull(resource,
                 "certificate resource can not be null");
     }
@@ -85,9 +82,7 @@ public class CertificateController extends AbstractController {
     @RequestMapping("")
     void getCertificate(@Nonnull final HttpServletResponse response) throws Exception {
         log.debug("queried for certificate");
-
-        ComponentSupport.ifDestroyedThrowDestroyedComponentException(this);
-        ComponentSupport.ifNotInitializedThrowUninitializedComponentException(this);
+        checkComponentActive();
 
         try (final InputStream in = certificateResource.getInputStream()) {
             final OutputStream out = response.getOutputStream();
