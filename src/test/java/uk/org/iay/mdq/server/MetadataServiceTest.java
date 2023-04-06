@@ -1,21 +1,27 @@
 
 package uk.org.iay.mdq.server;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.shibboleth.metadata.Item;
-import net.shibboleth.metadata.ItemSerializer;
-import net.shibboleth.metadata.MockItem;
-import net.shibboleth.metadata.SimpleItemCollectionSerializer;
-import net.shibboleth.metadata.pipeline.SimplePipeline;
+import javax.annotation.Nonnull;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import net.shibboleth.metadata.Item;
+import net.shibboleth.metadata.ItemSerializer;
+import net.shibboleth.metadata.SimpleItemCollectionSerializer;
+import net.shibboleth.metadata.pipeline.SimplePipeline;
+import net.shibboleth.metadata.testing.MockItem;
 
 public class MetadataServiceTest {
     
@@ -39,12 +45,16 @@ public class MetadataServiceTest {
         when(icl.get(id))
             .thenReturn(coll1, coll1, coll2, coll2);
 
+        final var renderPipeline = new SimplePipeline<String>();
+        renderPipeline.setId("render");
+        renderPipeline.initialize();
+
         final MetadataService<String> service = new MetadataService<>();
         service.setId("test");
         service.setItemCollectionLibrary(icl);
-        service.setRenderPipeline(new SimplePipeline<String>());
+        service.setRenderPipeline(renderPipeline);
         service.setSerializer(new SimpleItemCollectionSerializer<>(new ItemSerializer<String>(){
-            public void serialize(Item<String> item, OutputStream output) {
+            public void serialize(@Nonnull Item<String> item, @Nonnull OutputStream output) {
                 try {
                     output.write(item.unwrap().getBytes());
                 } catch (IOException e) {

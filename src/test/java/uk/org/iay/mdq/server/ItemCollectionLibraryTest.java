@@ -14,12 +14,12 @@ import org.testng.annotations.Test;
 import net.shibboleth.metadata.Item;
 import net.shibboleth.metadata.ItemId;
 import net.shibboleth.metadata.ItemTag;
-import net.shibboleth.metadata.MockItem;
 import net.shibboleth.metadata.pipeline.AbstractStage;
 import net.shibboleth.metadata.pipeline.SimplePipeline;
 import net.shibboleth.metadata.pipeline.Stage;
 import net.shibboleth.metadata.pipeline.StageProcessingException;
 import net.shibboleth.metadata.pipeline.StaticItemSourceStage;
+import net.shibboleth.metadata.testing.MockItem;
 
 public class ItemCollectionLibraryTest {
 
