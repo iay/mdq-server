@@ -199,7 +199,7 @@ public class ItemCollectionLibrary<T> extends AbstractIdentifiableInitializableC
                 ids.add(uniqueId.getId());
             }
             final IdentifiedItemCollection<T> newCollection = new IdentifiedItemCollection<>(item, ids, generation);
-            for (String id : ids) {
+            for (final String id : ids) {
                 if (newIdentifiedItemCollections.containsKey(id)) {
                     log.warn("duplicate unique identifier {} ignored", id);
                 } else {
@@ -254,7 +254,7 @@ public class ItemCollectionLibrary<T> extends AbstractIdentifiableInitializableC
         log.debug("executing source pipeline");
         try {
             sourcePipeline.execute(newItemCollection);
-        } catch (PipelineProcessingException e) {
+        } catch (final PipelineProcessingException e) {
             log.warn("source pipeline execution error", e);
             return;
         }
@@ -337,7 +337,7 @@ public class ItemCollectionLibrary<T> extends AbstractIdentifiableInitializableC
                             try {
                                 refresh();
                                 computeNextRefresh();
-                            } catch (Throwable e) {
+                            } catch (final Throwable e) {
                                 log.error("uncaught exception in refresh", e);
                             }
                         }
@@ -355,7 +355,7 @@ public class ItemCollectionLibrary<T> extends AbstractIdentifiableInitializableC
             executor.shutdownNow();
             try {
                 executor.awaitTermination(30, TimeUnit.SECONDS);
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 log.debug("ignored InterruptedException while winding down executor");
             } finally {
                 executor = null;

@@ -218,7 +218,7 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
      */
     private List<Item<T>> cloneItemCollection(@Nonnull final List<Item<T>> collection) {
         final List<Item<T>> newItems = new ArrayList<>();
-        for (Item<T> item : collection) {
+        for (final Item<T> item : collection) {
             newItems.add(item.copy());
         }
         return newItems;
@@ -240,10 +240,10 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
                 serializer.serializeCollection(items, os);
                 return os.toByteArray();
             }
-        } catch (IOException e) {
+        } catch (final IOException e) {
             log.debug("problem with output stream: " + e.getMessage());
             return null;
-        } catch (PipelineProcessingException e) {
+        } catch (final PipelineProcessingException e) {
             log.debug("problem with render pipeline: " + e.getMessage());
             return null;
         }
@@ -307,7 +307,7 @@ public class MetadataService<T> extends AbstractIdentifiableInitializableCompone
          */
         cacheLock.lock();
         try {
-            for (String id : identifiers) {
+            for (final String id : identifiers) {
                 resultCache.put(id, result);
             }
             return result;

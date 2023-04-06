@@ -52,10 +52,12 @@ import uk.org.ukfederation.mda.validate.mdui.MDUISupport;
 class JSONEntityListCollectionSerializer implements ItemCollectionSerializer<Element> {
 
     /** QName of the IDPSSODescriptor element. */
-    private static final @Nonnull QName IDP_SSO_DESCRIPTOR_NAME = new QName(SAMLMetadataSupport.MD_NS, "IDPSSODescriptor");
+    private static final @Nonnull QName IDP_SSO_DESCRIPTOR_NAME =
+            new QName(SAMLMetadataSupport.MD_NS, "IDPSSODescriptor");
 
     /** QName of the SPSSODescriptor element. */
-    private static final @Nonnull QName SP_SSO_DESCRIPTOR_NAME = new QName(SAMLMetadataSupport.MD_NS, "SPSSODescriptor");
+    private static final @Nonnull QName SP_SSO_DESCRIPTOR_NAME =
+            new QName(SAMLMetadataSupport.MD_NS, "SPSSODescriptor");
 
     /** QName of the AttributeAuthorityDescriptor element. */
     private static final @Nonnull QName AA_DESCRIPTOR_NAME =

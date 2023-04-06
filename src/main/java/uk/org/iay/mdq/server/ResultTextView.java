@@ -55,7 +55,7 @@ public class ResultTextView implements View {
             return;
         }
 
-        OutputStream out = response.getOutputStream();
+        final OutputStream out = response.getOutputStream();
 
         response.setContentType(new MediaType("text", "plain", Charset.forName("UTF-8")).toString());
         final Writer w = new OutputStreamWriter(out, Charset.forName("UTF-8"));

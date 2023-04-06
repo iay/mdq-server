@@ -44,7 +44,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 public class MVCConfigurationPostProcessor implements BeanPostProcessor, PriorityOrdered {
  
     @Override
-    public Object postProcessBeforeInitialization(Object bean, String beanName) {
+    public Object postProcessBeforeInitialization(final Object bean, final String beanName) {
         if (bean instanceof RequestMappingHandlerMapping) {
             final RequestMappingHandlerMapping requestMappingHandlerMapping = (RequestMappingHandlerMapping) bean;
  
@@ -59,7 +59,7 @@ public class MVCConfigurationPostProcessor implements BeanPostProcessor, Priorit
     }
  
     @Override
-    public Object postProcessAfterInitialization(Object bean, String beanName) {
+    public Object postProcessAfterInitialization(final Object bean, final String beanName) {
         return bean;
     }
  

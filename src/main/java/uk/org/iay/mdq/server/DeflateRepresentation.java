@@ -56,7 +56,7 @@ public class DeflateRepresentation extends BaseRepresentation {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (OutputStream compos = new DeflaterOutputStream(baos)) {
             compos.write(repBytes);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             log.error("can not construct compressed representation: {}", e);
         }
         return baos.toByteArray();

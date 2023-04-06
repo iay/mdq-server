@@ -31,7 +31,8 @@ public class RequestLogger extends AbstractRequestLoggingFilter {
     private final Logger log = LoggerFactory.getLogger(RequestLogger.class);
     
     @Override
-    protected String createMessage(HttpServletRequest request, String prefix, String suffix) {
+    protected String createMessage(final HttpServletRequest request,
+            final String prefix, final String suffix) {
         final StringBuilder msg = new StringBuilder();
         msg.append(prefix);
         msg.append(request.getMethod());
@@ -45,12 +46,12 @@ public class RequestLogger extends AbstractRequestLoggingFilter {
     }
 
     @Override
-    protected void beforeRequest(HttpServletRequest request, String message) {
+    protected void beforeRequest(final HttpServletRequest request, final String message) {
         log.debug(message);
     }
 
     @Override
-    protected void afterRequest(HttpServletRequest request, String message) {
+    protected void afterRequest(final HttpServletRequest request, final String message) {
         // do nothing
     }
 

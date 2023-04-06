@@ -74,7 +74,7 @@ public class Application {
      * 
      * @param args Command line arguments.
      */
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
 
         /*
          * Class logger.
@@ -97,10 +97,10 @@ public class Application {
         final ApplicationContext ctx = app.run(args);
         
         final Environment env = ctx.getEnvironment();
-        for (String profile : env.getDefaultProfiles()) {
+        for (final String profile : env.getDefaultProfiles()) {
             log.debug("default profile: {}", profile);
         }
-        for (String profile : env.getActiveProfiles()) {
+        for (final String profile : env.getActiveProfiles()) {
             log.debug("active profile: {}", profile);
         }
     }

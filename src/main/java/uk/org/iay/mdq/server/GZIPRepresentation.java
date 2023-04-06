@@ -56,7 +56,7 @@ public class GZIPRepresentation extends BaseRepresentation {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (OutputStream compos = new GZIPOutputStream(baos)) {
             compos.write(repBytes);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             log.error("can not construct compressed representation: {}", e);
         }
         return baos.toByteArray();
