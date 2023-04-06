@@ -3,14 +3,17 @@
 
 <module name="Checker">
   <property name="severity" value="warning"/>
+  <module name="SuppressWithPlainTextCommentFilter">
+    <property name="offCommentFormat" value="\bCheck[Ss]tyle:\s*([\w|]+)\s+OFF\b"/>
+    <property name="onCommentFormat" value="\bCheck[Ss]tyle:\s*([\w|]+)\s+ON\b"/>
+    <property name="checkFormat" value="$1"/>
+  </module>
   <module name="TreeWalker">
-    <module name="FileContentsHolder"/>
     <property name="tabWidth" value="4"/>
-    <module name="JavadocMethod">
-      <property name="allowThrowsTagsForSubclasses" value="true"/>
-      <property name="allowUndeclaredRTE" value="true"/>
+    <module name="JavadocMethod"/>
+    <module name="JavadocType">
+        <property name="allowUnknownTags" value="true"/>
     </module>
-    <module name="JavadocType"/>
     <module name="JavadocVariable"/>
     <module name="JavadocStyle">
       <property name="checkEmptyJavadoc" value="true"/>
@@ -28,9 +31,6 @@
     <module name="IllegalImport"/>
     <module name="RedundantImport"/>
     <module name="UnusedImports"/>
-    <module name="LineLength">
-      <property name="max" value="120"/>
-    </module>
     <module name="MethodLength">
       <property name="max" value="70"/>
     </module>
@@ -41,7 +41,6 @@
     <module name="MethodParamPad"/>
     <module name="ModifierOrder"/>
     <module name="AvoidNestedBlocks"/>
-    <module name="EmptyBlock"/>
     <module name="LeftCurly"/>
     <module name="NeedBraces"/>
     <module name="RightCurly"/>
@@ -55,13 +54,9 @@
     <module name="SimplifyBooleanReturn"/>
     <module name="FinalClass"/>
     <module name="HideUtilityClassConstructor"/>
-    <module name="InterfaceIsType"/>
     <module name="VisibilityModifier"/>
     <module name="ArrayTypeStyle"/>
     <module name="UpperEll"/>
-    <module name="AbstractClassName">
-      <property name="format" value="^Abstract.*$|^Base.*$"/>
-    </module>
     <module name="AnonInnerLength"/>
     <module name="EmptyForInitializerPad"/>
     <module name="CovariantEquals"/>
@@ -75,6 +70,7 @@
     <module name="ParameterAssignment"/>
     <module name="ReturnCount">
       <property name="max" value="8"/>
+      <property name="maxForVoid" value="8"/>
     </module>
     <module name="StringLiteralEquality"/>
     <module name="SuperFinalize"/>
@@ -88,12 +84,22 @@
     <module name="TrailingComment"/>
     <module name="EqualsAvoidNull"/>
     <module name="ModifiedControlVariable"/>
-    <module name="MissingOverride"/>
-  </module>
-  <module name="SuppressionCommentFilter">
-    <property name="offCommentFormat" value="\bCheck[Ss]tyle:\s*([\w|]+)\s+OFF\b"/>
-    <property name="onCommentFormat" value="\bCheck[Ss]tyle:\s*([\w|]+)\s+ON\b"/>
-    <property name="checkFormat" value="$1"/>
+    <module name="FinalParameters">
+      <property name="tokens" value="METHOD_DEF,CTOR_DEF,LITERAL_CATCH"/>
+    </module>
+    <module name="FinalLocalVariable">
+      <property name="tokens" value="PARAMETER_DEF,VARIABLE_DEF"/>
+      <property name="validateEnhancedForLoopVariable" value="true"/>
+    </module>
+    <module name="SuppressionCommentFilter">
+      <property name="offCommentFormat" value="\bCheck[Ss]tyle:\s*([\w|]+)\s+OFF\b"/>
+      <property name="onCommentFormat" value="\bCheck[Ss]tyle:\s*([\w|]+)\s+ON\b"/>
+      <property name="checkFormat" value="$1"/>
+    </module>
+    <module name="MissingJavadocMethod"/>
+    <module name="MissingJavadocPackage"/>
+    <module name="MissingJavadocType"/>
+    <module name="InvalidJavadocPosition"/>
   </module>
   <module name="FileTabCharacter"/>
   <module name="FileLength">
@@ -103,4 +109,7 @@
     <property name="header" value="^/\*$\n^ \* Copyright \(C\) 20\d\d Ian A\. Young\.$\n^ \*$\n^ \* Licensed under the Apache License, Version 2\.0 \(the &quot;License&quot;\);$\n^ \* you may not use this file except in compliance with the License\.$\n^ \* You may obtain a copy of the License at$\n^ \*$\n^ \*    http://www\.apache\.org/licenses/LICENSE-2\.0$\n^ \*$\n^ \* Unless required by applicable law or agreed to in writing, software$\n^ \* distributed under the License is distributed on an &quot;AS IS&quot; BASIS,$\n^ \* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied\.$\n^ \* See the License for the specific language governing permissions and$\n^ \* limitations under the License\.$\n^ \*/$\n"/>
   </module>
   <module name="JavadocPackage"/>
+  <module name="LineLength">
+    <property name="max" value="120"/>
+  </module>
 </module>
