@@ -29,7 +29,7 @@
         <shib-shared.groupId>net.shibboleth</shib-shared.groupId>
         <shib-shared.version>9.0.0-SNAPSHOT</shib-shared.version>
 
-        <spring.boot.version>3.0.6</spring.boot.version>
+        <spring.boot.version>3.0.7</spring.boot.version>
 
         <ukf-mda.version>0.10.0-SNAPSHOT</ukf-mda.version>
         <jetty.version>11.0.15</jetty.version>
