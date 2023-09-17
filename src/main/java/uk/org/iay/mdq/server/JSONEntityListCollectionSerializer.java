@@ -25,11 +25,13 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.json.Json;
-import javax.json.stream.JsonGenerator;
-import javax.json.stream.JsonGeneratorFactory;
 import javax.xml.namespace.QName;
 
+import org.w3c.dom.Element;
+
+import jakarta.json.Json;
+import jakarta.json.stream.JsonGenerator;
+import jakarta.json.stream.JsonGeneratorFactory;
 import net.shibboleth.metadata.Item;
 import net.shibboleth.metadata.ItemCollectionSerializer;
 import net.shibboleth.metadata.dom.saml.SAMLMetadataSupport;
@@ -38,8 +40,6 @@ import net.shibboleth.metadata.dom.saml.mdui.MDUISupport;
 import net.shibboleth.shared.xml.AttributeSupport;
 import net.shibboleth.shared.xml.ElementSupport;
 import net.shibboleth.shared.xml.XMLConstants;
-
-import org.w3c.dom.Element;
 
 /**
  * An {@link ItemCollectionSerializer} that serializes a collection of SAML entities
