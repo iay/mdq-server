@@ -27,7 +27,7 @@
 
         <mda.version>0.10.0-SNAPSHOT</mda.version>
         <shib-shared.groupId>net.shibboleth</shib-shared.groupId>
-        <shib-shared.version>9.0.0-SNAPSHOT</shib-shared.version>
+        <shib-shared.version>9.0.0</shib-shared.version>
 
         <spring.boot.version>3.0.7</spring.boot.version>
 
