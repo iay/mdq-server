@@ -45,4 +45,4 @@ jobs:
       run: mvn -v
 
     - name: Build and test
-      run: mvn -B -Prelease clean verify
+      run: mvn -B clean verify
