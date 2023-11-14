@@ -17,6 +17,12 @@ WORKDIR /application
 COPY pom.xml ./
 COPY src src
 
+#
+# Maven configuration from the host, including an access token
+# for the ukf/packages registry on GitHub.
+#
+COPY m2 /root/.m2
+
 RUN mvn --batch-mode \
     -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
     package

@@ -4,6 +4,16 @@
 #
 # Note that I use `ianayoung` on Docker Hub.
 #
+
+#
+# Because the build is performed in a container, and references
+# the UK federation packages repository on GitHub, it needs
+# to have access to an access token; provide that by passing
+# our Maven's settings.xml in from the host.
+#
+mkdir -p m2
+cp -f ~/.m2/settings.xml m2/settings.xml
+
 docker buildx build \
     --tag iay/mdq-server:latest \
     --output=type=docker \

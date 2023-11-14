@@ -1,3 +1,6 @@
+# Temporary copy of host user .m2 files.
+m2/
+
 target/
 test-output/
 signing.key

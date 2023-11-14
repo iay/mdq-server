@@ -408,6 +408,10 @@
 
     <repositories>
         <repository>
+            <id>ukf-packages</id>
+            <url>https://maven.pkg.github.com/ukf/packages</url>
+        </repository>
+        <repository>
             <id>shib-release</id>
             <url>https://build.shibboleth.net/nexus/content/groups/public</url>
             <snapshots>
@@ -419,20 +423,6 @@
             <url>https://build.shibboleth.net/nexus/content/repositories/snapshots</url>
             <releases>
                 <enabled>false</enabled>
-            </releases>
-        </repository>
-        <repository>
-            <id>ukf</id>
-            <url>https://apps.iay.org.uk/nexus/content/repositories/ukf</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </repository>
-        <repository>
-            <id>ukf-snapshots</id>
-            <url>https://apps.iay.org.uk/nexus/content/repositories/ukf-snapshots</url>
-            <releases>
-                <enabled>true</enabled>
             </releases>
         </repository>
     </repositories>

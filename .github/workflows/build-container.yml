@@ -44,6 +44,21 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+    - name: Set up Maven
+      uses: s4u/maven-settings-action@v2.8.0
+      with:
+        servers: |
+          [{
+              "id": "ukf-packages",
+              "username": "${{ github.actor }}",
+              "password": "${{ secrets.GITHUB_TOKEN }}"
+          }]
+
+    - name: Propagate Maven settings file.
+      run: |
+        mkdir -p m2
+        cp -f ~/.m2/settings.xml m2/settings.xml
+
     - name: Build and push
       run: |
         docker buildx build --platform=linux/amd64,linux/arm64 \

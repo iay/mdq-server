@@ -15,7 +15,7 @@ on:
   schedule:
     - cron: '17 8 * * SAT'
   #
-  # Allow manual invocation.
+  # Allow manual invocation, for example for feature branches.
   #
   workflow_dispatch:
 
@@ -34,6 +34,16 @@ jobs:
         java-version: 17
         distribution: corretto
 
+    - name: Set up Maven
+      uses: s4u/maven-settings-action@v2.8.0
+      with:
+        servers: |
+          [{
+              "id": "ukf-packages",
+              "username": "${{ github.actor }}",
+              "password": "${{ secrets.GITHUB_TOKEN }}"
+          }]
+
     - uses: actions/cache@v2
       with:
         path: ~/.m2/repository
@@ -45,4 +55,4 @@ jobs:
       run: mvn -v
 
     - name: Build and test
-      run: mvn -B clean verify
+      run: mvn --batch-mode --update-snapshots clean verify
