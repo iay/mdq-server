@@ -32,7 +32,7 @@
         <spring.boot.version>3.0.7</spring.boot.version>
 
         <ukf-mda.version>0.10.0-SNAPSHOT</ukf-mda.version>
-        <jetty.version>11.0.17</jetty.version>
+        <jetty.version>11.0.18</jetty.version>
 
         <image.library>ianayoung</image.library>
         <image.name>${project.artifactId}</image.name>
