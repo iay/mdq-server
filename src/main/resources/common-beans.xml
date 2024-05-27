@@ -50,12 +50,6 @@
         class="org.springframework.core.io.ClassPathResource"/>
     <bean id="FileSystemResource" abstract="true"
         class="org.springframework.core.io.FileSystemResource"/>
-    
-    <!--
-        Shibboleth-defined Resource class parent bean.
-    -->
-    <bean id="HTTPResource" abstract="true"
-        class="net.shibboleth.ext.spring.resource.HTTPResource"/>
 
     <!--
         component_parent
@@ -305,9 +299,6 @@
     
     <bean id="X509RSAKeyLengthValidator" abstract="true" parent="validator_parent"
         class="net.shibboleth.metadata.validate.x509.X509RSAKeyLengthValidator"/>
-    
-    <bean id="X509RSAOpenSSLBlacklistValidator" abstract="true" parent="validator_parent"
-        class="net.shibboleth.metadata.validate.x509.X509RSAOpenSSLBlacklistValidator"/>
 
     <!-- *** Parent beans for ukf-mda. *** -->
 
@@ -316,10 +307,10 @@
 
     <bean id="X509ConsistentNameValidator" abstract="true" parent="validator_parent"
         class="uk.org.ukfederation.mda.validate.X509ConsistentNameValidator"/>
-        
+
     <!-- *** Default Shibboleth component bean id property from Spring bean id *** -->
-    <bean class="net.shibboleth.ext.spring.config.IdentifiableBeanPostProcessor" lazy-init="false"/>
-    
+    <bean parent="mda.IdentifiableBeanPostProcessor" lazy-init="false"/>
+
     <!--
         ***********************************************
         ***                                         ***
@@ -362,7 +353,7 @@
         A NamespaceContext that assigns the usual prefix for each of the commonly used XML namespaces.
         This is used in the evaluation of XPath expressions.
     -->
-    <bean id="commonNamespaces" class="net.shibboleth.utilities.java.support.xml.SimpleNamespaceContext">
+    <bean id="commonNamespaces" parent="mda.SimpleNamespaceContext">
         <constructor-arg>
             <util:map map-class="java.util.HashMap">
                 <entry key="alg"        value-ref="alg_namespace"/>
@@ -886,7 +877,7 @@
         These options can be removed once the underlying issue has been resolved.
     -->
     <bean id="httpClientBuilder"
-        class="net.shibboleth.utilities.java.support.httpclient.HttpClientBuilder"
+        parent="mda.HttpClientBuilder"
         p:connectionDisregardTLSCertificate="true"
         p:socketTimeout="100000"
         p:connectionTimeout="100000"
@@ -904,11 +895,10 @@
         
         A pre-configured parser pool for use by source stages.
     -->
-    <bean id="parserPool" parent="component_parent"
-        class="net.shibboleth.utilities.java.support.xml.BasicParserPool"
+    <bean id="parserPool" parent="mda.BasicParserPool"
         p:ignoreComments="false"
         p:ignoreElementContentWhitespace="false"/>
-    
+
     <!--
         schemaResources
         

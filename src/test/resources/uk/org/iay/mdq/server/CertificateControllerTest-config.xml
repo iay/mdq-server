@@ -11,15 +11,20 @@
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
         http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
-    
+
     <mvc:annotation-driven/>
     <mvc:default-servlet-handler/>
-    
+
+    <!--
+        Pick up Shibboleth MDA beans.
+    -->
+    <import resource="classpath:net/shibboleth/metadata/beans.xml"/>
+
     <!-- *** Default Shibboleth component bean id property from Spring bean id *** -->
-    <bean class="net.shibboleth.shared.spring.config.IdentifiableBeanPostProcessor" lazy-init="false"/>
+    <bean parent="mda.IdentifiableBeanPostProcessor" lazy-init="false"/>
 
     <bean id="certificateController" class="uk.org.iay.mdq.server.CertificateController"
         p:certificateResource="classpath:uk/org/iay/mdq/server/CertificateControllerTest-cert.pem"
         init-method="initialize" destroy-method="destroy"/>
-    
+
 </beans>
