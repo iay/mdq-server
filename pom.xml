@@ -29,7 +29,7 @@
         <shib-shared.groupId>net.shibboleth</shib-shared.groupId>
         <shib-shared.version>9.1.2</shib-shared.version>
 
-        <spring.boot.version>3.3.1</spring.boot.version>
+        <spring.boot.version>3.3.6</spring.boot.version>
         <!-- Override logback version specified in Shibboleth parent. -->
         <logback.version>1.5.6</logback.version>
 
