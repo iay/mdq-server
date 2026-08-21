@@ -6,7 +6,7 @@
     <parent>
         <groupId>net.shibboleth</groupId>
         <artifactId>parent</artifactId>
-        <version>17.1.2</version>
+        <version>17.1.6</version>
     </parent>
 
     <groupId>uk.org.iay.mdq</groupId>
@@ -29,9 +29,21 @@
         <shib-shared.groupId>net.shibboleth</shib-shared.groupId>
         <shib-shared.version>9.1.2</shib-shared.version>
 
-        <spring.boot.version>3.3.6</spring.boot.version>
-        <!-- Override logback version specified in Shibboleth parent. -->
-        <logback.version>1.5.6</logback.version>
+        <spring.boot.version>3.4.13</spring.boot.version>
+
+        <!--
+            Override logback version specified in Shibboleth parent.
+
+            See https://github.com/spring-projects/spring-boot/issues/43568
+        -->
+        <logback.version>1.5.16</logback.version>
+
+        <!--
+            Override httpclient version specified in Shibboleth parent.
+
+            See https://stackoverflow.com/questions/79319438/failed-to-instantiate-org-springframework-boot-http-client-clienthttprequestfac
+         -->
+        <httpclient.version>5.4.1</httpclient.version>
 
         <ukf-mda.version>0.10.0</ukf-mda.version>
 
@@ -198,11 +210,15 @@
             <artifactId>spring-boot-starter-groovy-templates</artifactId>
             <scope>runtime</scope>
         </dependency>
-        <dependency>
+        <!--
+            The properties migrator should be disabled when migration
+            is complete.
+        -->
+        <!-- <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-properties-migrator</artifactId>
             <scope>runtime</scope>
-        </dependency>
+        </dependency> -->
 
         <!-- Test dependencies -->
 
