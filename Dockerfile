@@ -9,7 +9,7 @@
 # Build the .jar file in a build container. Run this under the build platform
 # even if we're generating an image for an emulated target platform.
 #
-FROM --platform=$BUILDPLATFORM maven:3.8.5-openjdk-17 AS builder
+FROM --platform=$BUILDPLATFORM maven:3.9.5-amazoncorretto-17-al2023 AS builder
 
 LABEL maintainer="Ian Young <ian@iay.org.uk>"
 
