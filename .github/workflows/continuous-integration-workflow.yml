@@ -26,16 +26,16 @@ jobs:
 
     steps:
 
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v7.0.1
 
     - name: Setup Java JDK
-      uses: actions/setup-java@v3.13.0
+      uses: actions/setup-java@v5.7.0
       with:
         java-version: 17
         distribution: corretto
 
     - name: Set up Maven
-      uses: s4u/maven-settings-action@v2.8.0
+      uses: s4u/maven-settings-action@v4.0.0
       with:
         servers: |
           [{
@@ -45,7 +45,7 @@ jobs:
           }]
 
     - name: Cache local Maven repository
-      uses: actions/cache@v3.3.2
+      uses: actions/cache@v6.1.0
       with:
         path: ~/.m2/repository
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
